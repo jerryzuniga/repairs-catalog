@@ -1,1974 +1,1436 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { createRoot } from 'react-dom/client';
 import { 
-  BookOpen, 
-  Search, 
-  Filter, 
-  CheckCircle, 
-  XCircle, 
-  AlertTriangle, 
-  FileText, 
-  LayoutGrid, 
-  Home, 
-  ChevronRight, 
-  ChevronDown, 
-  Info,
-  Download,
-  Copy,
-  Printer,
+  Book, 
   Shield, 
-  Heart, 
-  Zap, 
-  Users,
+  Users, 
+  Target, 
+  Filter, 
+  Activity, 
+  Briefcase, 
+  BarChart2, 
+  CheckCircle, 
+  Download, 
+  ChevronRight, 
+  Info, 
+  Save, 
+  Plus,
+  Trash2,
+  File,
+  FileText,
+  ClipboardCheck,
+  Menu,
+  X,
+  User,
+  CheckSquare,
+  ExternalLink,
+  Calendar,
+  Award,
+  AlertTriangle,
+  HardHat,
+  DollarSign,
+  Hammer,
+  Home,
   ArrowRight,
-  Layers,
-  GraduationCap,
-  Activity,
-  MousePointerClick,
-  Ban,
-  Wrench
+  AlertCircle,
+  Clipboard
 } from 'lucide-react';
 
-// --- Types & Interfaces ---
-// Defined to prevent Vercel build failures (noImplicitAny)
+// --- Constants & Data Models ---
 
-interface Intervention {
-  id: string;
-  name: string;
-  urgency: string;
-  condition: string;
-  pillarId?: string;
-  pillarName?: string;
-  subCatId?: string;
-  subCatName?: string;
-  typeId?: string;
-  typeName?: string;
-}
+const APP_VERSION = '1.7.7';
+const STORAGE_KEY = 'repair_manual_data_v1';
 
-interface Type {
-  id: string;
-  name: string;
-  description?: string;
-  interventions: Intervention[];
-}
-
-interface SubCategory {
-  id: string;
-  name: string;
-  description: string;
-  types: Type[];
-}
-
-interface Pillar {
-  id: string;
-  name: string;
-  icon: React.ElementType;
-  color: string;
-  bgColor: string;
-  description: string;
-  subCategories: SubCategory[];
-}
-
-interface Selection {
-  status?: 'eligible' | 'not_eligible' | 'conditional' | 'na';
-  urgency?: string;
-  condition?: string;
-  notes?: string;
-}
-
-interface SelectionsMap {
-  [key: string]: Selection;
-}
-
-// --- Brand Colors ---
-// Primary
-const C_BRIGHT_BLUE = 'text-[#0099CC]';
-// Secondary
-const C_TRAD_GREEN = 'text-[#3AA047]';
-const C_ORANGE = 'text-[#E55025]';
-const C_RED = 'text-[#A4343A]';
-
-// --- Mock Data: Taxonomy Framework ---
-const TAXONOMY_DATA: Pillar[] = [
-  {
-    id: 'p1',
-    name: 'Dwelling Safety',
-    icon: Shield,
-    color: C_RED,
-    bgColor: 'bg-[#A4343A]/10',
-    description: 'Focuses on immediate threats to the structure and safety of occupants.',
-    subCategories: [
-      {
-        id: 'sc1',
-        name: 'Structural Components',
-        description: 'Repairs to the home’s foundational and load-bearing elements.',
-        types: [
-          {
-            id: 'sct1',
-            name: 'Structural Flooring / Foundation',
-            description: 'Repairs that maintain the structural stability and integrity of the home’s foundation and flooring systems.',
-            interventions: [
-              { id: 'i101', name: 'Repair/replace deteriorated floor joists', urgency: 'Critical', condition: 'Active' },
-              { id: 'i102', name: 'Stabilize piers and footings', urgency: 'Critical', condition: 'Active' },
-              { id: 'i103', name: 'Level uneven concrete slabs', urgency: 'Critical', condition: 'Active' },
-              { id: 'i104', name: 'Repair/replace cracked foundations', urgency: 'Critical', condition: 'Active' },
-              { id: 'i105', name: 'Shore up failing crawl spaces', urgency: 'Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct2',
-            name: 'Structural Roofing',
-            description: 'Repairs or replacements necessary to maintain the basic structural integrity of the roof and prevent collapse or accelerate deterioration.',
-            interventions: [
-              { id: 'i106', name: 'Reinforce/replace compromised trusses', urgency: 'Critical', condition: 'Active' },
-              { id: 'i107', name: 'Fix sagging roof supports', urgency: 'Critical', condition: 'Active' },
-              { id: 'i108', name: 'Repair deteriorated roof decking', urgency: 'Critical', condition: 'Active' },
-              { id: 'i109', name: 'Stabilize roof beams', urgency: 'Critical', condition: 'Active' },
-              { id: 'i110', name: 'Address major rot in rafters', urgency: 'Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct3',
-            name: 'Structural Walls',
-            description: 'Repairs to load-bearing and external walls required to restore basic structural integrity and prevent collapse or accelerate deterioration.',
-            interventions: [
-              { id: 'i111', name: 'Reinforce bowing load-bearing walls', urgency: 'Critical', condition: 'Active' },
-              { id: 'i112', name: 'Repair failing wall studs', urgency: 'Critical', condition: 'Active' },
-              { id: 'i113', name: 'Address termite/moisture structural damage', urgency: 'Critical', condition: 'Active' },
-              { id: 'i114', name: 'Replace damaged wall plates', urgency: 'Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct4',
-            name: 'Non-unit Structural Repairs',
-            description: 'Structural interventions necessary for outbuildings, retaining walls, or other non-living unit structures that are essential for the stability and safety of the property as a whole.',
-            interventions: [
-              { id: 'i115', name: 'Stabilize retaining walls', urgency: 'Critical', condition: 'Active' },
-              { id: 'i116', name: 'Repair compromised garages/sheds', urgency: 'Critical', condition: 'Active' },
-              { id: 'i117', name: 'Reinforce external storage structures', urgency: 'Critical', condition: 'Active' },
-              { id: 'i118', name: 'Fix structural failures in carports', urgency: 'Critical', condition: 'Active' }
-            ]
-          }
-        ]
-      },
-      {
-        id: 'sc2',
-        name: 'Critical Home Systems',
-        description: 'Repairs to major systems necessary for basic living conditions.',
-        types: [
-          {
-            id: 'sct5',
-            name: 'Critical Roofing - Replacement',
-            description: 'Full replacement of roofing systems that are in critical condition, posing immediate risks such as leaks, structural damage, or compromised safety.',
-            interventions: [
-              { id: 'i119', name: 'Complete shingle replacement', urgency: 'Critical', condition: 'Active' },
-              { id: 'i120', name: 'Reinstall underlayment', urgency: 'Critical', condition: 'Active' },
-              { id: 'i121', name: 'Full tear-off and reroof', urgency: 'Critical', condition: 'Active' },
-              { id: 'i122', name: 'Upgrade to impact-resistant shingles', urgency: 'Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct6',
-            name: 'Critical Roofing - Repair',
-            description: 'Repairs to damaged roofing components that are essential to prevent water intrusion, structural failure, or other significant risks to the home.',
-            interventions: [
-              { id: 'i123', name: 'Repair damaged flashing', urgency: 'Critical', condition: 'Active' },
-              { id: 'i124', name: 'Fix roof valleys', urgency: 'Critical', condition: 'Active' },
-              { id: 'i125', name: 'Patch missing shingles', urgency: 'Critical', condition: 'Active' },
-              { id: 'i126', name: 'Seal active leaks', urgency: 'Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct7',
-            name: 'Critical Wall Systems',
-            description: 'Repair or replacement of wall components, both interior and exterior, that are critical to maintaining structural integrity, safety, and habitability.',
-            interventions: [
-              { id: 'i127', name: 'Replace compromised siding', urgency: 'Critical', condition: 'Active' },
-              { id: 'i128', name: 'Minimum siding repair standards', urgency: 'Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct8',
-            name: 'Critical HVAC',
-            description: 'Repairs or replacements necessary for heating, ventilation, and air conditioning systems that ensure safe indoor temperatures, proper ventilation, and air quality.',
-            interventions: [
-              { id: 'i129', name: 'Replace inoperable furnace/AC', urgency: 'Critical', condition: 'Active' },
-              { id: 'i130', name: 'Repair damaged ductwork', urgency: 'Critical', condition: 'Active' },
-              { id: 'i131', name: 'Fix malfunctioning thermostat', urgency: 'Critical', condition: 'Active' },
-              { id: 'i132', name: 'Install new air filtration', urgency: 'Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct9',
-            name: 'Critical Electrical',
-            description: 'Electrical system repairs or upgrades addressing immediate safety concerns or severe deficiencies that pose risks of fire, electrocution, or system failures.',
-            interventions: [
-              { id: 'i133', name: 'Upgrade sub-standard panels', urgency: 'Critical', condition: 'Active' },
-              { id: 'i134', name: 'Rewire unsafe circuits', urgency: 'Critical', condition: 'Active' },
-              { id: 'i135', name: 'Replace malfunctioning outlets', urgency: 'Critical', condition: 'Active' },
-              { id: 'i136', name: 'Install grounding systems', urgency: 'Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct10',
-            name: 'Critical Plumbing',
-            description: 'Essential repairs to water, sewage, and gas supply systems that address active failures or risks that directly impact health and safety.',
-            interventions: [
-              { id: 'i137', name: 'Fix burst water pipes', urgency: 'Critical', condition: 'Active' },
-              { id: 'i138', name: 'Repair severe sewer backups', urgency: 'Critical', condition: 'Active' },
-              { id: 'i139', name: 'Address gas leaks', urgency: 'Critical', condition: 'Active' },
-              { id: 'i140', name: 'Replace corroded pipes', urgency: 'Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct11',
-            name: 'Critical Flooring',
-            description: 'Repairs to floors that have become unstable, unsafe, or compromised due to issues like rot, water damage, or subfloor failure.',
-            interventions: [
-              { id: 'i141', name: 'Replace rotted subfloors', urgency: 'Critical', condition: 'Active' },
-              { id: 'i142', name: 'Fix buckling floors', urgency: 'Critical', condition: 'Active' },
-              { id: 'i143', name: 'Install moisture barriers', urgency: 'Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct12',
-            name: 'Critical Walkways / Decks / Steps',
-            description: 'Repairs to exterior pathways that address safety hazards, such as instability, collapse risks, or severe trip hazards, ensuring safe movement across the property.',
-            interventions: [
-              { id: 'i144', name: 'Rebuild deteriorated steps', urgency: 'Critical', condition: 'Active' },
-              { id: 'i145', name: 'Reinforce weak deck structures', urgency: 'Critical', condition: 'Active' },
-              { id: 'i146', name: 'Replace crumbling walkways', urgency: 'Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct13',
-            name: 'Critical Water Heater',
-            description: 'Replacement or repair of water heaters that are non-functional or failing, resulting in unreliable hot water supply critical for daily living.',
-            interventions: [
-              { id: 'i147', name: 'Install new water heater', urgency: 'Critical', condition: 'Active' },
-              { id: 'i148', name: 'Replace leaking unit', urgency: 'Critical', condition: 'Active' },
-              { id: 'i149', name: 'Fix heating element', urgency: 'Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct14',
-            name: 'Critical Doors & Windows',
-            description: 'Repairs or replacements that address immediate safety, security, or severe weatherproofing issues, ensuring proper insulation, entry, and exit functionality.',
-            interventions: [
-              { id: 'i150', name: 'Replace shattered windows', urgency: 'Critical', condition: 'Active' },
-              { id: 'i151', name: 'Repair broken locks', urgency: 'Critical', condition: 'Active' },
-              { id: 'i152', name: 'Fix inoperable doors', urgency: 'Critical', condition: 'Active' }
-            ]
-          }
-        ]
-      },
-      {
-        id: 'sc3',
-        name: 'Deferred Repair',
-        description: 'Active non-critical issues that will become critical if ignored.',
-        types: [
-          {
-            id: 'sct15',
-            name: 'Deferred Plumbing & Water Heater',
-            description: 'Repairs addressing active, non-critical plumbing and water heater issues that display visible symptoms of disrepair and, if left unattended, could escalate into critical problems.',
-            interventions: [
-              { id: 'i153', name: 'Fix dripping faucets', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i154', name: 'Replace corroded anode rod', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i155', name: 'Address clogged drains', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i156', name: 'Regulate water pressure', urgency: 'Emergent', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct16',
-            name: 'Deferred Electrical',
-            description: 'Addressing active electrical issues that present visible signs of disrepair but do not immediately threaten safety or function; these repairs prevent future critical failures.',
-            interventions: [
-              { id: 'i157', name: 'Replace worn switches/outlets', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i158', name: 'Fix flickering lights', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i159', name: 'Replace outdated fixtures', urgency: 'Emergent', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct17',
-            name: 'Deferred Door and Window',
-            description: 'Repairs to doors and windows showing visible signs of deterioration, such as drafts, alignment issues, or minor damage, that need attention before escalating into more serious problems.',
-            interventions: [
-              { id: 'i160', name: 'Re-align sagging doors', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i161', name: 'Seal drafty windows', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i162', name: 'Replace cracked panes', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i163', name: 'Re-caulk windows', urgency: 'Emergent', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct18',
-            name: 'Deferred Exterior Paint',
-            description: 'Addressing visible exterior paint damage that, while not immediately threatening the home’s integrity, can lead to more significant wear if neglected.',
-            interventions: [
-              { id: 'i164', name: 'Repaint peeling areas', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i165', name: 'Touch-up exposed wood', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i166', name: 'Seal exterior cracks', urgency: 'Emergent', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct19',
-            name: 'Deferred Interior Paint',
-            description: 'Repairs focusing on visible interior paint damage that could worsen over time if unaddressed, such as peeling, chipping, or staining.',
-            interventions: [
-              { id: 'i167', name: 'Repaint chipped/peeling walls', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i168', name: 'Cover visible stains', urgency: 'Emergent', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct20',
-            name: 'Deferred Appliance',
-            description: 'Repairing or replacing appliances with visible, active issues such as diminished efficiency, malfunctioning parts, or minor damage that can lead to complete breakdowns if left unattended.',
-            interventions: [
-              { id: 'i169', name: 'Repair refrigerator compressor', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i170', name: 'Replace cracked stove elements', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i171', name: 'Replace broken seals', urgency: 'Emergent', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct21',
-            name: 'Deferred Cabinetry',
-            description: 'Repairs to cabinetry that shows signs of active deterioration, such as misalignment, wear, or minor damage that, if left unaddressed, can impact functionality or lead to more significant repair needs.',
-            interventions: [
-              { id: 'i172', name: 'Re-align cabinet doors', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i173', name: 'Fix sticking drawers', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i174', name: 'Replace broken hinges', urgency: 'Emergent', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct22',
-            name: 'Deferred Flooring',
-            description: 'Addressing active flooring issues such as looseness, visible damage, or wear that, while not yet critical, can lead to safety hazards or more severe deterioration if not repaired.',
-            interventions: [
-              { id: 'i175', name: 'Secure loose tiles/boards', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i176', name: 'Repair cracked grout', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i177', name: 'Refinish scratched hardwood', urgency: 'Emergent', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct23',
-            name: 'Deferred Exterior Decks/Walkways',
-            description: 'Repairs focused on visible signs of wear or damage to exterior surfaces that, while not immediately hazardous, can worsen and create safety risks or structural issues if left untreated.',
-            interventions: [
-              { id: 'i178', name: 'Replace rotting deck boards', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i179', name: 'Fix loose railings', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i180', name: 'Fill concrete cracks', urgency: 'Emergent', condition: 'Active' }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'p2',
-    name: 'Occupant Health',
-    icon: Heart,
-    color: C_ORANGE,
-    bgColor: 'bg-[#E55025]/10',
-    description: 'Addresses environmental hazards and accessibility needs.',
-    subCategories: [
-      {
-        id: 'sc4',
-        name: 'Environmental Hazards Controls',
-        description: 'Mitigation of health-threatening hazards.',
-        types: [
-          {
-            id: 'sct24',
-            name: 'Respiratory Hazards',
-            description: 'Controls and interventions targeting indoor air pollutants that can harm respiratory health, ensuring safe air quality for occupants.',
-            interventions: [
-              { id: 'i181', name: 'Ventilation controls', urgency: 'Critical', condition: 'Active' },
-              { id: 'i182', name: 'Radon testing and remediation', urgency: 'Critical', condition: 'Active' },
-              { id: 'i183', name: 'Air purifiers / cleaning', urgency: 'Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct25',
-            name: 'Chemical Hazards',
-            description: 'Measures that address harmful chemicals present in the home, such as lead, asbestos, and other toxic substances, ensuring safe living conditions.',
-            interventions: [
-              { id: 'i184', name: 'Lead paint encapsulation', urgency: 'Critical', condition: 'Active' },
-              { id: 'i185', name: 'Lead paint abatement (removal)', urgency: 'Critical', condition: 'Active' },
-              { id: 'i186', name: 'Lead line replacement', urgency: 'Critical', condition: 'Active' },
-              { id: 'i187', name: 'Asbestos encapsulation/abatement', urgency: 'Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct26',
-            name: 'Biological Hazards',
-            description: 'Controls and remediation of biological contaminants that threaten health, such as mold, pests, and bio-waste, ensuring a sanitary living environment.',
-            interventions: [
-              { id: 'i188', name: 'Mold remediation', urgency: 'Critical', condition: 'Active' },
-              { id: 'i189', name: 'Pest control', urgency: 'Critical', condition: 'Active' },
-              { id: 'i190', name: 'Bio-waste cleanup', urgency: 'Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct27',
-            name: 'Environmental Hazards - Other',
-            description: 'Controls addressing various structural or disasters not covered under more specific categories, including interventions that reduce risks from environmental conditions or structural dangers.',
-            interventions: [
-              { id: 'i191', name: 'Hazardous tree removal', urgency: 'Critical', condition: 'Active' },
-              { id: 'i192', name: 'Structural hazard removal', urgency: 'Critical', condition: 'Active' }
-            ]
-          }
-        ]
-      },
-      {
-        id: 'sc5',
-        name: 'Critical Accessibility / Fall Prevention',
-        description: 'Modifications for urgent mobility barriers.',
-        types: [
-          {
-            id: 'sct28',
-            name: 'Critical Accessibility - Ingress/Egress',
-            description: 'Systems and modifications that provide accessible entry and exit for individuals with mobility challenges, enabling easier movement across different levels of the home.',
-            interventions: [
-              { id: 'i193', name: 'Modular/temporary ramp system', urgency: 'Critical', condition: 'Active' },
-              { id: 'i194', name: 'Permanent integrated ramp', urgency: 'Critical', condition: 'Active' },
-              { id: 'i195', name: 'Stair lifts / Platform lifts', urgency: 'Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct29',
-            name: 'Critical Accessibility - Showering',
-            description: 'Modifications and equipment that improve the safety and accessibility of bathing and showering areas, especially for those with limited mobility.',
-            interventions: [
-              { id: 'i196', name: 'Roll-in/Zero-barrier shower', urgency: 'Critical', condition: 'Active' },
-              { id: 'i197', name: 'Tub cutout', urgency: 'Critical', condition: 'Active' },
-              { id: 'i198', name: 'Lever shower controls', urgency: 'Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct30',
-            name: 'Critical Accessibility - Bathroom',
-            description: 'Bathroom-specific interventions that improve accessibility, focusing on fixtures, controls, and layouts that cater to individuals with physical limitations.',
-            interventions: [
-              { id: 'i199', name: 'Pedestal/wall-mount sink', urgency: 'Critical', condition: 'Active' },
-              { id: 'i200', name: 'Raised toilet/frames', urgency: 'Critical', condition: 'Active' },
-              { id: 'i201', name: 'Non-slip mats', urgency: 'Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct31',
-            name: 'Fall Prevention - Grab Bars / Railings',
-            description: 'Installation of support bars and railings in critical areas to reduce fall risks and provide additional stability for those with balance or mobility challenges.',
-            interventions: [
-              { id: 'i202', name: 'Grab bars (all locations)', urgency: 'Critical', condition: 'Active' },
-              { id: 'i203', name: 'Interior stair railings', urgency: 'Critical', condition: 'Active' },
-              { id: 'i204', name: 'Transfer poles', urgency: 'Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct32',
-            name: 'Fall Prevention - Decks, Steps & Walkways',
-            description: 'Interventions designed to minimize fall hazards in outdoor and transitional spaces by providing safe, stable, and accessible surfaces.',
-            interventions: [
-              { id: 'i205', name: 'Half-step systems', urgency: 'Critical', condition: 'Active' },
-              { id: 'i206', name: 'Contrast step systems', urgency: 'Critical', condition: 'Active' },
-              { id: 'i207', name: 'Exterior anti-slip treatment', urgency: 'Critical', condition: 'Active' }
-            ]
-          }
-        ]
-      },
-      {
-        id: 'sc6',
-        name: 'Non-Critical Accessibility / Aging in Place',
-        description: 'Enhancements for usability and comfort.',
-        types: [
-          {
-            id: 'sct33',
-            name: 'Assistive Aids',
-            description: 'Tools and devices designed to assist individuals with mobility, reaching, or daily activities that can be challenging due to aging or physical limitations.',
-            interventions: [
-              { id: 'i208', name: 'Reacher/grabber tools', urgency: 'Non-Critical', condition: 'Active' },
-              { id: 'i209', name: 'Walking canes', urgency: 'Non-Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct34',
-            name: 'Assistive Kitchen & Bath',
-            description: 'Modifications or devices in kitchens and bathrooms that improve accessibility and ease of use for older adults and individuals with limited mobility.',
-            interventions: [
-              { id: 'i210', name: 'Accessibility shelving', urgency: 'Non-Critical', condition: 'Active' },
-              { id: 'i211', name: 'Cabinet adjustments (lower/raise)', urgency: 'Non-Critical', condition: 'Active' },
-              { id: 'i212', name: 'Anti-scald devices', urgency: 'Non-Critical', condition: 'Active' },
-              { id: 'i213', name: 'Shower chair/transfer bench', urgency: 'Non-Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct35',
-            name: 'Assistive Technology',
-            description: 'Technology solutions that enhance safety, independence, and convenience for older adults and individuals aging in place.',
-            interventions: [
-              { id: 'i214', name: 'Smart door locks', urgency: 'Non-Critical', condition: 'Active' },
-              { id: 'i215', name: 'Automatic pill dispensers', urgency: 'Non-Critical', condition: 'Active' },
-              { id: 'i216', name: 'Fall detection devices', urgency: 'Non-Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct36',
-            name: 'Comfort Enhancements',
-            description: 'Adjustments and tools that improve comfort and simplify daily living tasks, allowing for easier and more enjoyable aging in place.',
-            interventions: [
-              { id: 'i217', name: 'Ceiling fans', urgency: 'Non-Critical', condition: 'Active' },
-              { id: 'i218', name: 'Ergonomic furniture', urgency: 'Non-Critical', condition: 'Active' },
-              { id: 'i219', name: 'Automatic bed risers', urgency: 'Non-Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct37',
-            name: 'Lighting Improvements',
-            description: 'Lighting enhancements designed to improve visibility and safety in non-critical situations, particularly for aging individuals.',
-            interventions: [
-              { id: 'i220', name: 'Motion-activated lights', urgency: 'Non-Critical', condition: 'Active' },
-              { id: 'i221', name: 'Task lighting', urgency: 'Non-Critical', condition: 'Active' },
-              { id: 'i222', name: 'Exterior walkway lighting', urgency: 'Non-Critical', condition: 'Active' }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'p3',
-    name: 'Home Performance',
-    icon: Zap,
-    color: C_BRIGHT_BLUE,
-    bgColor: 'bg-[#0099CC]/10',
-    description: 'Energy efficiency, comfort, and utility cost reduction.',
-    subCategories: [
-      {
-        id: 'sc7',
-        name: 'Disaster / Security Readiness',
-        description: 'Proactive resilience measures.',
-        types: [
-          {
-            id: 'sct38',
-            name: 'Utility Management',
-            description: 'Systems and interventions aimed at ensuring critical utilities remain operational during emergencies or failures. This includes the ability to control, isolate, and protect utility systems from damage or disruption.',
-            interventions: [
-              { id: 'i223', name: 'Automated shutoff systems', urgency: 'Emergent', condition: 'Passive' },
-              { id: 'i224', name: 'Backup generator/power', urgency: 'Emergent', condition: 'Passive' },
-              { id: 'i225', name: 'Surge protection', urgency: 'Emergent', condition: 'Passive' }
-            ]
-          },
-          {
-            id: 'sct39',
-            name: 'Structural Safeguarding',
-            description: 'Measures to enhance the physical resilience of a structure against natural or human-induced hazards. These interventions include reinforcement and protection strategies designed to mitigate the effects of forces like earthquakes, floods, and storms.',
-            interventions: [
-              { id: 'i226', name: 'Hurricane straps/clips', urgency: 'Emergent', condition: 'Passive' },
-              { id: 'i227', name: 'Seismic retrofitting', urgency: 'Emergent', condition: 'Passive' },
-              { id: 'i228', name: 'Storm shutters', urgency: 'Emergent', condition: 'Passive' },
-              { id: 'i229', name: 'Floodproofing/barriers', urgency: 'Emergent', condition: 'Passive' }
-            ]
-          },
-          {
-            id: 'sct40',
-            name: 'Fire Safety',
-            description: 'Systems and devices implemented to detect, control, and prevent the outbreak or spread of fires. These include both preventive measures and active fire suppression systems designed to protect occupants and property.',
-            interventions: [
-              { id: 'i230', name: 'Smoke/CO2 alarms', urgency: 'Emergent', condition: 'Passive' },
-              { id: 'i231', name: 'Fire extinguishers', urgency: 'Emergent', condition: 'Passive' },
-              { id: 'i232', name: 'Residential sprinkler system', urgency: 'Emergent', condition: 'Passive' }
-            ]
-          },
-          {
-            id: 'sct41',
-            name: 'Emergency Preparedness',
-            description: 'Precautionary measures and installations designed to prepare a home and its occupants for emergencies. These can include safe rooms, emergency communication systems, and other readiness strategies to protect lives during a crisis.',
-            interventions: [
-              { id: 'i233', name: 'Safe room construction', urgency: 'Emergent', condition: 'Passive' },
-              { id: 'i234', name: 'Home medical alert system', urgency: 'Emergent', condition: 'Passive' },
-              { id: 'i235', name: 'Emergency water storage', urgency: 'Emergent', condition: 'Passive' }
-            ]
-          }
-        ]
-      },
-      {
-        id: 'sc8',
-        name: 'Home Utilities Performance',
-        description: 'Efficiency and conservation measures.',
-        types: [
-          {
-            id: 'sct42',
-            name: 'Energy - Solar Energy Systems',
-            description: 'Installation and maintenance of systems that capture solar energy for home use, helping to reduce reliance on traditional energy sources and lower utility costs.',
-            interventions: [
-              { id: 'i236', name: 'Solar panel installation', urgency: 'Non-Critical', condition: 'Passive' },
-              { id: 'i237', name: 'Solar battery storage', urgency: 'Non-Critical', condition: 'Passive' }
-            ]
-          },
-          {
-            id: 'sct43',
-            name: 'Energy - Efficient Lighting',
-            description: 'Upgrades and modifications to lighting systems that reduce energy consumption while maintaining or improving lighting quality.',
-            interventions: [
-              { id: 'i238', name: 'LED lighting upgrades', urgency: 'Non-Critical', condition: 'Passive' },
-              { id: 'i239', name: 'Smart lighting systems', urgency: 'Non-Critical', condition: 'Passive' }
-            ]
-          },
-          {
-            id: 'sct44',
-            name: 'Energy - Efficient HVAC/Water Heater',
-            description: 'Upgrades or replacements to heating, ventilation, air conditioning, and water heating systems that enhance energy efficiency and optimize performance.',
-            interventions: [
-              { id: 'i240', name: 'High-efficiency furnace', urgency: 'Non-Critical', condition: 'Passive' },
-              { id: 'i241', name: 'Geothermal heat pumps', urgency: 'Non-Critical', condition: 'Passive' },
-              { id: 'i242', name: 'Ductless mini-split systems', urgency: 'Non-Critical', condition: 'Passive' }
-            ]
-          },
-          {
-            id: 'sct45',
-            name: 'Water - Low-flow Fixtures',
-            description: 'Installation of water-saving fixtures that reduce water usage while maintaining performance and comfort.',
-            interventions: [
-              { id: 'i243', name: 'Low-flow showerheads', urgency: 'Non-Critical', condition: 'Passive' },
-              { id: 'i244', name: 'Dual-flush toilets', urgency: 'Non-Critical', condition: 'Passive' }
-            ]
-          },
-          {
-            id: 'sct46',
-            name: 'Weatherization - Insulation',
-            description: 'Adding or upgrading insulation in key areas of the home to improve energy efficiency and comfort by reducing heat loss or gain.',
-            interventions: [
-              { id: 'i245', name: 'Attic insulation', urgency: 'Non-Critical', condition: 'Passive' },
-              { id: 'i246', name: 'Spray foam insulation', urgency: 'Non-Critical', condition: 'Passive' },
-              { id: 'i247', name: 'Radiant barriers', urgency: 'Non-Critical', condition: 'Passive' }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'p4',
-    name: 'Community Repair',
-    icon: Users,
-    color: C_TRAD_GREEN,
-    bgColor: 'bg-[#3AA047]/10',
-    description: 'Improvements to shared spaces and community assets.',
-    subCategories: [
-      {
-        id: 'sc9',
-        name: 'Community / Nonprofit Building Repair',
-        description: 'Stabilizing buildings to serve the community.',
-        types: [
-          {
-            id: 'sct47',
-            name: 'Critical Building Systems Repairs',
-            description: 'Repairs focused on essential systems within community and nonprofit buildings that are vital for safe and functional operations. These include interventions that address urgent issues impacting habitability, safety, and compliance with minimum operational standards.',
-            interventions: [
-              { id: 'i248', name: 'Repair faulty community HVAC', urgency: 'N/A', condition: 'N/A' },
-              { id: 'i249', name: 'Fix leaking plumbing systems', urgency: 'N/A', condition: 'N/A' },
-              { id: 'i250', name: 'Address critical roof leaks', urgency: 'N/A', condition: 'N/A' }
-            ]
-          },
-          {
-            id: 'sct48',
-            name: 'Non-Critical Building Improvements',
-            description: 'Non-essential improvements that enhance the usability, comfort, or aesthetics of community and nonprofit spaces but are not immediately required for basic safety and functionality.',
-            interventions: [
-              { id: 'i251', name: 'Repaint community rooms', urgency: 'N/A', condition: 'N/A' },
-              { id: 'i252', name: 'Replace worn flooring', urgency: 'N/A', condition: 'N/A' }
-            ]
-          }
-        ]
-      },
-      {
-        id: 'sc10',
-        name: 'Community Energy & Performance',
-        description: 'Decrease utility consumption/increase resilience.',
-        types: [
-          {
-            id: 'sct49',
-            name: 'Community Energy Projects',
-            description: 'Initiatives focused on improving energy efficiency, reducing energy consumption, and enhancing sustainability within community and nonprofit buildings. These projects aim to lower operational costs and contribute to environmental stewardship.',
-            interventions: [
-              { id: 'i253', name: 'Install LED lighting upgrades', urgency: 'N/A', condition: 'N/A' },
-              { id: 'i254', name: 'Add community solar panels', urgency: 'N/A', condition: 'N/A' },
-              { id: 'i255', name: 'Programmable thermostats', urgency: 'N/A', condition: 'N/A' }
-            ]
-          }
-        ]
-      },
-      {
-        id: 'sc11',
-        name: 'Public Space Improvements',
-        description: 'Improve community space conditions.',
-        types: [
-          {
-            id: 'sct50',
-            name: 'Community Accessibility Improvements',
-            description: 'Modifications and upgrades that improve the accessibility of public spaces and community buildings, ensuring inclusivity for individuals with disabilities and mobility challenges.',
-            interventions: [
-              { id: 'i256', name: 'Install wheelchair ramps', urgency: 'N/A', condition: 'N/A' },
-              { id: 'i257', name: 'Add accessible restrooms', urgency: 'N/A', condition: 'N/A' },
-              { id: 'i258', name: 'Improve curb cuts', urgency: 'N/A', condition: 'N/A' }
-            ]
-          },
-          {
-            id: 'sct51',
-            name: 'Non-critical Community Space Improvements',
-            description: 'Enhancements to public and community spaces that improve aesthetics, usability, and overall community well-being but are not essential for safety or accessibility.',
-            interventions: [
-              { id: 'i259', name: 'Add decorative landscaping', urgency: 'N/A', condition: 'N/A' },
-              { id: 'i260', name: 'Install public art/murals', urgency: 'N/A', condition: 'N/A' },
-              { id: 'i261', name: 'Upgrade community gardens', urgency: 'N/A', condition: 'N/A' }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+const STEPS = [
+  { id: 'foundations', title: 'Setup', icon: Book, description: 'Org details and Key Staff' },
+  { id: 'policyMap', title: 'Policy Map', icon: Shield, description: 'Distinguish Org vs. Program policies' },
+  { id: 'programModel', title: 'Roles/Responsibilities', icon: Users, description: 'Define staff and board roles' },
+  { id: 'scope', title: 'Scope & Impact', icon: Target, description: 'Eligibility, caps, and exclusions' },
+  { id: 'clientServices', title: 'Client Services', icon: Clipboard, description: 'Service flow and participation' },
+  { id: 'screening', title: 'Prioritization', icon: Filter, description: 'Intake and scoring matrix' },
+  { id: 'lifecycle', title: 'Project Lifecycle', icon: Activity, description: 'Assessment to Closeout' },
+  { id: 'workforce', title: 'Workforce Strategy', icon: Briefcase, description: 'Contractors vs. Volunteers' },
+  { id: 'performance', title: 'Performance', icon: BarChart2, description: 'KPIs and Reporting' },
+  { id: 'compliance', title: 'Compliance', icon: CheckSquare, description: 'Policy 33 Alignment' },
+  { id: 'export', title: 'Review & Export', icon: ClipboardCheck, description: 'Finalize and download' },
 ];
 
-// --- Helper Functions ---
-const flattenInterventions = (): Intervention[] => {
-  const all: Intervention[] = [];
-  TAXONOMY_DATA.forEach(p => {
-    p.subCategories.forEach(sc => {
-      sc.types.forEach(t => {
-        t.interventions.forEach(i => {
-          all.push({ ...i, pillarId: p.id, pillarName: p.name, subCatId: sc.id, subCatName: sc.name, typeId: t.id, typeName: t.name });
-        });
-      });
-    });
-  });
-  return all;
-};
+const VULNERABLE_GROUPS = [
+  { key: 'lmiHouseholds', label: 'LMI Households (≤80% AMI)', reason: 'Core target for HUD/funding; risk of deferred maintenance' },
+  { key: 'olderAdults', label: 'Older Adults (62+)', reason: 'Aging in place, fall risk, fixed income' },
+  { key: 'disabilities', label: 'People with Disabilities', reason: 'High ADL challenges, modification needs' },
+  { key: 'veterans', label: 'Veterans', reason: 'Displacement risk, targeted outreach needs' },
+  { key: 'raciallyMarginalized', label: 'Racially Marginalized Communities', reason: 'Historic disinvestment/redlining' },
+  { key: 'persistentPoverty', label: 'Persistent Poverty / Distressed', reason: 'Chronic disinvestment, economic hardship' },
+  { key: 'femaleHead', label: 'Female Head of Household', reason: 'Historical income disparity' },
+  { key: 'largeFamilies', label: 'Large Families (5+ members)', reason: 'Overcrowding, systems stress' },
+  { key: 'mobileHomeowners', label: 'Manufactured/Mobile Homeowners', reason: 'High substandard rates, energy burden' },
+  { key: 'ruralHouseholds', label: 'Rural Households', reason: 'Limited funding, workforce challenges' },
+  { key: 'disasterImpacted', label: 'Disaster-Impacted', reason: 'Structural damage, immediate displacement risk' }
+];
 
-const ALL_INTERVENTIONS = flattenInterventions();
+const REQUIRED_TOPICS_2_1_1 = [
+  { key: 'assessment', label: 'Project assessment and selection criteria' },
+  { key: 'partnerSelection', label: 'Repair partner selection criteria & process' },
+  { key: 'participation', label: 'Owner and household member participation' },
+  { key: 'staffing', label: 'Staffing and volunteer participation' },
+  { key: 'pricing', label: 'Pricing and repayment model' },
+  { key: 'constructionTypes', label: 'Types of construction activities' },
+  { key: 'sustainability', label: 'Financial sustainability' },
+  { key: 'risk', label: 'Risk management' },
+  { key: 'safety', label: 'Safety' }
+];
 
-// --- Components ---
+const INITIAL_DATA = {
+  // Foundations
+  orgName: '',
+  orgAddress: '',
+  orgPhone: '',
+  orgEmail: '',
+  serviceArea: '',
+  existingPolicies: '', 
+  staff: [
+    { id: 1, name: '', title: 'Executive Director' },
+    { id: 2, name: '', title: 'Program Manager' },
+    { id: 3, name: '', title: 'Board Champion' }
+  ],
+  
+  // Step 2: Policy Map
+  policyMap: {
+    governance: { org: false, program: false, programDetails: '' },
+    finance: { org: false, program: false, programDetails: '' },
+    hr: { org: false, program: false, programDetails: '' },
+    eligibility: { org: false, program: false, programDetails: '' },
+    safety: { org: false, program: false, programDetails: '' },
+    procurement: { org: false, program: false, programDetails: '' },
+    recordKeeping: { org: false, program: false, programDetails: '' }
+  },
+  policyPackage: {
+    exists: false,
+    coveredTopics: {},
+    topicContent: {} 
+  },
 
-interface StatusBadgeProps {
-  status?: string;
-}
+  // Step 9: Compliance
+  policy33Aligned: false,
+  policy33Checklist: {
+    codes: false,
+    agreements: false,
+    consumerProtection: false,
+    lendingCompliance: false,
+    subcontractorOversight: false,
+    insurance: false
+  },
+  repairsAOMReviewed: false,
+  
+  governance: {
+    approvalDate: '',
+    policyVersion: '1.0',
+    lastReviewDate: '',
+    nextReviewDate: '',
+    storageLocation: '',
+    approverRole: 'Board of Directors',
+    resolutionReference: ''
+  },
 
-const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
-  switch (status) {
-    case 'eligible': return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#C4D600]/20 text-[#3AA047]"><CheckCircle className="w-3 h-3 mr-1" /> Eligible</span>;
-    case 'not_eligible': return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#A4343A]/10 text-[#A4343A]"><XCircle className="w-3 h-3 mr-1" /> Not Eligible</span>;
-    case 'conditional': return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#FFD100]/20 text-[#E55025]"><AlertTriangle className="w-3 h-3 mr-1" /> Conditional</span>;
-    case 'na': return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#88888D]/10 text-[#88888D]"><Ban className="w-3 h-3 mr-1" /> N/A</span>;
-    default: return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">Unselected</span>;
+  // Program Model
+  roles: [
+    { id: 1, title: 'Program Manager', responsibilities: 'Overall execution, compliance, reporting', approves: ['SOW', 'Closeout'] },
+    { id: 2, title: 'Intake Coordinator', responsibilities: 'Client screening, document collection', approves: ['Eligibility'] },
+    { id: 3, title: 'Construction Lead', responsibilities: 'Scoping, QC, Contractor management', approves: ['Change Order'] }
+  ],
+
+  // Scope
+  repairTypes: {
+    critical: true,
+    accessibility: false,
+    energy: false,
+    exterior: false
+  },
+  financialCap: 15000,
+  exclusions: '',
+
+  // Client Screening
+  intakeMethods: { phone: true, web: false, walkin: false },
+  priorityFactors: {
+    healthSafety: 5,
+    lmiHouseholds: 3,
+    olderAdults: 3
+  },
+  projectFeasibility: {
+    assessmentProtocol: 'internal',
+    selectionAuthority: 'Program Manager',
+    selectionArtifact: 'Scoring Matrix',
+    feasibilityLimits: ''
+  },
+  
+  // Client Services
+  clientServices: {
+    stages: [
+        { id: 1, name: 'Inquiry & App', reqDoc: 'Application Form' },
+        { id: 2, name: 'Eligibility Review', reqDoc: 'Income Verification' },
+        { id: 3, name: 'Home Assessment', reqDoc: 'Inspection Report' },
+        { id: 4, name: 'SOW & Approval', reqDoc: 'Signed Agreement' },
+        { id: 5, name: 'Construction', reqDoc: 'Permits' },
+        { id: 6, name: 'Closeout', reqDoc: 'Satisfaction Survey' }
+    ],
+    participation: {
+        required: '', 
+        options: 'Sweat equity hours, Provide lunch, Site cleanup',
+        documentation: 'Partner Agreement Clause 4.1'
+    }
+  },
+
+  // Lifecycle
+  stages: [
+    { id: 1, name: 'Inquiry & App', reqDoc: 'Application Form' },
+    { id: 2, name: 'Eligibility Review', reqDoc: 'Income Verification' },
+    { id: 3, name: 'Home Assessment', reqDoc: 'Inspection Report' },
+    { id: 4, name: 'SOW & Approval', reqDoc: 'Signed Agreement' },
+    { id: 5, name: 'Construction', reqDoc: 'Permits' },
+    { id: 6, name: 'Closeout', reqDoc: 'Satisfaction Survey' }
+  ],
+  participation: {
+    required: 'required',
+    options: 'Sweat equity hours, Provide lunch, Site cleanup',
+    documentation: 'Partner Agreement Clause 4.1'
+  },
+
+  // Workforce
+  model: 'blended',
+  qcFrequency: 'milestone',
+  procurement: {
+    selectionMethod: 'Preferred Vendor List', 
+    minQualifications: 'State License, General Liability Insurance ($1M)',
+    requiredDocs: { w9: true, coi: true, bonding: false, warranty: true }
+  },
+  volunteerStandards: {
+    allowedScopes: 'Painting, Landscaping, Demolition (non-structural)',
+    supervision: 'HFH Site Supervisor must be present at all times',
+    training: 'Online Safety Course + On-site orientation'
+  },
+  safety: {
+    riskScreening: 'Asbestos, Lead, Structural Integrity, Pet Safety',
+    safetyPlan: 'Daily tailgate talks, PPE enforcement, Incident Reporting Log',
+    specialtyContractorTriggers: 'Electrical, Plumbing, HVAC, Roofs > 1 story'
+  },
+
+  // Performance
+  kpis: {
+    homesServed: true,
+    avgCost: true,
+    repairTimeline: false,
+    clientSatisfaction: true,
+    safetyIncidents: false
+  },
+  reportingSchedule: 'monthly',
+  feedbackMechanism: '',
+  sustainability: {
+    fundingMix: '40% Grants, 30% ReStore Profits, 30% Donations',
+    costControls: 'Change orders >$500 require ED approval',
+    pipelineTargets: '15 homes/year, Avg $10k/home'
+  },
+
+  // Meta
+  version: '1.7.7',
+  lastUpdated: new Date().toISOString(),
+  constructionActivities: {
+    hasCatalog: null, 
+    eligibleScopes: '',
+    ineligibleScopes: '',
+    permitTriggers: ''
+  },
+  pricing: {
+    modelType: 'grant', // grant, loan, hybrid, fee
+    calculationMethod: 'Project Cost + 10% Admin',
+    repaymentTerms: '0% interest, forgivable after 5 years',
+    hardshipPolicy: 'Deferral available for medical emergencies'
   }
 };
 
-interface LearnSidebarProps {
-  currentStep: number;
-  steps: { title: string; content: React.ReactNode }[];
-  onStepChange: (step: number) => void;
-  onHome: () => void;
-}
-
-const LearnSidebar: React.FC<LearnSidebarProps> = ({ currentStep, steps, onStepChange, onHome }) => {
+// --- Landing Page Component ---
+const LandingPage = ({ onStart }) => {
   return (
-    <div className="w-72 bg-slate-50 border-r border-slate-200 flex flex-col h-full hidden md:flex shrink-0">
-      <div className="p-4 border-b border-slate-200">
-        <h3 className="font-semibold text-black flex items-center gap-2">
-          <BookOpen size={18} /> Learning Guide
-        </h3>
-      </div>
-      
-      <div className="flex-1 overflow-y-auto p-4 space-y-6">
-        <div>
-            <h4 className="text-xs font-semibold text-[#88888D] uppercase mb-3">Module Progress</h4>
-            <div className="space-y-2 relative">
-                {/* Visual connecting line */}
-                <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-slate-200 -z-10"></div>
-                
-                {steps.map((s, idx) => (
-                    <button 
-                        key={idx}
-                        onClick={() => onStepChange(idx)}
-                        className={`flex items-start gap-3 text-left w-full group ${idx === currentStep ? 'opacity-100' : 'opacity-70 hover:opacity-100'}`}
-                    >
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 border-2 transition-colors ${
-                            idx === currentStep 
-                                ? 'bg-[#0099CC] text-white border-[#0099CC]' 
-                                : idx < currentStep 
-                                    ? 'bg-[#3AA047] text-white border-[#3AA047]'
-                                    : 'bg-white text-[#88888D] border-slate-300'
-                        }`}>
-                            {idx < currentStep ? <CheckCircle size={12} /> : idx + 1}
-                        </div>
-                        <span className={`text-sm py-0.5 ${idx === currentStep ? 'font-semibold text-black' : 'text-[#88888D]'}`}>
-                            {s.title.split(':')[0]}
-                        </span>
-                    </button>
-                ))}
-            </div>
-        </div>
-
-        <div className="bg-[#0099CC]/5 p-4 rounded-lg border border-[#0099CC]/20">
-            <h4 className="font-bold text-black text-sm mb-2 flex items-center gap-2">
-                <Info size={14}/> Guidance
-            </h4>
-            <p className="text-xs text-black leading-relaxed">
-                Use this module to understand the core taxonomy before building your catalog. 
-                <br/><br/>
-                <strong>Tip:</strong> Don't rush through the definitions. Understanding the difference between <strong>Critical</strong> and <strong>Emergent</strong> is key to building a defensible policy.
-            </p>
-        </div>
-      </div>
-
-      <div className="p-4 bg-slate-50 border-t border-slate-200">
-        <button 
-          onClick={() => window.open('#', '_blank')}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 mb-2 bg-white border border-slate-300 rounded-lg text-black hover:bg-slate-100 transition-colors shadow-sm text-sm"
-        >
-          <BookOpen size={16} /> Access Guide
-        </button>
-        <button 
-          onClick={onHome}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded-lg text-black hover:bg-slate-100 transition-colors shadow-sm text-sm"
-        >
-          <Home size={16} /> Back to Home
-        </button>
-        <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.1.2.1
-        </div>
-      </div>
-    </div>
-  );
-};
-
-interface SidebarProps {
-  activePillar: string;
-  onPillarChange: (id: string) => void;
-  activeSubCat: string;
-  onSubCatChange: (id: string) => void;
-  activeType: string;
-  onTypeChange: (id: string) => void;
-  selections: SelectionsMap;
-  onHome: () => void;
-}
-
-const Sidebar: React.FC<SidebarProps> = ({ activePillar, onPillarChange, activeSubCat, onSubCatChange, activeType, onTypeChange, selections, onHome }) => {
-  const stats = useMemo(() => {
-    let eligible = 0, notEligible = 0, conditional = 0, na = 0;
-    Object.values(selections).forEach(s => {
-      if (s.status === 'eligible') eligible++;
-      if (s.status === 'not_eligible') notEligible++;
-      if (s.status === 'conditional') conditional++;
-      if (s.status === 'na') na++;
-    });
-    return { eligible, notEligible, conditional, na };
-  }, [selections]);
-
-  const togglePillar = (id: string) => {
-    if (activePillar !== id) {
-      onPillarChange(id);
-      onSubCatChange('all');
-      onTypeChange('all');
-    } else {
-       onPillarChange('all');
-       onSubCatChange('all');
-       onTypeChange('all');
-    }
-  };
-
-  const toggleSubCat = (id: string) => {
-    if (activeSubCat !== id) {
-      onSubCatChange(id);
-      onTypeChange('all');
-    } else {
-      onSubCatChange('all');
-      onTypeChange('all');
-    }
-  };
-
-  return (
-    <div className="w-72 bg-slate-50 border-r border-slate-200 flex flex-col h-full hidden md:flex shrink-0">
-      <div className="p-4 border-b border-slate-200">
-        <h3 className="font-semibold text-black flex items-center gap-2">
-          <Filter size={18} /> Filters
-        </h3>
-      </div>
-      
-      <div className="flex-1 overflow-y-auto p-2">
-        <div className="space-y-1">
-          <button 
-            onClick={() => {
-              onPillarChange('all');
-              onSubCatChange('all');
-              onTypeChange('all');
-            }}
-            className={`w-full text-left px-3 py-2 rounded text-sm mb-2 ${activePillar === 'all' ? 'bg-black font-bold text-white' : 'hover:bg-slate-100 text-black'}`}
-          >
-            All Pillars
-          </button>
-          
-          {TAXONOMY_DATA.map(p => {
-             const isActivePillar = activePillar === p.id;
-             return (
-              <div key={p.id} className="space-y-1">
-                <button 
-                  onClick={() => togglePillar(p.id)}
-                  className={`w-full text-left px-3 py-2 rounded text-sm flex items-center justify-between group ${isActivePillar ? 'bg-white shadow-sm ring-1 ring-slate-200 font-medium' : 'hover:bg-slate-100 text-black'}`}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${p.color.replace('text', 'bg')}`}></div>
-                    <span className="truncate">{p.name}</span>
-                  </div>
-                  {isActivePillar ? <ChevronDown size={14} className="text-[#88888D]"/> : <ChevronRight size={14} className="text-[#88888D] group-hover:text-black"/>}
-                </button>
-
-                {isActivePillar && (
-                  <div className="ml-3 pl-3 border-l border-slate-200 space-y-1 my-1">
-                    {p.subCategories.map(sc => {
-                      const isActiveSub = activeSubCat === sc.id;
-                      const activityCount = sc.types.reduce((acc, t) => acc + t.interventions.length, 0);
-                      return (
-                        <div key={sc.id}>
-                          <button
-                            onClick={() => toggleSubCat(sc.id)}
-                            className={`w-full text-left px-2 py-1.5 rounded text-xs flex items-center justify-between ${isActiveSub ? 'bg-slate-100 text-black font-medium' : 'text-[#88888D] hover:text-black hover:bg-slate-50'}`}
-                          >
-                             <span className="truncate">{sc.name} <span className="text-[#88888D] text-[10px]">({activityCount})</span></span>
-                             {isActiveSub ? <ChevronDown size={12}/> : <ChevronRight size={12} className="opacity-0 group-hover:opacity-100"/>}
-                          </button>
-                          
-                          {isActiveSub && (
-                            <div className="ml-2 pl-2 border-l border-slate-200 space-y-0.5 my-1">
-                              {sc.types.map(t => (
-                                <button
-                                  key={t.id}
-                                  onClick={() => onTypeChange(t.id === activeType ? 'all' : t.id)}
-                                  className={`w-full text-left px-2 py-1.5 rounded text-[11px] leading-tight ${activeType === t.id ? 'bg-[#0099CC]/10 text-[#0099CC] font-semibold shadow-sm' : 'text-[#88888D] hover:text-black truncate'}`}
-                                >
-                                  {t.name}
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+    <div className="min-h-screen bg-white">
+      {/* Navigation */}
+      <nav className="border-b border-gray-100 bg-white/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-2">
+              <div className="bg-blue-600 p-2 rounded-lg">
+                <Book className="h-5 w-5 text-white" />
               </div>
-             );
-          })}
-        </div>
-      </div>
-
-      <div className="p-4 bg-slate-50 border-t border-slate-200">
-        <h4 className="text-xs font-semibold text-[#88888D] uppercase mb-3">Your Policy Stats</h4>
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="flex items-center gap-1 text-[#3AA047]"><CheckCircle size={14}/> Eligible</span>
-            <span className="font-mono font-bold">{stats.eligible}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="flex items-center gap-1 text-[#A4343A]"><XCircle size={14}/> Not Eligible</span>
-            <span className="font-mono font-bold">{stats.notEligible}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="flex items-center gap-1 text-[#E55025]"><AlertTriangle size={14}/> Conditional</span>
-            <span className="font-mono font-bold">{stats.conditional}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="flex items-center gap-1 text-[#88888D]"><Ban size={14}/> N/A</span>
-            <span className="font-mono font-bold">{stats.na}</span>
-          </div>
-        </div>
-        <button 
-          onClick={() => window.open('#', '_blank')}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 mt-4 mb-2 bg-white border border-slate-300 rounded-lg text-black hover:bg-slate-100 transition-colors shadow-sm text-sm"
-        >
-          <BookOpen size={16} /> Access Guide
-        </button>
-        <button 
-          onClick={onHome}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded-lg text-black hover:bg-slate-100 transition-colors shadow-sm text-sm"
-        >
-          <Home size={16} /> Back to Home
-        </button>
-        <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.1.2.1
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const MatrixGrid = () => {
-  const cells = [
-    { u: 'Critical', c: 'Active', color: 'bg-[#A4343A] text-white', label: 'Priority 1: Immediate Action' },
-    { u: 'Emergent', c: 'Active', color: 'bg-[#E55025] text-white', label: 'Priority 2: High Urgency' },
-    { u: 'Non-Critical', c: 'Active', color: 'bg-[#FFD100] text-black', label: 'Priority 4: Monitor' },
-    { u: 'Critical', c: 'Passive', color: 'bg-[#E55025] text-white', label: 'Priority 2: Address Soon' },
-    { u: 'Emergent', c: 'Passive', color: 'bg-[#FFD100] text-black', label: 'Priority 3: Plan' },
-    { u: 'Non-Critical', c: 'Passive', color: 'bg-[#88888D]/50 text-white', label: 'Priority 4: Defer' },
-    { u: 'Critical', c: 'Inactive', color: 'bg-[#FFD100] text-black', label: 'Priority 3: Investigate' },
-    { u: 'Emergent', c: 'Inactive', color: 'bg-[#88888D]/50 text-white', label: 'Priority 4: Defer' },
-    { u: 'Non-Critical', c: 'Inactive', color: 'bg-[#88888D]/20 text-black', label: 'Priority 5: No Action' },
-  ];
-
-  return (
-    <div className="grid grid-cols-[100px_1fr_1fr_1fr] gap-3 text-xs sm:text-sm">
-      {/* Header Row */}
-      <div className="col-start-2 text-center font-bold text-black">Active Condition</div>
-      <div className="text-center font-bold text-black">Passive Condition</div>
-      <div className="text-center font-bold text-black">Inactive Condition</div>
-
-      {/* Rows */}
-      <div className="flex items-center justify-end pr-4 font-bold text-black">Critical</div>
-      <div className={`h-24 md:h-32 rounded-lg p-3 flex flex-col justify-between shadow-sm transition-transform hover:scale-105 ${cells[0].color}`}>
-        <span className="font-bold">Critical / Active</span>
-        <span className="opacity-90">{cells[0].label}</span>
-      </div>
-      <div className={`h-24 md:h-32 rounded-lg p-3 flex flex-col justify-between shadow-sm transition-transform hover:scale-105 ${cells[3].color}`}>
-        <span className="font-bold">Critical / Passive</span>
-        <span className="opacity-90">{cells[3].label}</span>
-      </div>
-      <div className={`h-24 md:h-32 rounded-lg p-3 flex flex-col justify-between shadow-sm transition-transform hover:scale-105 ${cells[6].color}`}>
-        <span className="font-bold">Critical / Inactive</span>
-        <span className="opacity-90">{cells[6].label}</span>
-      </div>
-
-      <div className="flex items-center justify-end pr-4 font-bold text-black">Emergent</div>
-      <div className={`h-24 md:h-32 rounded-lg p-3 flex flex-col justify-between shadow-sm transition-transform hover:scale-105 ${cells[1].color}`}>
-        <span className="font-bold">Emergent / Active</span>
-        <span className="opacity-90">{cells[1].label}</span>
-      </div>
-      <div className={`h-24 md:h-32 rounded-lg p-3 flex flex-col justify-between shadow-sm transition-transform hover:scale-105 ${cells[4].color}`}>
-        <span className="font-bold">Emergent / Passive</span>
-        <span className="opacity-90">{cells[4].label}</span>
-      </div>
-      <div className={`h-24 md:h-32 rounded-lg p-3 flex flex-col justify-between shadow-sm transition-transform hover:scale-105 ${cells[7].color}`}>
-        <span className="font-bold">Emergent / Inactive</span>
-        <span className="opacity-90">{cells[7].label}</span>
-      </div>
-
-      <div className="flex items-center justify-end pr-4 font-bold text-black">Non-Critical</div>
-      <div className={`h-24 md:h-32 rounded-lg p-3 flex flex-col justify-between shadow-sm transition-transform hover:scale-105 ${cells[2].color}`}>
-        <span className="font-bold">Non-Critical / Active</span>
-        <span className="opacity-90">{cells[2].label}</span>
-      </div>
-      <div className={`h-24 md:h-32 rounded-lg p-3 flex flex-col justify-between shadow-sm transition-transform hover:scale-105 ${cells[5].color}`}>
-        <span className="font-bold">Non-Critical / Passive</span>
-        <span className="opacity-90">{cells[5].label}</span>
-      </div>
-      <div className={`h-24 md:h-32 rounded-lg p-3 flex flex-col justify-between shadow-sm transition-transform hover:scale-105 ${cells[8].color}`}>
-        <span className="font-bold">Non-Critical / Inactive</span>
-        <span className="opacity-90">{cells[8].label}</span>
-      </div>
-    </div>
-  );
-};
-
-// --- Views ---
-
-interface LandingViewProps {
-  onStart: () => void;
-  onLearn: () => void;
-}
-
-const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
-  <div className="h-full overflow-y-auto bg-white">
-    {/* Hero Section */}
-    <div className="bg-[#E55025] text-white relative overflow-hidden">
-      <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-orange-400 via-orange-600 to-[#E55025]"></div>
-      <div className="max-w-7xl mx-auto px-6 py-24 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-sm font-medium mb-6">
-            <span className="flex h-2 w-2 rounded-full bg-white"></span>
-            Version 1.1.2.1 Available
-          </div>
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 leading-tight">
-            Standardize Your <span className="text-white">Home Repair</span> Program
-          </h1>
-          <p className="text-xl text-white/90 mb-10 leading-relaxed max-w-2xl mx-auto">
-            A unified taxonomy to categorize activities, prioritize based on criticality, and automatically generate your "Eligible Activities" policy manual.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
+              <span className="text-xl font-bold text-gray-900 tracking-tight">P&P <span className="text-blue-600">Builder</span></span>
+            </div>
+            <button 
               onClick={onStart}
-              className="flex items-center justify-center gap-2 px-8 py-4 bg-white text-[#E55025] rounded-lg font-bold text-lg hover:bg-slate-50 transition-all shadow-lg shadow-black/10"
+              className="bg-slate-900 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-slate-800 transition-colors"
             >
-              Start Activity Builder <ArrowRight size={20} />
-            </button>
-            <button
-              onClick={onLearn}
-              className="flex items-center justify-center gap-2 px-8 py-4 bg-transparent text-white border border-white rounded-lg font-bold text-lg hover:bg-white/10 transition-all"
-            >
-              Learn the Framework
+              Launch Builder
             </button>
           </div>
         </div>
-      </div>
-      
-      {/* Abstract visual shapes */}
-      <div className="absolute right-0 top-0 h-full w-1/2 opacity-10 pointer-events-none hidden lg:block">
-        <svg viewBox="0 0 100 100" className="h-full w-full fill-current text-white">
-          <path d="M50 0 L100 0 L100 100 L0 100 Z" />
-        </svg>
-      </div>
-    </div>
+      </nav>
 
-    {/* Value Props */}
-    <div className="py-24 bg-slate-50">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl font-bold text-black mb-4">Why use the Framework?</h2>
-          <p className="text-[#88888D] text-lg">Move beyond "roofs and ramps" to a data-driven approach that supports funding, reporting, and impact measurement.</p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-            <div className="w-12 h-12 bg-[#0099CC]/10 text-[#0099CC] rounded-xl flex items-center justify-center mb-6">
-              <Layers size={24} />
+      {/* Hero Section */}
+      <div className="relative overflow-hidden pt-16 pb-24 lg:pt-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="text-center max-w-3xl mx-auto">
+            <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold uppercase tracking-wide mb-6">
+              New: Policy 33 Automation
             </div>
-            <h3 className="text-xl font-bold text-black mb-3">Unified Taxonomy</h3>
-            <p className="text-[#88888D] leading-relaxed">
-              Standardize your work into 4 Pillars, Sub-Categories, and Types. Eliminate ambiguity in your program data.
+            <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight mb-6 leading-tight">
+              Build a Compliant Home Repair Manual <span className="text-blue-600">in Minutes.</span>
+            </h1>
+            <p className="text-lg text-slate-600 mb-10 leading-relaxed">
+              Stop starting from a blank page. The P&P Builder guides you through every step of creating a Board-ready Policy & Procedure manual, ensuring full alignment with U.S. Policy 33.
             </p>
-          </div>
-          <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-            <div className="w-12 h-12 bg-[#E55025]/10 text-[#E55025] rounded-xl flex items-center justify-center mb-6">
-              <AlertTriangle size={24} />
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <button 
+                onClick={onStart}
+                className="inline-flex justify-center items-center px-8 py-4 border border-transparent text-lg font-bold rounded-xl text-white bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all hover:-translate-y-1"
+              >
+                Launch Builder
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </button>
+              <a href="#how-it-works" className="inline-flex justify-center items-center px-8 py-4 border border-slate-200 text-lg font-semibold rounded-xl text-slate-700 bg-white hover:bg-slate-50 transition-all">
+                See How It Works
+              </a>
             </div>
-            <h3 className="text-xl font-bold text-black mb-3">Smart Prioritization</h3>
-            <p className="text-[#88888D] leading-relaxed">
-              Use the Criticality Matrix (Urgency + Condition) to objectively rank repairs and defend your scope decisions.
-            </p>
-          </div>
-          <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-            <div className="w-12 h-12 bg-[#3AA047]/10 text-[#3AA047] rounded-xl flex items-center justify-center mb-6">
-              <FileText size={24} />
-            </div>
-            <h3 className="text-xl font-bold text-black mb-3">Instant Policy</h3>
-            <p className="text-[#88888D] leading-relaxed">
-              Stop writing manuals from scratch. Select your activities and export a formatted "Eligible Activities" document instantly.
-            </p>
           </div>
         </div>
       </div>
-    </div>
 
-    {/* Call to Action Footer */}
-    <div className="bg-slate-900 text-white py-20">
-      <div className="max-w-4xl mx-auto px-6 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to define your program?</h2>
-        <p className="text-[#88888D] text-lg mb-8">
-          Join other affiliates in standardizing the way we talk about and perform home repairs.
-        </p>
-        <button
-          onClick={onStart}
-          className="px-8 py-4 bg-[#3AA047] text-white rounded-lg font-bold text-lg hover:bg-[#3AA047]/90 transition-all shadow-lg shadow-[#3AA047]/20"
-        >
-          Open Activity Builder
-        </button>
+      {/* Features Grid */}
+      <div className="py-24 bg-slate-50 border-t border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-slate-900">Everything you need to launch safely</h2>
+            <p className="mt-4 text-slate-600 max-w-2xl mx-auto">Designed specifically for Habitat affiliates to navigate the complexities of repair programs without the administrative headache.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mb-6">
+                <CheckSquare className="w-6 h-6 text-emerald-600" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Policy 33 Compliance</h3>
+              <p className="text-slate-600">Built-in checklists ensure you meet all 9 required topic areas, from 2.1.1 assessments to 2.1.8 insurance requirements.</p>
+            </div>
+            
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
+                <Shield className="w-6 h-6 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Governance Mapping</h3>
+              <p className="text-slate-600">Clearly distinguish between Board-level policies and Staff-level procedures to prevent governance bloat and improve agility.</p>
+            </div>
+            
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-6">
+                <FileText className="w-6 h-6 text-purple-600" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Instant Documentation</h3>
+              <p className="text-slate-600">Export a professionally formatted, editable Microsoft Word document ready for your Board packet or grant application.</p>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-);
 
-interface LearnViewProps {
-  onComplete: () => void;
-  onHome: () => void;
-}
-
-const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
-  const [step, setStep] = useState(0);
-  
-  const steps = [
-    {
-      title: "Introduction: Why a Taxonomy?",
-      content: (
-        <div className="space-y-6">
-          <div className="flex items-start gap-4 p-4 bg-[#0099CC]/5 rounded-lg border border-[#0099CC]/20">
-            <Info className="text-[#0099CC] min-w-[24px]" />
+      {/* How It Works (Stepper Preview) */}
+      <div id="how-it-works" className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
-              <h3 className="font-bold text-black mb-2">The Problem</h3>
-              <p className="text-black">Affiliates use inconsistent language. "Roof repair" might mean a full replacement in one county and a patch in another. This makes it impossible to compare data or define standard policies.</p>
+              <h2 className="text-3xl font-bold text-slate-900 mb-6">A guided path to a better manual</h2>
+              <p className="text-lg text-slate-600 mb-8">We've broken down the daunting task of manual writing into 10 logical, bite-sized steps.</p>
+              
+              <div className="space-y-6">
+                {[
+                  { title: 'Define Scope & Impact', desc: 'Set financial caps, eligible repairs, and pricing models.', icon: Target },
+                  { title: 'Establish Workforce Strategy', desc: 'Decide how you will balance contractors vs. volunteers.', icon: Users },
+                  { title: 'Automate Compliance', desc: 'Validate against Policy 33 requirements in real-time.', icon: CheckCircle }
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start">
+                    <div className="flex-shrink-0 mt-1">
+                      <item.icon className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div className="ml-4">
+                      <h4 className="text-lg font-semibold text-slate-900">{item.title}</h4>
+                      <p className="text-slate-600">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div>
-              <p className="text-lg text-black mb-4">The <strong>Housing Preservation Framework</strong> breaks down complex repair work into a standard hierarchy. This allows us to:</p>
-              <ul className="space-y-3">
-                <li className="flex items-center gap-2"><CheckCircle size={16} className="text-[#3AA047]"/> <span>Standardize reporting across affiliates</span></li>
-                <li className="flex items-center gap-2"><CheckCircle size={16} className="text-[#3AA047]"/> <span>Define precise eligibility rules</span></li>
-                <li className="flex items-center gap-2"><CheckCircle size={16} className="text-[#3AA047]"/> <span>Prioritize based on real need (Criticality)</span></li>
-              </ul>
-            </div>
-            <div className="bg-slate-100 p-6 rounded-xl border border-slate-200">
-               <h4 className="font-bold text-black mb-4 text-center text-sm uppercase tracking-wide">The Hierarchy</h4>
-               <div className="space-y-2 max-w-[200px] mx-auto">
-                 <div className="p-2 bg-black text-white text-center rounded text-sm font-semibold">Pillar</div>
-                 <div className="flex justify-center"><ChevronDown size={16} className="text-[#88888D]"/></div>
-                 <div className="p-2 bg-[#88888D] text-white text-center rounded text-sm font-semibold">Sub-Category</div>
-                 <div className="flex justify-center"><ChevronDown size={16} className="text-[#88888D]"/></div>
-                 <div className="p-2 bg-[#88888D] text-white text-center rounded text-sm font-semibold">Type</div>
-                 <div className="flex justify-center"><ChevronDown size={16} className="text-[#88888D]"/></div>
-                 <div className="p-2 bg-[#3AA047] text-white text-center rounded text-sm font-bold shadow-lg transform scale-105">Activity</div>
-               </div>
-            </div>
-          </div>
-        </div>
-      )
-    },
-    {
-      title: "The Four Pillars",
-      content: (
-        <div className="space-y-6">
-          <p className="text-[#88888D]">All repair work falls into one of these four high-level goals. This is the highest level of reporting.</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {TAXONOMY_DATA.map(p => {
-               const Icon = p.icon;
-               return (
-                 <div key={p.id} className={`${p.bgColor} p-6 rounded-xl border border-slate-200 hover:shadow-md transition-shadow`}>
-                   <div className="flex items-center gap-3 mb-3">
-                     <div className={`p-2 bg-white rounded-lg shadow-sm`}>
-                       <Icon size={24} className={p.color} />
-                     </div>
-                     <h3 className="font-bold text-black text-lg">{p.name}</h3>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl transform rotate-3 opacity-20 blur-xl"></div>
+              <div className="relative bg-white border border-gray-200 rounded-2xl shadow-xl p-8">
+                <div className="space-y-4">
+                   <div className="h-4 bg-gray-100 rounded w-3/4"></div>
+                   <div className="h-4 bg-gray-100 rounded w-1/2"></div>
+                   <div className="h-32 bg-blue-50 rounded-xl border border-blue-100 flex items-center justify-center text-blue-500 font-medium">
+                       Interactive Policy Builder Preview
                    </div>
-                   <p className="text-black leading-relaxed">{p.description}</p>
-                 </div>
-               )
-            })}
-          </div>
-        </div>
-      )
-    },
-    {
-      title: "Understanding Criticality",
-      content: (
-        <div className="space-y-6">
-          <p className="text-lg text-[#88888D]">We don't just ask "what needs fixing?", we ask "how urgent is it?". Criticality is determined by two factors:</p>
-          
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-[#E55025]/5 p-6 rounded-xl border border-[#E55025]/20">
-              <div className="flex items-center gap-2 mb-4">
-                <AlertTriangle className="text-[#E55025]" />
-                <h3 className="text-xl font-bold text-[#E55025]">1. Urgency</h3>
-              </div>
-              <ul className="space-y-4">
-                <li className="bg-white p-3 rounded shadow-sm border border-[#E55025]/20">
-                  <span className="font-bold text-[#A4343A] block mb-1">Critical</span>
-                  <span className="text-sm text-[#88888D]">Immediate threat to life, health, or safety. Must be addressed now.</span>
-                </li>
-                <li className="bg-white p-3 rounded shadow-sm border border-[#E55025]/20">
-                  <span className="font-bold text-[#E55025] block mb-1">Emergent</span>
-                  <span className="text-sm text-[#88888D]">Will become critical within 6-12 months if ignored.</span>
-                </li>
-                <li className="bg-white p-3 rounded shadow-sm border border-[#E55025]/20">
-                  <span className="font-bold text-[#FFD100] block mb-1">Non-Critical</span>
-                  <span className="text-sm text-[#88888D]">Maintenance, efficiency, or cosmetic issues. No immediate threat.</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="bg-slate-100 p-6 rounded-xl border border-slate-200">
-              <div className="flex items-center gap-2 mb-4">
-                <Activity className="text-black" />
-                <h3 className="text-xl font-bold text-black">2. Condition State</h3>
-              </div>
-              <ul className="space-y-4">
-                <li className="bg-white p-3 rounded shadow-sm border border-slate-200">
-                  <span className="font-bold text-black block mb-1">Active</span>
-                  <span className="text-sm text-[#88888D]">The defect is currently causing damage (e.g., active roof leak, live wires).</span>
-                </li>
-                <li className="bg-white p-3 rounded shadow-sm border border-slate-200">
-                  <span className="font-bold text-[#88888D] block mb-1">Passive</span>
-                  <span className="text-sm text-[#88888D]">Broken but stable. Not getting worse actively (e.g., broken window pane).</span>
-                </li>
-                <li className="bg-white p-3 rounded shadow-sm border border-slate-200">
-                  <span className="font-bold text-[#88888D]/50 block mb-1">Inactive</span>
-                  <span className="text-sm text-[#88888D]">Functioning but old, inefficient, or nearing end of life.</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      )
-    },
-    {
-      title: "Deep Dive: Sub-Category Definitions",
-      content: (
-        <div className="space-y-10 animate-in fade-in duration-500">
-          <div>
-            <h3 className="text-xl font-bold text-black mb-4 border-b border-slate-200 pb-2">A. Residential Unit Sub-Categories</h3>
-            <p className="text-sm text-[#88888D] mb-6">Each sub-category is assigned a default Urgency and Condition State to help prioritization.</p>
-            
-            {/* Dwelling Safety */}
-            <div className="mb-8">
-              <h4 className="font-bold text-[#A4343A] mb-3 flex items-center gap-2"><Shield size={20}/> Dwelling Safety</h4>
-              <div className="grid gap-4">
-                <div className="bg-white p-5 rounded-lg border-l-4 border-[#A4343A] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Structural Components</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                       <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
-                       <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Repairs to the home’s foundational and load-bearing elements (e.g., framing, beams, floor joists) that are essential for ensuring the home’s structural integrity and immediate habitability.</p>
-                </div>
-
-                <div className="bg-white p-5 rounded-lg border-l-4 border-[#A4343A] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Critical Home Systems</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                       <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
-                       <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Repairs to major, non-structural systems (e.g., plumbing, electrical, HVAC) that are necessary for maintaining basic living conditions.</p>
-                </div>
-
-                <div className="bg-white p-5 rounded-lg border-l-4 border-[#E55025] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Deferred Repair</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                       <span className="px-2 py-0.5 bg-[#E55025]/10 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Emergent</span>
-                       <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Deferred maintenance repairs address active, non-critical home systems repair needs that, if left unaddressed, can become critical home repair needs over time and use.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Occupant Health */}
-            <div className="mb-8">
-              <h4 className="font-bold text-[#E55025] mb-3 flex items-center gap-2"><Heart size={20}/> Occupant Health</h4>
-              <div className="grid gap-4">
-                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#A4343A] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Environmental Hazards Controls</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                       <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
-                       <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Non-architectural interventions that mitigate urgent, health-threatening environmental hazards (e.g., lead, mold, pest infestations) by directly reducing exposure to contaminants or conditions that severely impact resident health.</p>
-                </div>
-
-                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#A4343A] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Critical Accessibility / Fall Prevention</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                       <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
-                       <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Modifications that address urgent barriers preventing residents from safely and independently navigating and utilizing their home environment, ensuring immediate and safe use.</p>
-                </div>
-
-                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#FFD100] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Non-Critical Accessibility / Aging in Place</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                       <span className="px-2 py-0.5 bg-[#FFD100]/20 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Non-Critical</span>
-                       <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Non-critical improvements that enhance usability and functional access for individuals facing reduced mobility, visual, or auditory challenges, supporting their long-term independence and comfort.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Home Performance */}
-             <div className="mb-8">
-              <h4 className="font-bold text-[#0099CC] mb-3 flex items-center gap-2"><Zap size={20}/> Home Performance</h4>
-              <div className="grid gap-4">
-                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#E55025] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Disaster / Security Readiness</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                       <span className="px-2 py-0.5 bg-[#E55025]/10 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Emergent</span>
-                       <span className="px-2 py-0.5 bg-slate-200 text-[#88888D] text-xs rounded font-bold uppercase tracking-wide">Passive</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Proactive measures to strengthen the home’s resilience against external threats, helping prevent loss of life, property damage, or security breaches in emergencies.</p>
-                </div>
-
-                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#FFD100] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Home Utilities Performance</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                       <span className="px-2 py-0.5 bg-[#FFD100]/20 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Non-Critical</span>
-                       <span className="px-2 py-0.5 bg-slate-200 text-[#88888D] text-xs rounded font-bold uppercase tracking-wide">Passive</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Improving home systems' utility consumption and performance through maintenance, efficiency, conservation, and weatherization measures.</p>
+                   <div className="h-4 bg-gray-100 rounded w-5/6"></div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          <div>
-            <h3 className="text-xl font-bold text-black mb-4 border-b border-slate-200 pb-2">B. Community-based Sub-Categories</h3>
-            <p className="text-sm text-[#88888D] mb-6 bg-slate-100 p-3 rounded-lg border border-slate-200 inline-flex items-center gap-2">
-              <Info size={16} className="text-[#88888D]"/> 
-              <span><strong>Note:</strong> Criticality currently does not apply for Community Repair sub-categories.</span>
-            </p>
-            
-            <div className="mb-6">
-               <h4 className="font-bold text-[#3AA047] mb-3 flex items-center gap-2"><Users size={20}/> Community Repair</h4>
-               <div className="grid gap-4">
-                <div className="bg-white p-5 rounded-lg border-l-4 border-[#3AA047] shadow-sm">
-                  <span className="font-bold text-black block mb-2 text-lg">Community / Nonprofit Building Repair</span>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Repairs and improvements to all community and nonprofit buildings that stabilize these buildings so that they may continue to serve the community.</p>
-                </div>
-                <div className="bg-white p-5 rounded-lg border-l-4 border-[#3AA047] shadow-sm">
-                  <span className="font-bold text-black block mb-2 text-lg">Community Energy & Performance</span>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Repairs and improvements to all community and nonprofit buildings that decrease utility consumption and/or increase climate resilience.</p>
-                </div>
-                <div className="bg-white p-5 rounded-lg border-l-4 border-[#3AA047] shadow-sm">
-                  <span className="font-bold text-black block mb-2 text-lg">Public Space Improvements</span>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Non-building repairs and improvements that improve community space conditions.</p>
-                </div>
-               </div>
-            </div>
-          </div>
+      {/* CTA Section */}
+      <div className="bg-slate-900 py-20">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold text-white mb-6">Ready to professionalize your repair program?</h2>
+          <p className="text-slate-400 mb-10 text-lg">Join hundreds of affiliates using P&P Builder to standardize operations and reduce risk.</p>
+          <button 
+            onClick={onStart}
+            className="inline-flex justify-center items-center px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all hover:scale-105"
+          >
+            Launch Builder
+            <ChevronRight className="ml-2 w-5 h-5" />
+          </button>
         </div>
-      )
-    },
-    {
-      title: "Interactive Tool: The Criticality Matrix",
-      content: (
-        <div className="space-y-6">
-          <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 mb-6">
-            <h3 className="font-bold text-black mb-2 flex items-center gap-2">
-              <MousePointerClick size={20} /> How to use this Matrix
-            </h3>
-            <p className="text-[#88888D]">
-              When assessing a home, map every defect to this grid. <strong>Red zones</strong> represent your highest priority (Scope A). 
-              <strong>Orange/Yellow zones</strong> are secondary (Scope B). <strong>Grey zones</strong> should typically be referred out or deferred.
-            </p>
-          </div>
-          
-          {/* Embedding the Matrix Grid here */}
-          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <MatrixGrid />
-          </div>
-        </div>
-      )
-    },
-    {
-      title: "How to Use the Catalog Builder",
-      content: (
-        <div className="space-y-6">
-          <div className="bg-[#0099CC]/5 p-4 rounded-lg border border-[#0099CC]/20 flex items-start gap-3">
-             <LayoutGrid className="text-[#0099CC] mt-1" size={24} />
-             <div>
-               <h3 className="font-bold text-black mb-2">Your Workspace</h3>
-               <p className="text-black text-sm">The Catalog view is your interactive workspace. Here you will make policy decisions for every activity in the framework.</p>
-             </div>
-          </div>
+      </div>
+    </div>
+  );
+};
 
-          <div className="grid md:grid-cols-2 gap-8">
-            <div>
-               <h4 className="font-bold text-black mb-4 flex items-center gap-2">
-                 <span className="w-6 h-6 rounded-full bg-slate-200 text-black flex items-center justify-center text-xs">1</span>
-                 Navigation & Filters
-               </h4>
-               <p className="text-[#88888D] text-sm mb-4">
-                 Use the left sidebar to drill down into Pillars, Sub-Categories, and Types. You can also use the search bar at the top to find specific keywords like "Roof" or "Mold".
-               </p>
-               
-               <h4 className="font-bold text-black mb-4 flex items-center gap-2">
-                 <span className="w-6 h-6 rounded-full bg-slate-200 text-black flex items-center justify-center text-xs">2</span>
-                 Set Criticality Defaults
-               </h4>
-               <p className="text-[#88888D] text-sm mb-4">
-                 Each activity comes with a default Urgency and Condition. You can override these per activity if your local context differs.
-               </p>
+// --- Guide Panel Component ---
+
+const GuidePanel = ({ stepId }) => {
+  const guideContent = {
+    foundations: { title: "Setting the Foundation", text: "Start by defining your organization's boundaries. Providing accurate contact details ensures that the exported manual is ready for distribution." },
+    policyMap: { title: "Governance vs. Operations", text: "Policy 33 requires specific topics to be in a 'written, board-approved policy' (Sec 2.1.1). Use the 'Repair Program Policy Package' section to draft this policy language directly. Check a topic to open a text box for that section." },
+    programModel: { title: "Roles & Responsibilities", text: "Avoid listing specific people. List roles. In smaller affiliates, one person might wear three hats. Explicitly define who has 'signing authority'." },
+    scope: { title: "Pricing & Construction", text: "Policy 33 requires a defined 'Pricing and repayment model' and 'Types of construction activities'. Be specific about what you DON'T do (e.g., mold) to manage expectations." },
+    clientServices: { title: "Sweat Equity", text: "There is no obligation for the affiliate to implement sweat equity for its repair program, nor is a minimum number of sweat-equity hours required. However, if sweat equity is enforced, affiliates must provide accessible participation for the homeowner, as appropriate. It is important to remember that repairs serve individuals who may be living at extremely low-income levels and/or experiencing severe mobility and social limitations. Safeguarding both the mental and physical well-being of those at the greatest level of need should be the baseline for how repair programming is implemented." },
+    screening: { title: "Project Selection", text: "Define not just WHO you serve, but HOW you decide if a home is feasible. Define your 'Walk Away' criteria—when is a house too damaged?" },
+    lifecycle: { title: "Participation (Sweat Equity)", text: "Policy 33 requires defined 'Owner participation requirements'. Will you require sweat equity? If so, what accommodations exist for seniors or those with disabilities?" },
+    workforce: { title: "Risk & Procurement", text: "This is critical. Policy 33 requires 'Repair partner selection criteria' and 'Safety procedures'. Don't just check a box—list the actual insurance minimums and training rules." },
+    performance: { title: "Sustainability", text: "Policy 33 mandates a 'Financial sustainability' plan. How are you funding this? What are your cost controls? Grant reporting often relies on the KPIs you select here." },
+    compliance: { title: "Automating Compliance", text: "This section verifies your alignment with U.S. Policy 33. The 'Governance' fields allow you to generate a formal Compliance Declaration.", link: "https://hfhi.sharepoint.com/sites/ComplianceRequirements/Shared%20Documents/Policy%2033_Home_Repairs.pdf?csf=1&e=ZJK1Q9&CID=46dbe841-b4a0-4ae3-8d69-22a34d8cc56a", linkText: "View Policy 33 PDF" },
+    export: { title: "Ready for Approval", text: "This export generates a draft for your Board or ED. It includes a version history log." }
+  };
+
+  const content = guideContent[stepId] || { title: "Guidance", text: "Follow the prompts to complete this section." };
+
+  return (
+    <div className="bg-white border-l border-gray-200 p-6 h-full shadow-sm flex flex-col">
+      <div className="flex-1">
+        <div className="flex items-center mb-4">
+            <div className="bg-blue-100 p-2 rounded-full mr-3">
+              {stepId === 'clientServices' ? <AlertCircle className="w-5 h-5 text-blue-600" /> : <Info className="w-5 h-5 text-blue-600" />}
             </div>
-            
-            <div className="bg-slate-100 p-4 rounded-xl border border-slate-200">
-               <h4 className="font-bold text-black mb-4 text-center">The Decision Buttons</h4>
-               <div className="space-y-3">
-                 <div className="bg-white p-3 rounded shadow-sm border-l-4 border-[#3AA047]">
-                   <span className="font-bold text-[#3AA047] block text-xs uppercase">Eligible</span>
-                   <span className="text-xs text-[#88888D]">Standard offer. We do this work.</span>
-                 </div>
-                 <div className="bg-white p-3 rounded shadow-sm border-l-4 border-[#FFD100]">
-                   <span className="font-bold text-[#E55025] block text-xs uppercase">Conditional</span>
-                   <span className="text-xs text-[#88888D]">Only under specific circumstances (add a note!).</span>
-                 </div>
-                 <div className="bg-white p-3 rounded shadow-sm border-l-4 border-[#A4343A]">
-                   <span className="font-bold text-[#A4343A] block text-xs uppercase">Not Eligible</span>
-                   <span className="text-xs text-[#88888D]">We do not fund or perform this work.</span>
-                 </div>
-               </div>
+            <h4 className="font-bold text-gray-800 text-sm uppercase tracking-wide">
+              {stepId === 'clientServices' ? 'IMPORTANT' : 'Best Practices'}
+            </h4>
+        </div>
+        <h3 className="text-lg font-semibold text-blue-900 mb-3">{content.title}</h3>
+        <p className="text-sm text-gray-600 leading-relaxed mb-6">{content.text}</p>
+        {content.link && (
+            <a href={content.link} target="_blank" rel="noopener noreferrer" className="flex items-center p-3 bg-blue-50 border border-blue-100 rounded-lg text-sm text-blue-700 font-medium hover:bg-blue-100 transition-colors group">
+            <FileText className="w-4 h-4 mr-2" />{content.linkText || "View Resource"}<ExternalLink className="w-3 h-3 ml-auto opacity-50 group-hover:opacity-100" />
+            </a>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// --- Step Components ---
+
+const FoundationsStep = ({ data, onChange }) => {
+  const addStaff = () => {
+    const newStaff = { id: Date.now(), name: '', title: '' };
+    onChange('staff', [...(data.staff || []), newStaff]);
+  };
+  const updateStaff = (id, field, value) => {
+    const updated = data.staff.map(s => s.id === id ? { ...s, [field]: value } : s);
+    onChange('staff', updated);
+  };
+  const removeStaff = (id) => onChange('staff', data.staff.filter(s => s.id !== id));
+
+  return (
+    <div className="space-y-8 max-w-4xl">
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-6">
+            <h4 className="font-bold text-gray-900 border-b pb-2 mb-4">Organization Profile</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="md:col-span-2">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Affiliate / Organization Name <span className="text-red-500">*</span></label>
+                    <input type="text" className="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border" value={data.orgName || ''} onChange={(e) => onChange('orgName', e.target.value)} placeholder="e.g. Habitat for Humanity of Springfield" />
+                </div>
+                <div className="md:col-span-2">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Mailing Address <span className="text-red-500">*</span></label>
+                    <input type="text" className="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border" value={data.orgAddress || ''} onChange={(e) => onChange('orgAddress', e.target.value)} placeholder="e.g. 123 Main St, Springfield, IL 62704" />
+                </div>
+                <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Phone Number <span className="text-red-500">*</span></label>
+                    <input type="text" className="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border" value={data.orgPhone || ''} onChange={(e) => onChange('orgPhone', e.target.value)} placeholder="(555) 123-4567" />
+                </div>
+                <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address <span className="text-red-500">*</span></label>
+                    <input type="email" className="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border" value={data.orgEmail || ''} onChange={(e) => onChange('orgEmail', e.target.value)} placeholder="info@habitatspringfield.org" />
+                </div>
+                <div className="md:col-span-2">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Service Area (Counties/Zips) <span className="text-red-500">*</span></label>
+                    <input type="text" className="w-full rounded-lg border-gray-300 shadow-sm p-2.5 border" value={data.serviceArea || ''} onChange={(e) => onChange('serviceArea', e.target.value)} placeholder="e.g. Greene County and Northern Polk County" />
+                </div>
             </div>
-          </div>
         </div>
-      )
-    },
-    {
-      title: "Ready to Build Your Policy?",
-      content: (
-        <div className="text-center space-y-8 py-8">
-          <div className="w-20 h-20 bg-[#3AA047]/10 text-[#3AA047] rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle size={40} />
-          </div>
-          <div>
-            <h3 className="text-2xl font-bold text-black mb-4">You're ready to start.</h3>
-            <p className="text-lg text-[#88888D] max-w-xl mx-auto">
-              Use the <strong>Catalog</strong> to browse activities. Mark them as Eligible, Not Eligible, or Conditional. 
-              Then, use the <strong>Export Activities</strong> tool to generate your manual.
-            </p>
-          </div>
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <h4 className="font-bold text-gray-900 mb-4 flex items-center border-b pb-2"><User className="w-5 h-5 mr-2 text-blue-600"/> Key Staff Contacts</h4>
+            <div className="space-y-3">
+                {(data.staff || []).map((staff) => (
+                    <div key={staff.id} className="flex gap-3 items-center">
+                        <input type="text" className="flex-1 rounded-lg border-gray-300 shadow-sm p-2.5 border" value={staff.name} onChange={(e) => updateStaff(staff.id, 'name', e.target.value)} placeholder="Full Name" />
+                        <input type="text" className="flex-1 rounded-lg border-gray-300 shadow-sm p-2.5 border" value={staff.title} onChange={(e) => updateStaff(staff.id, 'title', e.target.value)} placeholder="Job Title" />
+                        <button onClick={() => removeStaff(staff.id)} className="text-gray-400 hover:text-red-500"><Trash2 className="h-4 w-4" /></button>
+                    </div>
+                ))}
+                <button onClick={addStaff} className="text-sm text-blue-600 font-medium flex items-center mt-2"><Plus className="h-4 w-4 mr-1" /> Add Staff Member</button>
+            </div>
         </div>
-      )
-    }
+    </div>
+  );
+};
+
+const PolicyMapStep = ({ data, onChange }) => {
+  const updateMap = (key, field, value) => {
+    // If updating a boolean toggle
+    const currentEntry = data.policyMap?.[key] || { org: false, program: false, programDetails: '' };
+    onChange('policyMap', { 
+        ...data.policyMap, 
+        [key]: { ...currentEntry, [field]: value } 
+    });
+  };
+
+  const updatePackage = (exists) => {
+    onChange('policyPackage', { ...(data.policyPackage || {}), exists });
+  };
+
+  const toggleCoveredTopic = (topicKey) => {
+    const newTopics = { 
+        ...(data.policyPackage?.coveredTopics || {}), 
+        [topicKey]: !data.policyPackage?.coveredTopics?.[topicKey] 
+    };
+    onChange('policyPackage', { ...(data.policyPackage || {}), coveredTopics: newTopics });
+  };
+
+  const updateTopicContent = (topicKey, value) => {
+    const newContent = {
+        ...(data.policyPackage?.topicContent || {}),
+        [topicKey]: value
+    };
+    onChange('policyPackage', { ...(data.policyPackage || {}), topicContent: newContent });
+  };
+
+  const rows = [
+    { key: 'governance', label: 'Governance & Board Structure' },
+    { key: 'finance', label: 'Financial Management' },
+    { key: 'hr', label: 'HR & Personnel' },
+    { key: 'eligibility', label: 'Client Eligibility Criteria' },
+    { key: 'safety', label: 'Worksite Safety' },
+    { key: 'procurement', label: 'Contractor Procurement' },
+    { key: 'recordKeeping', label: 'Record Keeping' },
   ];
 
   return (
-    <div className="flex h-[calc(100vh-80px)]">
-      <LearnSidebar 
-        currentStep={step}
-        steps={steps}
-        onStepChange={setStep}
-        onHome={onHome}
-      />
-      
-      <div className="flex-1 overflow-y-auto bg-slate-50">
-        <div className="max-w-5xl mx-auto p-6 min-h-full flex flex-col">
-          <div className="flex-1">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-3xl font-bold text-black">{steps[step].title}</h2>
-              <span className="text-sm font-medium px-3 py-1 bg-slate-200 rounded-full text-black">Step {step + 1} of {steps.length}</span>
-            </div>
+    <div className="space-y-8 max-w-4xl">
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+        <div className="bg-slate-50 px-6 py-4 border-b border-gray-200">
+            <h3 className="font-bold text-gray-800 flex items-center">
+                <FileText className="w-5 h-5 mr-2 text-blue-600"/> Repair Program Policy Package (2.1.1)
+            </h3>
+        </div>
+        <div className="p-6">
+            <p className="text-sm text-gray-600 mb-4">
+                Policy 33 (Sec 2.1.1) requires a "written, board-approved policy" covering specific topics. 
+                Select the topics below to open a text box where you can draft or paste your policy language.
+            </p>
             
-            <div className="w-full bg-slate-200 h-2 rounded-full mb-8 overflow-hidden">
-              <div 
-                className="bg-[#0099CC] h-2 rounded-full transition-all duration-500 ease-out"
-                style={{ width: `${((step + 1) / steps.length) * 100}%` }}
-              />
-            </div>
+            <label className={`flex items-center space-x-3 p-4 rounded-xl border transition-all cursor-pointer shadow-sm mb-6 ${data.policyPackage?.exists ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-200'}`}>
+                <input
+                    type="checkbox"
+                    className="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    checked={data.policyPackage?.exists || false}
+                    onChange={(e) => updatePackage(e.target.checked)}
+                />
+                <span className="font-semibold text-gray-800">We have (or are drafting) a Board-Approved Repair Policy.</span>
+            </label>
 
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 min-h-[400px] animate-in fade-in slide-in-from-bottom-4 duration-500">
-              {steps[step].content}
-            </div>
-          </div>
-
-          <div className="flex justify-between mt-8 pt-6 border-t border-slate-200 sticky bottom-0 bg-slate-50/90 backdrop-blur pb-4">
-            <button 
-              onClick={() => setStep(Math.max(0, step - 1))}
-              disabled={step === 0}
-              className="px-6 py-3 rounded-lg text-[#88888D] font-medium disabled:opacity-30 hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200 transition-all"
-            >
-              Back
-            </button>
-            <button 
-              onClick={() => {
-                if (step === steps.length - 1) onComplete();
-                else setStep(step + 1);
-              }}
-              className="px-8 py-3 bg-[#0099CC] text-white font-bold rounded-lg hover:bg-[#0099CC]/80 shadow-md hover:shadow-lg transition-all flex items-center gap-2"
-            >
-              {step === steps.length - 1 ? "Start Activity Builder" : "Next Step"}
-              {step !== steps.length - 1 && <ChevronRight size={18} />}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-interface BreadcrumbsProps {
-  activePillar: string;
-  activeSubCat: string;
-  activeType: string;
-}
-
-const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ activePillar, activeSubCat, activeType }) => {
-  const pillar = TAXONOMY_DATA.find(p => p.id === activePillar);
-  const subCat = pillar?.subCategories.find(sc => sc.id === activeSubCat);
-  const type = subCat?.types.find(t => t.id === activeType);
-
-  if (activePillar === 'all' || !pillar) return <div className="text-sm text-[#88888D] font-medium">Viewing All Catalog</div>;
-
-  return (
-    <div className="flex items-center gap-2 text-sm text-[#88888D] mt-2">
-      <span className="font-semibold text-black">{pillar.name}</span>
-      {subCat && (
-        <>
-          <ChevronRight size={14} className="text-[#88888D]" />
-          <span className={!type ? "font-semibold text-black" : ""}>{subCat.name}</span>
-        </>
-      )}
-      {type && (
-        <>
-          <ChevronRight size={14} className="text-[#88888D]" />
-          <span className="font-semibold text-[#0099CC] bg-[#0099CC]/10 px-2 py-0.5 rounded border border-[#0099CC]/20">{type.name}</span>
-        </>
-      )}
-    </div>
-  );
-};
-
-interface CatalogViewProps {
-  selections: SelectionsMap;
-  onUpdateSelection: (id: string, data: Selection) => void;
-  onHome: () => void;
-}
-
-const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection, onHome }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [activePillar, setActivePillar] = useState("all");
-  const [activeSubCat, setActiveSubCat] = useState("all");
-  const [activeType, setActiveType] = useState("all");
-
-  const filteredData = useMemo(() => {
-    let data = TAXONOMY_DATA;
-    
-    // Filter by Pillar
-    if (activePillar !== "all") {
-      data = data.filter(p => p.id === activePillar);
-    }
-    
-    // Process subcats and types based on filters and search
-    return data.map(p => ({
-      ...p,
-      subCategories: p.subCategories.map(sc => ({
-        ...sc,
-        types: sc.types.map(t => ({
-          ...t,
-          interventions: t.interventions.filter(i => 
-            // Search text filter
-            (!searchTerm || i.name.toLowerCase().includes(searchTerm.toLowerCase()) || t.name.toLowerCase().includes(searchTerm.toLowerCase()))
-          )
-        })).filter(t => {
-           // Type filter logic
-           const typeMatch = activeType === 'all' || t.id === activeType;
-           const hasInterventions = t.interventions.length > 0;
-           return typeMatch && hasInterventions;
-        })
-      })).filter(sc => {
-          // SubCat filter logic
-          const subCatMatch = activeSubCat === 'all' || sc.id === activeSubCat;
-          const hasTypes = sc.types.length > 0;
-          return subCatMatch && hasTypes;
-      })
-    })).filter(p => p.subCategories.length > 0);
-  }, [searchTerm, activePillar, activeSubCat, activeType]);
-
-  return (
-    <div className="flex h-[calc(100vh-80px)]">
-      <Sidebar 
-        activePillar={activePillar} 
-        onPillarChange={setActivePillar}
-        activeSubCat={activeSubCat}
-        onSubCatChange={setActiveSubCat}
-        activeType={activeType}
-        onTypeChange={setActiveType}
-        selections={selections}
-        onHome={onHome}
-      />
-
-      {/* Main Content */}
-      <div className="flex-1 overflow-y-auto bg-white">
-        <div className="sticky top-0 bg-white border-b border-slate-200 z-10 px-6 py-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#88888D]" size={20} />
-            <input 
-              type="text" 
-              placeholder="Search activities (e.g., 'mold', 'foundation', 'roof')..." 
-              className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#0099CC] focus:outline-none"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <Breadcrumbs activePillar={activePillar} activeSubCat={activeSubCat} activeType={activeType} />
-        </div>
-
-        <div className="p-6 space-y-8">
-          {filteredData.length === 0 ? (
-            <div className="text-center text-[#88888D] py-12">No activities found matching your filters.</div>
-          ) : (
-            filteredData.map(pillar => (
-              <div key={pillar.id} className="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                <div className={`${pillar.bgColor} px-6 py-4 border-b border-slate-200 flex items-center justify-between`}>
-                  <div className="flex items-center gap-3">
-                    <pillar.icon className={pillar.color} size={24} />
-                    <div>
-                      <h2 className="text-lg font-bold text-black">{pillar.name}</h2>
-                      <p className="text-xs text-black">{pillar.description}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="divide-y divide-slate-100">
-                  {pillar.subCategories.map(sc => (
-                    <div key={sc.id} className="bg-white">
-                      <div className="px-6 py-3 bg-slate-50 flex items-center justify-between">
-                        <span className="font-semibold text-black text-sm">{sc.name}</span>
-                      </div>
-                      <div className="p-6 grid gap-6">
-                        {sc.types.map(type => (
-                          <div key={type.id} className="space-y-3">
-                            <div className="border-b border-slate-100 pb-2">
-                              <h4 className="text-sm font-bold text-black flex items-center gap-2">
-                                <span className="w-1.5 h-1.5 bg-[#88888D] rounded-full"></span>
-                                {type.name}
-                              </h4>
-                              {type.description && (
-                                <p className="text-xs text-[#88888D] mt-1 ml-3.5 leading-relaxed">{type.description}</p>
-                              )}
-                            </div>
-                            
-                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                              {type.interventions.map(int => {
-                                const sel = selections[int.id] || {};
-                                return (
-                                  <div key={int.id} className={`border rounded-lg p-4 transition-all ${sel.status ? 'border-slate-300 bg-white' : 'border-slate-200 bg-slate-50/50 hover:bg-white hover:shadow-sm'}`}>
-                                    <div className="flex justify-between items-start mb-3">
-                                      <div>
-                                        <h5 className="font-medium text-black">{int.name}</h5>
-                                        <div className="flex flex-wrap gap-2 mt-2">
-                                          <div className="flex flex-col">
-                                            <label className="text-[10px] text-[#88888D] font-semibold mb-0.5">URGENCY</label>
-                                            <select
-                                              value={sel.urgency || int.urgency}
-                                              onChange={(e) => onUpdateSelection(int.id, { ...sel, urgency: e.target.value })}
-                                              className="text-[10px] uppercase tracking-wider px-2 py-1 bg-slate-100 text-black rounded border border-slate-200 cursor-pointer hover:bg-slate-200 focus:ring-1 focus:ring-[#0099CC] focus:outline-none"
-                                              onClick={(e) => e.stopPropagation()}
-                                            >
-                                              {['Critical', 'Emergent', 'Non-Critical', 'N/A'].map(o => <option key={o} value={o}>{o}</option>)}
-                                            </select>
-                                          </div>
-                                          <div className="flex flex-col">
-                                            <label className="text-[10px] text-[#88888D] font-semibold mb-0.5">CONDITION</label>
-                                            <select
-                                              value={sel.condition || int.condition}
-                                              onChange={(e) => onUpdateSelection(int.id, { ...sel, condition: e.target.value })}
-                                              className="text-[10px] uppercase tracking-wider px-2 py-1 bg-slate-100 text-black rounded border border-slate-200 cursor-pointer hover:bg-slate-200 focus:ring-1 focus:ring-[#0099CC] focus:outline-none"
-                                              onClick={(e) => e.stopPropagation()}
-                                            >
-                                              {['Active', 'Passive', 'Inactive', 'N/A'].map(o => <option key={o} value={o}>{o}</option>)}
-                                            </select>
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <StatusBadge status={sel.status} />
-                                    </div>
+            {data.policyPackage?.exists && (
+                <div className="animate-fadeIn space-y-4">
+                    <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Required Topics (Select to Edit)</h4>
+                    <div className="space-y-3">
+                        {REQUIRED_TOPICS_2_1_1.map(topic => {
+                            const isChecked = data.policyPackage?.coveredTopics?.[topic.key] || false;
+                            return (
+                                <div key={topic.key} className={`border rounded-lg p-3 transition-all ${isChecked ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-200'}`}>
+                                    <label className="flex items-center space-x-3 cursor-pointer">
+                                        <input 
+                                            type="checkbox"
+                                            className="rounded text-blue-600 focus:ring-blue-500 h-4 w-4"
+                                            checked={isChecked}
+                                            onChange={() => toggleCoveredTopic(topic.key)}
+                                        />
+                                        <span className={`text-sm font-medium ${isChecked ? 'text-blue-900' : 'text-gray-700'}`}>{topic.label}</span>
+                                    </label>
                                     
-                                    {/* Action Buttons */}
-                                    <div className="flex gap-2 mt-4 pt-3 border-t border-slate-100">
-                                      <button 
-                                        onClick={() => onUpdateSelection(int.id, { ...sel, status: 'eligible' })}
-                                        className={`flex-1 text-xs py-1.5 rounded border ${sel.status === 'eligible' ? 'bg-[#3AA047] text-white border-[#3AA047]' : 'border-slate-200 text-[#88888D] hover:bg-[#3AA047]/10'}`}
-                                      >
-                                        Eligible
-                                      </button>
-                                      <button 
-                                        onClick={() => onUpdateSelection(int.id, { ...sel, status: 'conditional' })}
-                                        className={`flex-1 text-xs py-1.5 rounded border ${sel.status === 'conditional' ? 'bg-[#FFD100] text-black border-[#FFD100]' : 'border-slate-200 text-[#88888D] hover:bg-[#FFD100]/20'}`}
-                                      >
-                                        Conditional
-                                      </button>
-                                      <button 
-                                        onClick={() => onUpdateSelection(int.id, { ...sel, status: 'not_eligible' })}
-                                        className={`flex-1 text-xs py-1.5 rounded border ${sel.status === 'not_eligible' ? 'bg-[#A4343A] text-white border-[#A4343A]' : 'border-slate-200 text-[#88888D] hover:bg-[#A4343A]/10'}`}
-                                      >
-                                        No
-                                      </button>
-                                      <button 
-                                        onClick={() => onUpdateSelection(int.id, { ...sel, status: 'na' })}
-                                        className={`flex-1 text-xs py-1.5 rounded border ${sel.status === 'na' ? 'bg-[#88888D] text-white border-[#88888D]' : 'border-slate-200 text-[#88888D] hover:bg-slate-100'}`}
-                                      >
-                                        N/A
-                                      </button>
-                                    </div>
-                                    {sel.status && (
-                                      <input 
-                                        type="text"
-                                        placeholder="Add notes/conditions..."
-                                        className="w-full mt-2 text-xs border border-slate-200 rounded px-2 py-1 focus:ring-1 focus:ring-[#0099CC] focus:border-[#0099CC]"
-                                        value={sel.notes || ''}
-                                        onChange={(e) => onUpdateSelection(int.id, { ...sel, notes: e.target.value })}
-                                      />
+                                    {isChecked && (
+                                        <div className="mt-3 ml-7 animate-fadeIn">
+                                            <textarea
+                                                className="w-full text-sm rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2.5 border"
+                                                rows={3}
+                                                placeholder={`Enter policy text for ${topic.label}...`}
+                                                value={data.policyPackage?.topicContent?.[topic.key] || ''}
+                                                onChange={(e) => updateTopicContent(topic.key, e.target.value)}
+                                            />
+                                        </div>
                                     )}
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                                </div>
+                            );
+                        })}
                     </div>
-                  ))}
                 </div>
-              </div>
-            ))
-          )}
+            )}
+        </div>
+      </div>
+
+      <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm bg-white">
+        <div className="bg-slate-50 px-6 py-4 border-b border-gray-200">
+            <h3 className="font-bold text-gray-800 flex items-center">
+                <Shield className="w-5 h-5 mr-2 text-blue-600"/> Affiliate Policy Map
+            </h3>
+        </div>
+        
+        <div className="p-6 bg-white border-b border-gray-100">
+            <p className="text-sm text-gray-600">
+                Use checkboxes to indicate where each policy exists. In many cases, there may be both affiliate and program level policy for these topic areas.
+            </p>
+        </div>
+
+        <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-white">
+            <tr>
+                <th className="py-4 pl-6 pr-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-1/3">Category</th>
+                <th className="px-3 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider w-24">Org Level</th>
+                <th className="px-3 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider w-24">Program Level</th>
+                <th className="px-3 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Details</th>
+            </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100 bg-white">
+            {rows.map((row) => {
+                const entry = data.policyMap?.[row.key] || { org: false, program: false, programDetails: '' };
+                const isOrg = typeof entry === 'object' ? entry.org : (entry === 'org' || entry === 'both');
+                const isProgram = typeof entry === 'object' ? entry.program : (entry === 'program' || entry === 'both');
+                const details = typeof entry === 'object' ? entry.programDetails : '';
+
+                return (
+                    <tr key={row.key} className="hover:bg-slate-50 transition-colors">
+                        <td className="py-4 pl-6 pr-3 text-sm font-medium text-gray-900 align-top pt-5">{row.label}</td>
+                        <td className="px-3 py-4 text-center align-top pt-5">
+                            <input 
+                                type="checkbox" 
+                                className="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                checked={isOrg} 
+                                onChange={(e) => updateMap(row.key, 'org', e.target.checked)} 
+                            />
+                        </td>
+                        <td className="px-3 py-4 text-center align-top pt-5">
+                            <input 
+                                type="checkbox" 
+                                className="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                checked={isProgram} 
+                                onChange={(e) => updateMap(row.key, 'program', e.target.checked)} 
+                            />
+                        </td>
+                        <td className="px-3 py-4 align-top">
+                            {isProgram && (
+                                <div className="animate-fadeIn">
+                                    <textarea
+                                        className="w-full text-xs rounded border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
+                                        rows={2}
+                                        placeholder={`Enter specific ${row.label} program policy details...`}
+                                        value={details}
+                                        onChange={(e) => updateMap(row.key, 'programDetails', e.target.value)}
+                                    />
+                                </div>
+                            )}
+                        </td>
+                    </tr>
+                );
+            })}
+            </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+const ProgramModelStep = ({ data, onChange }) => {
+  const addRole = () => {
+    const newRole = { id: Date.now(), title: 'New Role', responsibilities: '', approves: [] };
+    onChange('roles', [...data.roles, newRole]);
+  };
+
+  const updateRole = (id, field, value) => {
+    const updated = data.roles.map(r => r.id === id ? { ...r, [field]: value } : r);
+    onChange('roles', updated);
+  };
+
+  const removeRole = (id) => {
+    onChange('roles', data.roles.filter(r => r.id !== id));
+  };
+
+  return (
+    <div className="space-y-4">
+      {data.roles.map((role) => (
+        <div key={role.id} className="relative rounded-xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div className="absolute top-4 right-4">
+            <button onClick={() => removeRole(role.id)} className="text-gray-400 hover:text-red-500 p-1"><Trash2 className="h-4 w-4" /></button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Role Title</label>
+              <input type="text" className="block w-full border-0 border-b-2 border-gray-100 focus:border-blue-500 focus:ring-0 px-0 py-2 text-gray-900 font-medium placeholder-gray-300 transition-colors bg-transparent" value={role.title} onChange={(e) => updateRole(role.id, 'title', e.target.value)} placeholder="Enter title" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Key Responsibilities</label>
+              <input type="text" className="block w-full border-0 border-b-2 border-gray-100 focus:border-blue-500 focus:ring-0 px-0 py-2 text-gray-900 placeholder-gray-300 transition-colors bg-transparent" value={role.responsibilities} onChange={(e) => updateRole(role.id, 'responsibilities', e.target.value)} placeholder="Enter responsibilities" />
+            </div>
+          </div>
+        </div>
+      ))}
+      <button onClick={addRole} className="w-full flex justify-center items-center py-4 border-2 border-dashed border-gray-300 rounded-xl text-sm font-semibold text-gray-500 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all"><Plus className="h-5 w-5 mr-2" /> Add New Role</button>
+    </div>
+  );
+};
+
+const ScopeStep = ({ data, onChange }) => {
+  const updatePricing = (field, value) => onChange('pricing', { ...data.pricing, [field]: value });
+  // Logic to handle catalog selection
+  const setHasCatalog = (val) => onChange('constructionActivities', { ...data.constructionActivities, hasCatalog: val });
+
+  return (
+    <div className="space-y-8">
+      {/* Pricing Model - Moved Up */}
+      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+        <h4 className="font-bold text-gray-900 mb-4 flex items-center"><DollarSign className="w-5 h-5 mr-2 text-blue-600"/> Pricing & Repayment Model</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Pricing Model Type</label>
+                <select className="block w-full rounded-lg border-gray-300 p-2.5 border" value={data.pricing?.modelType || 'grant'} onChange={(e) => updatePricing('modelType', e.target.value)}>
+                    <option value="grant">Grant / No Cost</option>
+                    <option value="loan">Loan / Repayment</option>
+                    <option value="hybrid">Hybrid (Grant + Loan)</option>
+                    <option value="fee">Fee for Service</option>
+                </select>
+            </div>
+            <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Calculation Method</label>
+                <input type="text" className="block w-full rounded-lg border-gray-300 p-2.5 border" value={data.pricing?.calculationMethod || ''} onChange={(e) => updatePricing('calculationMethod', e.target.value)} placeholder="e.g. Materials + Labor + 15%" />
+            </div>
+            <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Repayment Terms & Hardship Policy</label>
+                <textarea className="block w-full rounded-lg border-gray-300 p-2.5 border h-20" value={data.pricing?.repaymentTerms || ''} onChange={(e) => updatePricing('repaymentTerms', e.target.value)} placeholder="e.g. 0% interest, forgivable lien. Hardship deferrals available." />
+            </div>
+            <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Financial Cap per Project ($)</label>
+                <input type="number" className="block w-full rounded-lg border-gray-300 p-2.5 border" value={data.financialCap} onChange={(e) => onChange('financialCap', e.target.value)} />
+            </div>
+        </div>
+      </div>
+
+      {/* Construction Activities - Simplified & Moved Down */}
+      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+        <h4 className="font-bold text-gray-900 mb-4 flex items-center"><Hammer className="w-5 h-5 mr-2 text-blue-600"/> Construction Activities</h4>
+        <div className="space-y-4">
+             <label className="block text-sm font-medium text-gray-700">
+                Have you generated a comprehensive construction activities list using the Catalog Builder?
+             </label>
+             <div className="flex gap-4">
+                <label className="flex items-center cursor-pointer">
+                    <input 
+                        type="radio" 
+                        name="hasCatalog" 
+                        checked={data.constructionActivities?.hasCatalog === true} 
+                        onChange={() => setHasCatalog(true)} 
+                        className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                    />
+                    <span className="ml-2 text-sm text-gray-900">Yes</span>
+                </label>
+                <label className="flex items-center cursor-pointer">
+                    <input 
+                        type="radio" 
+                        name="hasCatalog" 
+                        checked={data.constructionActivities?.hasCatalog === false} 
+                        onChange={() => setHasCatalog(false)} 
+                        className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                    />
+                    <span className="ml-2 text-sm text-gray-900">No</span>
+                </label>
+             </div>
+
+             {data.constructionActivities?.hasCatalog === true && (
+                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 flex items-start animate-fadeIn">
+                    <Info className="w-5 h-5 text-blue-600 mr-2 mt-0.5" />
+                    <div>
+                        <p className="text-sm text-blue-900 font-bold mb-1">Action Required</p>
+                        <p className="text-sm text-blue-800">Please attach <strong>"Appendix A: Construction Activities"</strong> to your final Policies and Procedures Manual.</p>
+                    </div>
+                 </div>
+             )}
+
+             {data.constructionActivities?.hasCatalog === false && (
+                 <div className="bg-amber-50 p-4 rounded-lg border border-amber-200 flex items-start animate-fadeIn">
+                    <AlertCircle className="w-5 h-5 text-amber-600 mr-2 mt-0.5" />
+                    <div>
+                        <p className="text-sm text-amber-900 font-bold mb-1">Incomplete</p>
+                        <p className="text-sm text-amber-800">
+                            To proceed compliant with Policy 33, you must define your construction activities. 
+                            Please use the <a href="#" className="underline font-semibold hover:text-amber-900">Catalog Builder</a> to generate this list.
+                        </p>
+                    </div>
+                 </div>
+             )}
         </div>
       </div>
     </div>
   );
 };
 
-interface ReportViewProps {
-  selections: SelectionsMap;
-}
-
-const ReportView: React.FC<ReportViewProps> = ({ selections }) => {
-  const reportRef = useRef<HTMLDivElement>(null);
-
-  const getFilteredInterventions = (status: string) => {
-    return ALL_INTERVENTIONS.filter(i => (selections[i.id]?.status === status));
-  };
-
-  const getPriorityLabel = (urgency?: string, condition?: string) => {
-    if (!urgency || !condition || urgency === 'N/A' || condition === 'N/A') return null;
+// --- NEW CLIENT SERVICES STEP ---
+const ClientServicesStep = ({ data, onChange }) => {
+    // Helper to update clientServices nested data
+    const updateCS = (field, value) => onChange('clientServices', { ...data.clientServices, [field]: value });
     
-    const map: { [key: string]: string } = {
-      'Critical-Active': 'Priority 1: Immediate Action',
-      'Emergent-Active': 'Priority 2: High Urgency',
-      'Non-Critical-Active': 'Priority 4: Monitor',
-      'Critical-Passive': 'Priority 2: Address Soon',
-      'Emergent-Passive': 'Priority 3: Plan',
-      'Non-Critical-Passive': 'Priority 5: Defer',
-      'Critical-Inactive': 'Priority 3: Investigate',
-      'Emergent-Inactive': 'Priority 5: Defer',
-      'Non-Critical-Inactive': 'Priority 6: No Action',
+    // For stages inside clientServices
+    const updateStages = (newStages) => {
+        updateCS('stages', newStages);
     };
-    return map[`${urgency}-${condition}`] || null;
-  };
 
-  const eligibleItems = getFilteredInterventions('eligible');
-  const conditionalItems = getFilteredInterventions('conditional');
-  const notEligibleItems = getFilteredInterventions('not_eligible');
+    // For participation inside clientServices
+    const updateParticipation = (field, value) => {
+        const currentPart = data.clientServices?.participation || {};
+        updateCS('participation', { ...currentPart, [field]: value });
+    };
 
-  const copyToClipboard = () => {
-    if (reportRef.current) {
-      const range = document.createRange();
-      range.selectNode(reportRef.current);
-      window.getSelection()?.removeAllRanges();
-      window.getSelection()?.addRange(range);
-      document.execCommand('copy');
-      window.getSelection()?.removeAllRanges();
-      alert('Report copied to clipboard! You can now paste it into Word or Google Docs.');
-    }
-  };
-
-  const GroupedList: React.FC<{ items: Intervention[] }> = ({ items }) => {
-    if (items.length === 0) return <p className="italic text-[#88888D]">None selected.</p>;
-    
-    // Group by Pillar -> SubCategory
-    const grouped = items.reduce((acc, item) => {
-      const key = `${item.pillarName}::${item.subCatName}`;
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(item);
-      return acc;
-    }, {} as { [key: string]: Intervention[] });
+    const stages = data.clientServices?.stages || [];
+    const participation = data.clientServices?.participation || {};
 
     return (
-      <div className="space-y-6">
-        {Object.entries(grouped).map(([key, groupItems]) => {
-          const [pillar, subCat] = key.split('::');
-          return (
-            <div key={key} className="break-inside-avoid">
-              <h4 className="font-bold text-black border-b border-slate-200 pb-1 mb-3">{pillar} - {subCat}</h4>
-              <ul className="list-disc pl-5 space-y-4">
-                {groupItems.map(item => {
-                  const urgency = selections[item.id]?.urgency || item.urgency;
-                  const condition = selections[item.id]?.condition || item.condition;
-                  const priority = getPriorityLabel(urgency, condition);
-
-                  return (
-                    <li key={item.id} className="text-sm text-black">
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1">
-                        <span className="font-medium text-base">{item.name}</span>
-                        {priority && (
-                          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border shrink-0 ${
-                            priority.includes('Priority 1') ? 'bg-[#A4343A]/10 text-[#A4343A] border-[#A4343A]/20' :
-                            priority.includes('Priority 2') ? 'bg-[#E55025]/10 text-[#E55025] border-[#E55025]/20' :
-                            'bg-slate-100 text-[#88888D] border-slate-200'
-                          }`}>
-                            {priority}
-                          </span>
-                        )}
-                      </div>
-                      
-                      {(urgency !== 'N/A' && condition !== 'N/A') && (
-                        <div className="text-xs text-[#88888D] mt-1 flex flex-wrap gap-x-4 gap-y-1">
-                          <span className="flex items-center gap-1 font-medium text-black">
-                            Urgency: <span className="font-normal text-[#88888D]">{urgency}</span>
-                          </span>
-                          <span className="flex items-center gap-1 font-medium text-black">
-                            Condition: <span className="font-normal text-[#88888D]">{condition}</span>
-                          </span>
-                        </div>
-                      )}
-
-                      {selections[item.id].notes && (
-                        <div className="mt-1.5 bg-[#FFD100]/20 p-2 rounded border border-[#FFD100]/40 text-xs italic text-black">
-                          <strong>Note:</strong> {selections[item.id].notes}
-                        </div>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
+        <div className="space-y-8">
+             <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                <h4 className="font-bold text-gray-900 mb-4 flex items-center"><User className="w-5 h-5 mr-2 text-blue-600"/> Owner Participation (Sweat Equity)</h4>
+                <div className="grid grid-cols-1 gap-6">
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Participation Requirement <span className="text-red-500">*</span></label>
+                        <select 
+                            className="block w-full rounded-lg border-gray-300 p-2.5 border" 
+                            value={participation.required || ''} 
+                            onChange={(e) => updateParticipation('required', e.target.value)}
+                        >
+                            <option value="" disabled>Select one</option>
+                            <option value="not_required">Not Required (Recommended)</option>
+                            <option value="required">Required</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Participation Options & Accommodations</label>
+                        <textarea className="block w-full rounded-lg border-gray-300 p-2.5 border h-20" value={participation.options || ''} onChange={(e) => updateParticipation('options', e.target.value)} placeholder="e.g. Site prep, lunch, education classes. Physical limitations accommodated via..." />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Documentation Method</label>
+                        <input type="text" className="block w-full rounded-lg border-gray-300 p-2.5 border" value={participation.documentation || ''} onChange={(e) => updateParticipation('documentation', e.target.value)} placeholder="e.g. Homeowner Agreement Clause" />
+                    </div>
+                </div>
             </div>
-          );
-        })}
-      </div>
+
+             <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                <h4 className="font-bold text-gray-900 mb-4 flex items-center"><Activity className="w-5 h-5 mr-2 text-blue-600"/> Project Lifecycle Stages</h4>
+                <div className="pl-4 border-l-2 border-gray-200 space-y-6">
+                    {stages.map((stage, i) => (
+                        <div key={stage.id} className="pl-4 relative">
+                            <div className="absolute -left-[21px] top-1 w-3 h-3 bg-blue-500 rounded-full"></div>
+                            <h5 className="font-bold text-sm text-gray-800">{stage.name}</h5>
+                            <div className="flex items-center text-xs text-gray-500 mt-1 bg-gray-50 p-2 rounded inline-block">
+                                <FileText className="w-3 h-3 mr-1" />
+                                <span className="font-semibold mr-1">Trigger:</span> {stage.reqDoc}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+             </div>
+        </div>
     );
+};
+
+const ClientScreeningStep = ({ data, onChange }) => {
+  const getLabel = (key) => {
+    if (key === 'healthSafety') return 'Health & Safety Urgency (Home Condition)';
+    const group = VULNERABLE_GROUPS.find(g => g.key === key);
+    return group ? group.label : key.replace(/([A-Z])/g, ' $1').trim();
+  };
+
+  const toggleGroup = (key) => {
+    const newFactors = { ...data.priorityFactors };
+    if (newFactors[key] !== undefined) {
+      delete newFactors[key];
+    } else {
+      newFactors[key] = 3; // Default weight
+    }
+    onChange('priorityFactors', newFactors);
+  };
+
+  const updateFeasibility = (field, value) => {
+    onChange('projectFeasibility', { ...data.projectFeasibility, [field]: value });
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-8 print:hidden">
-        <div>
-          <h2 className="text-3xl font-bold text-black">Export Activities</h2>
-          <p className="text-[#88888D]">Review your selections and export your policy manual.</p>
+    <div className="space-y-8">
+      {/* 2.1.1 Project Assessment & Selection Card */}
+      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+        <div className="flex items-center mb-4">
+            <ClipboardCheck className="w-5 h-5 mr-2 text-blue-600"/> 
+            <h4 className="font-bold text-gray-900">Project Assessment & Selection</h4>
         </div>
-        <div className="flex gap-3">
-          <button onClick={copyToClipboard} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded hover:bg-slate-50 shadow-sm text-black">
-            <Copy size={18} /> Copy Text
-          </button>
-          <button onClick={() => window.print()} className="flex items-center gap-2 px-4 py-2 bg-[#0099CC] text-white rounded hover:bg-[#0099CC]/80 shadow-sm">
-            <Printer size={18} /> Print / Save PDF
-          </button>
+        <p className="text-sm text-gray-500 mb-6">
+            Define how you assess property feasibility and who makes the final decision (Policy 33 Sec 2.1.1).
+        </p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Assessment Protocol</label>
+                <select 
+                    className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2.5 border"
+                    value={data.projectFeasibility?.assessmentProtocol || 'internal'}
+                    onChange={(e) => updateFeasibility('assessmentProtocol', e.target.value)}
+                >
+                    <option value="internal">Internal Staff Checklist</option>
+                    <option value="partner">Third-Party Inspection</option>
+                    <option value="hybrid">Hybrid (Staff + Specialist)</option>
+                    <option value="energy">Energy/HERS Audit</option>
+                </select>
+            </div>
+            <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Selection Authority (Role)</label>
+                <input 
+                    type="text" 
+                    className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2.5 border"
+                    value={data.projectFeasibility?.selectionAuthority || ''}
+                    onChange={(e) => updateFeasibility('selectionAuthority', e.target.value)}
+                    placeholder="e.g. Program Manager"
+                />
+            </div>
+            <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Decision Artifact (Document)</label>
+                <input 
+                    type="text" 
+                    className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2.5 border"
+                    value={data.projectFeasibility?.selectionArtifact || ''}
+                    onChange={(e) => updateFeasibility('selectionArtifact', e.target.value)}
+                    placeholder="e.g. Project Selection Scorecard, Approval Memo"
+                />
+            </div>
+            <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Feasibility Limits (Deferral Policy)</label>
+                <textarea 
+                    className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2.5 border h-24"
+                    value={data.projectFeasibility?.feasibilityLimits || ''}
+                    onChange={(e) => updateFeasibility('feasibilityLimits', e.target.value)}
+                    placeholder="Describe when a project is rejected (e.g. Cost exceeds 50% of home value, structural instability, hoarding issues)."
+                />
+                <div className="flex items-center mt-2 text-xs text-amber-600 bg-amber-50 p-2 rounded">
+                    <AlertTriangle className="w-3 h-3 mr-1" />
+                    <span>Clear deferral criteria protect your affiliate from liability and scope creep.</span>
+                </div>
+            </div>
         </div>
       </div>
 
-      <div ref={reportRef} className="bg-white p-12 shadow-lg border border-slate-200 min-h-[1000px] print:shadow-none print:border-none print:p-0">
-        <div className="text-center border-b-2 border-black pb-6 mb-8">
-          <h1 className="text-3xl font-bold uppercase tracking-wide text-black">Appendix A: Construction Activities</h1>
-          <p className="text-[#88888D] mt-2">Generated via Repairs Catalog Builder</p>
-          <p className="text-sm text-[#88888D] mt-1">{new Date().toLocaleDateString()}</p>
+      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+        <h4 className="font-bold text-gray-900 mb-4">Intake Channels</h4>
+        <div className="flex flex-wrap gap-4">
+          {['phone', 'web', 'walkin'].map(channel => (
+            <label key={channel} className={`flex items-center space-x-3 px-4 py-3 rounded-lg border cursor-pointer transition-all ${data.intakeMethods[channel] ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500' : 'bg-white border-gray-200 hover:border-gray-300'}`}>
+              <input 
+                type="checkbox" 
+                checked={data.intakeMethods[channel]}
+                onChange={(e) => onChange('intakeMethods', { ...data.intakeMethods, [channel]: e.target.checked })}
+                className="rounded text-blue-600 focus:ring-blue-500 h-5 w-5"
+              />
+              <span className="capitalize text-sm font-medium text-gray-700">{channel === 'walkin' ? 'Walk-in' : channel}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+        <div className="mb-6">
+            <h4 className="font-bold text-gray-900 mb-2">Target Populations</h4>
+            <p className="text-sm text-gray-500">Select the specific vulnerable groups your program prioritizes.</p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
+          {VULNERABLE_GROUPS.map(group => (
+            <label key={group.key} className={`flex items-start space-x-3 p-3 rounded-lg border cursor-pointer transition-all ${data.priorityFactors?.[group.key] !== undefined ? 'bg-blue-50 border-blue-200' : 'hover:bg-slate-50 border-transparent'}`}>
+               <input 
+                 type="checkbox"
+                 className="mt-1 rounded text-blue-600 focus:ring-blue-500 h-4 w-4"
+                 checked={data.priorityFactors?.[group.key] !== undefined}
+                 onChange={() => toggleGroup(group.key)}
+               />
+               <div>
+                 <div className={`text-sm font-medium ${data.priorityFactors?.[group.key] !== undefined ? 'text-blue-900' : 'text-gray-700'}`}>{group.label}</div>
+                 <div className="text-xs text-gray-500 mt-0.5">{group.reason}</div>
+               </div>
+            </label>
+          ))}
         </div>
 
-        <div className="mb-8">
-          <h3 className="text-xl font-bold text-black bg-slate-100 p-2 mb-4 border-l-4 border-[#3AA047]">1. Eligible Repairs</h3>
-          <p className="mb-4 text-sm text-[#88888D]">The following activities have been approved for program funding and execution, subject to standard feasibility assessments.</p>
-          <GroupedList items={eligibleItems} />
+        <div className="border-t border-gray-100 pt-6">
+          <h4 className="font-bold text-gray-900 mb-4">Prioritization Matrix Weights (1-5)</h4>
+          
+          <div className="space-y-6">
+            <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                <div className="flex justify-between items-center mb-2">
+                <span className="font-bold text-gray-800 text-sm">Health & Safety Urgency</span>
+                <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">{data.priorityFactors?.healthSafety || 5}</span>
+                </div>
+                <input 
+                type="range" 
+                min="1" 
+                max="5" 
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                value={data.priorityFactors?.healthSafety || 5}
+                onChange={(e) => onChange('priorityFactors', { ...data.priorityFactors, healthSafety: parseInt(e.target.value) })}
+                />
+                <div className="flex justify-between text-xs text-gray-400 mt-1">
+                    <span>Low Priority</span>
+                    <span>Critical</span>
+                </div>
+            </div>
+
+            {Object.keys(data.priorityFactors || {}).filter(k => k !== 'healthSafety').map(factor => (
+                <div key={factor}>
+                <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium text-gray-700 capitalize">{getLabel(factor)}</span>
+                    <span className="text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded">{data.priorityFactors[factor]}</span>
+                </div>
+                <input 
+                    type="range" 
+                    min="1" 
+                    max="5" 
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                    value={data.priorityFactors[factor]}
+                    onChange={(e) => onChange('priorityFactors', { ...data.priorityFactors, [factor]: parseInt(e.target.value) })}
+                />
+                </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const LifecycleStep = ({ data, onChange }) => {
+  const updateParticipation = (field, value) => onChange('participation', { ...data.participation, [field]: value });
+
+  return (
+    <div className="space-y-8">
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <h4 className="font-bold text-gray-900 mb-4 flex items-center"><User className="w-5 h-5 mr-2 text-blue-600"/> Owner Participation (Sweat Equity)</h4>
+            <div className="grid grid-cols-1 gap-6">
+                <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Participation Requirement</label>
+                    <select className="block w-full rounded-lg border-gray-300 p-2.5 border" value={data.participation?.required || 'required'} onChange={(e) => updateParticipation('required', e.target.value)}>
+                        <option value="required">Required</option>
+                        <option value="optional">Optional / Encouraged</option>
+                        <option value="none">None</option>
+                    </select>
+                </div>
+                <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Participation Options & Accommodations</label>
+                    <textarea className="block w-full rounded-lg border-gray-300 p-2.5 border h-20" value={data.participation?.options || ''} onChange={(e) => updateParticipation('options', e.target.value)} placeholder="e.g. Site prep, lunch, education classes. Physical limitations accommodated via..." />
+                </div>
+                <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Documentation Method</label>
+                    <input type="text" className="block w-full rounded-lg border-gray-300 p-2.5 border" value={data.participation?.documentation || ''} onChange={(e) => updateParticipation('documentation', e.target.value)} placeholder="e.g. Homeowner Agreement Clause" />
+                </div>
+            </div>
+        </div>
+        
+        {/* Stages List (Simplified View) */}
+        <div className="pl-4 border-l-2 border-gray-200">
+            {data.stages.map((stage, i) => (
+                <div key={stage.id} className="mb-4 pl-4 relative">
+                    <div className="absolute -left-[21px] top-1 w-3 h-3 bg-blue-500 rounded-full"></div>
+                    <h5 className="font-bold text-sm">{stage.name}</h5>
+                    <p className="text-xs text-gray-500">{stage.reqDoc}</p>
+                </div>
+            ))}
+        </div>
+    </div>
+  );
+};
+
+const WorkforceStep = ({ data, onChange }) => {
+  const updateProcurement = (field, value) => onChange('procurement', { ...data.procurement, [field]: value });
+  const updateVolunteers = (field, value) => onChange('volunteerStandards', { ...data.volunteerStandards, [field]: value });
+  const updateSafety = (field, value) => onChange('safety', { ...data.safety, [field]: value });
+  const toggleDoc = (key) => {
+      const currentDocs = data.procurement?.requiredDocs || {};
+      onChange('procurement', { ...data.procurement, requiredDocs: { ...currentDocs, [key]: !currentDocs[key] } });
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Procurement */}
+      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+        <h4 className="font-bold text-gray-900 mb-4 flex items-center"><Briefcase className="w-5 h-5 mr-2 text-blue-600"/> Repair Partner (Contractor) Selection</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Selection Method</label>
+                <select className="block w-full rounded-lg border-gray-300 p-2.5 border" value={data.procurement?.selectionMethod || 'Preferred Vendor List'} onChange={(e) => updateProcurement('selectionMethod', e.target.value)}>
+                    <option value="Bids">Competitive Bids (3+)</option>
+                    <option value="Preferred Vendor List">Preferred Vendor List</option>
+                    <option value="Sole Source">Sole Source (Specialized)</option>
+                </select>
+            </div>
+            <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Minimum Qualifications</label>
+                <input type="text" className="block w-full rounded-lg border-gray-300 p-2.5 border" value={data.procurement?.minQualifications || ''} onChange={(e) => updateProcurement('minQualifications', e.target.value)} placeholder="License, Insurance limits, etc." />
+            </div>
+            <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Required Documentation</label>
+                <div className="flex gap-4">
+                    {['w9', 'coi', 'bonding', 'warranty'].map(doc => (
+                        <label key={doc} className="flex items-center space-x-2">
+                            <input type="checkbox" checked={data.procurement?.requiredDocs?.[doc] || false} onChange={() => toggleDoc(doc)} className="rounded text-blue-600" />
+                            <span className="uppercase text-sm">{doc}</span>
+                        </label>
+                    ))}
+                </div>
+            </div>
+        </div>
+      </div>
+
+      {/* Volunteer Standards */}
+      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+        <h4 className="font-bold text-gray-900 mb-4 flex items-center"><Users className="w-5 h-5 mr-2 text-blue-600"/> Volunteer Participation</h4>
+        <div className="space-y-4">
+            <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Allowed vs. Prohibited Scopes</label>
+                <input type="text" className="block w-full rounded-lg border-gray-300 p-2.5 border" value={data.volunteerStandards?.allowedScopes || ''} onChange={(e) => updateVolunteers('allowedScopes', e.target.value)} placeholder="e.g. Painting allowed; Roofing prohibited" />
+            </div>
+            <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Supervision Requirements</label>
+                <input type="text" className="block w-full rounded-lg border-gray-300 p-2.5 border" value={data.volunteerStandards?.supervision || ''} onChange={(e) => updateVolunteers('supervision', e.target.value)} placeholder="e.g. Ratio 1:5, Competent Person on site" />
+            </div>
+            <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Training Requirements</label>
+                <input type="text" className="block w-full rounded-lg border-gray-300 p-2.5 border" value={data.volunteerStandards?.training || ''} onChange={(e) => updateVolunteers('training', e.target.value)} placeholder="e.g. Online safety video, Ladder safety" />
+            </div>
+        </div>
+      </div>
+
+      {/* Safety */}
+      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+        <h4 className="font-bold text-gray-900 mb-4 flex items-center"><HardHat className="w-5 h-5 mr-2 text-blue-600"/> Risk Management & Safety</h4>
+        <div className="space-y-4">
+            <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Risk Screening Topics</label>
+                <input type="text" className="block w-full rounded-lg border-gray-300 p-2.5 border" value={data.safety?.riskScreening || ''} onChange={(e) => updateSafety('riskScreening', e.target.value)} placeholder="e.g. Lead, Asbestos, Structural, Pets" />
+            </div>
+            <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Safety Plan Elements</label>
+                <input type="text" className="block w-full rounded-lg border-gray-300 p-2.5 border" value={data.safety?.safetyPlan || ''} onChange={(e) => updateSafety('safetyPlan', e.target.value)} placeholder="e.g. PPE, Morning Briefs, Stop Work Authority" />
+            </div>
+            <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Mandatory Specialty Contractors</label>
+                <input type="text" className="block w-full rounded-lg border-gray-300 p-2.5 border" value={data.safety?.specialtyContractorTriggers || ''} onChange={(e) => updateSafety('specialtyContractorTriggers', e.target.value)} placeholder="e.g. Electrical, High Roofs, HVAC" />
+            </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const PerformanceStep = ({ data, onChange }) => {
+  const updateSustainability = (field, value) => onChange('sustainability', { ...data.sustainability, [field]: value });
+
+  return (
+    <div className="space-y-8">
+      {/* Financial Sustainability */}
+      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+        <h4 className="font-bold text-gray-900 mb-4 flex items-center"><Activity className="w-5 h-5 mr-2 text-blue-600"/> Financial Sustainability</h4>
+        <div className="grid grid-cols-1 gap-4">
+            <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Funding Mix Strategy</label>
+                <input type="text" className="block w-full rounded-lg border-gray-300 p-2.5 border" value={data.sustainability?.fundingMix || ''} onChange={(e) => updateSustainability('fundingMix', e.target.value)} placeholder="e.g. Grants, Fees, Donations" />
+            </div>
+            <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Cost Controls & Contingency</label>
+                <input type="text" className="block w-full rounded-lg border-gray-300 p-2.5 border" value={data.sustainability?.costControls || ''} onChange={(e) => updateSustainability('costControls', e.target.value)} placeholder="e.g. 10% contingency on all projects" />
+            </div>
+            <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Annual Targets (Pipeline)</label>
+                <input type="text" className="block w-full rounded-lg border-gray-300 p-2.5 border" value={data.sustainability?.pipelineTargets || ''} onChange={(e) => updateSustainability('pipelineTargets', e.target.value)} placeholder="e.g. 15 homes" />
+            </div>
+        </div>
+      </div>
+
+      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+        <h4 className="font-bold text-gray-900 mb-4">Reporting & Feedback</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Reporting Schedule</label>
+                <select className="block w-full rounded-lg border-gray-300 p-2.5 border" value={data.reportingSchedule} onChange={(e) => onChange('reportingSchedule', e.target.value)}>
+                    <option value="monthly">Monthly</option>
+                    <option value="quarterly">Quarterly</option>
+                    <option value="annually">Annually</option>
+                </select>
+            </div>
+            <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Feedback Mechanism</label>
+                <input type="text" className="block w-full rounded-lg border-gray-300 p-2.5 border" value={data.feedbackMechanism} onChange={(e) => onChange('feedbackMechanism', e.target.value)} placeholder="e.g. Annual Survey" />
+            </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ... ComplianceStep remains same as v1.4.0 ...
+const ComplianceStep = ({ data, onChange }) => {
+    // Keeping existing logic
+    const updateGovernance = (field, value) => onChange('governance', { ...data.governance, [field]: value });
+    const toggleCheck = (key) => {
+        const newChecklist = { ...data.policy33Checklist, [key]: !data.policy33Checklist[key] };
+        onChange('policy33Checklist', newChecklist);
+    };
+    const checklistItems = [
+        { key: 'codes', label: '2.1.2 Compliance with building codes & industry standards' },
+        { key: 'agreements', label: '2.1.3 Written agreements executed before work' },
+        { key: 'consumerProtection', label: '2.1.4 Compliance with consumer protection laws' },
+        { key: 'lendingCompliance', label: '2.1.5 Compliance with lending laws (if applicable)' },
+        { key: 'subcontractorOversight', label: '2.1.6 Subcontractor insurance and bonding' },
+        { key: 'insurance', label: '2.1.8 Adequate insurance coverage maintenance' },
+    ];
+    return (
+        <div className="space-y-8 max-w-4xl">
+            <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                <div className="bg-slate-50 px-6 py-4 border-b border-gray-200"><h3 className="font-bold text-gray-800">Compliance & Governance</h3></div>
+                <div className="p-6 grid grid-cols-2 gap-6">
+                    <input type="date" className="border p-2 rounded" value={data.governance.approvalDate} onChange={(e) => updateGovernance('approvalDate', e.target.value)} />
+                    <input type="text" className="border p-2 rounded" value={data.governance.policyVersion} onChange={(e) => updateGovernance('policyVersion', e.target.value)} placeholder="Version" />
+                </div>
+                <div className="p-6 border-t">
+                    <h4 className="font-bold mb-4">Requirements</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                        {checklistItems.map(item => (
+                            <label key={item.key} className="flex items-start space-x-2">
+                                <input type="checkbox" className="mt-1" checked={data.policy33Checklist[item.key]} onChange={() => toggleCheck(item.key)} />
+                                <span className="text-sm">{item.label}</span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const ExportStep = ({ data }) => {
+  const handleExport = () => {
+    // Generate a simple HTML document that acts as a Doc
+    const getLabel = (key) => {
+        if (key === 'healthSafety') return 'Health & Safety Urgency (Home Condition)';
+        const group = VULNERABLE_GROUPS.find(g => g.key === key);
+        return group ? group.label : key.replace(/([A-Z])/g, ' $1').trim();
+    };
+
+    const content = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+      <head>
+        <style>
+            @page { size: 8.5in 11in; margin: 1.0in; }
+            body { font-family: Arial, sans-serif; font-size: 9pt; line-height: 13pt; color: #000000; }
+            .cover-page { text-align: center; padding-top: 3in; page-break-after: always; background-color: #00467F; color: white; height: 9in; } /* Habitat Blue approx */
+            .title { font-family: 'Arial Black', Arial, sans-serif; font-size: 38pt; font-weight: bold; color: #FFFFFF; }
+            .subtitle { font-family: 'Arial', sans-serif; font-size: 24pt; font-weight: bold; color: #FFFFFF; margin-top: 20pt; }
+            .edition { font-size: 14pt; margin-top: 40pt; color: #FFFFFF; }
+            
+            h1 { font-family: Arial, sans-serif; font-size: 24pt; color: #000000; margin-top: 13pt; page-break-before: always; }
+            h2 { font-family: Arial, sans-serif; font-size: 14pt; font-weight: bold; color: #000000; margin-top: 13pt; }
+            h3 { font-family: Arial, sans-serif; font-size: 11pt; font-weight: bold; color: #000000; margin-top: 13pt; }
+            p { margin-top: 3pt; margin-bottom: 3pt; }
+            ul { margin-top: 3pt; margin-bottom: 3pt; }
+            li { margin-bottom: 3pt; }
+            
+            table { width: 100%; border-collapse: collapse; margin-top: 10pt; font-size: 9pt; }
+            th, td { border: 1px solid #000000; padding: 6px; vertical-align: top; text-align: left; }
+            th { font-weight: bold; background-color: #f0f0f0; }
+            
+            .callout { border: 2px solid #000000; background-color: #f9f9f9; padding: 10px; margin: 10px 0; }
+            .callout-label { font-weight: bold; font-size: 9pt; margin-bottom: 6px; display: block; }
+        </style>
+      <title>${data.orgName} Repair Manual</title></head>
+      <body>
+        <!-- Cover Page -->
+        <div class="cover-page">
+            <div class="title">Policies and Procedures Manual</div>
+            <div class="subtitle">Repairs</div>
+            <div class="edition">
+                ${data.orgName}<br/>
+                Version ${data.governance.policyVersion || '1.0'}<br/>
+                Date: ${data.governance.approvalDate || new Date().toLocaleDateString()}
+            </div>
         </div>
 
-        <div className="mb-8">
-          <h3 className="text-xl font-bold text-black bg-slate-100 p-2 mb-4 border-l-4 border-[#FFD100]">2. Conditional Repairs</h3>
-          <p className="mb-4 text-sm text-[#88888D]">The following activities are eligible only when specific conditions are met (see notes).</p>
-          <GroupedList items={conditionalItems} />
-        </div>
+        <h1>1. Introduction & Foundations</h1>
+        <p><strong>Affiliate:</strong> ${data.orgName}</p>
+        <p><strong>Address:</strong> ${data.orgAddress || 'N/A'}</p>
+        <p><strong>Phone:</strong> ${data.orgPhone || 'N/A'} | <strong>Email:</strong> ${data.orgEmail || 'N/A'}</p>
+        <p><strong>Service Area:</strong> ${data.serviceArea}</p>
+        <h3>Key Staff</h3>
+        <ul>
+          ${(data.staff || []).map(s => `<li><strong>${s.name}</strong> - ${s.title}</li>`).join('')}
+        </ul>
+        
+        <h2>2. Affiliate Policy Map</h2>
+        <table border="1" cellpadding="5" cellspacing="0">
+            <tr>
+                <th>Category</th>
+                <th align="center">Org Level</th>
+                <th align="center">Program Level</th>
+                <th>Details</th>
+            </tr>
+            ${Object.keys(data.policyMap).map(key => {
+                const entry = data.policyMap[key] || { org: false, program: false, programDetails: '' };
+                const isOrg = typeof entry === 'object' ? entry.org : entry;
+                const isProgram = typeof entry === 'object' ? entry.program : false; 
+                
+                const detailsParts = [];
+                if (isOrg) detailsParts.push("Insert Affiliate-level Policy here.");
+                if (isProgram && entry.programDetails) detailsParts.push(entry.programDetails);
 
-        <div className="mb-8">
-          <h3 className="text-xl font-bold text-black bg-slate-100 p-2 mb-4 border-l-4 border-[#A4343A]">3. Non-Eligible Activities</h3>
-          <p className="mb-4 text-sm text-[#88888D]">The following activities are strictly outside the current program scope.</p>
-          <GroupedList items={notEligibleItems} />
-        </div>
+                return `
+                    <tr>
+                        <td>${key.charAt(0).toUpperCase() + key.slice(1)}</td>
+                        <td align="center">${isOrg ? 'Yes' : ''}</td>
+                        <td align="center">${isProgram ? 'Yes' : ''}</td>
+                        <td>${detailsParts.join('<br>')}</td>
+                    </tr>
+                `;
+            }).join('')}
+        </table>
 
-        <div className="mt-12 pt-8 border-t border-slate-200 text-center text-xs text-[#88888D]">
-          <p>End of Policy Section</p>
-        </div>
+        <h2>3. Program Policies (Policy 33)</h2>
+        ${REQUIRED_TOPICS_2_1_1.filter(topic => data.policyPackage?.coveredTopics?.[topic.key]).map(topic => `
+            <h3>${topic.label}</h3>
+            <p>${data.policyPackage?.topicContent?.[topic.key] || 'No specific policy text provided.'}</p>
+        `).join('')}
+
+        <h2>4. Pricing & Repayment</h2>
+        <p><strong>Model:</strong> ${data.pricing?.modelType || 'N/A'}</p>
+        <p><strong>Calculation:</strong> ${data.pricing?.calculationMethod || 'N/A'}</p>
+        <p><strong>Terms:</strong> ${data.pricing?.repaymentTerms || 'N/A'}</p>
+        <p><strong>Financial Cap:</strong> $${data.financialCap}</p>
+
+        <h2>5. Scope of Services</h2>
+        <p><strong>Construction Activities:</strong> ${data.constructionActivities?.hasCatalog ? 'Refer to Appendix A: Construction Activities' : 'Not Defined'}</p>
+        <p><strong>Exclusions:</strong> ${data.constructionActivities?.ineligibleScopes || 'N/A'}</p>
+        <p><strong>Permits:</strong> ${data.constructionActivities?.permitTriggers || 'N/A'}</p>
+        
+        <h2>6. Client Screening & Selection</h2>
+        <h3>Intake</h3>
+        <p><strong>Channels:</strong> ${Object.keys(data.intakeMethods).filter(k => data.intakeMethods[k]).map(k => k.charAt(0).toUpperCase() + k.slice(1)).join(', ') || 'None selected'}</p>
+        
+        <h3>Assessment & Selection</h3>
+        <p><strong>Assessment Protocol:</strong> ${data.projectFeasibility?.assessmentProtocol || 'N/A'}</p>
+        <p><strong>Selection Authority:</strong> ${data.projectFeasibility?.selectionAuthority || 'N/A'}</p>
+        <p><strong>Decision Documentation:</strong> ${data.projectFeasibility?.selectionArtifact || 'N/A'}</p>
+        <p><strong>Feasibility Limits:</strong> ${data.projectFeasibility?.feasibilityLimits || 'N/A'}</p>
+        
+        <h3>Prioritization</h3>
+        <p>Applications are prioritized based on the following weighted criteria:</p>
+        <ul>
+           ${Object.keys(data.priorityFactors || {}).map(key => `<li><strong>${getLabel(key)}:</strong> Weight ${data.priorityFactors[key]}</li>`).join('')}
+        </ul>
+
+        <h2>7. Client Services & Participation</h2>
+        <p><strong>Participation Requirement:</strong> ${data.clientServices?.participation?.required === 'required' ? 'Required' : (data.clientServices?.participation?.required === 'not_required' ? 'Not Required (Recommended)' : 'N/A')}</p>
+        <p><strong>Options & Accommodations:</strong> ${data.clientServices?.participation?.options || 'N/A'}</p>
+        <p><strong>Documentation Method:</strong> ${data.clientServices?.participation?.documentation || 'N/A'}</p>
+
+        <h2>8. Project Lifecycle</h2>
+        <h3>Stages</h3>
+        <ol>
+           ${data.stages.map(s => `<li><strong>${s.name}</strong> (Trigger: ${s.reqDoc})</li>`).join('')}
+        </ol>
+
+        <h2>9. Workforce & Safety</h2>
+        <p><strong>Delivery Model:</strong> ${data.model || 'N/A'}</p>
+        <p><strong>QC Frequency:</strong> ${data.qcFrequency || 'N/A'}</p>
+        
+        <h3>Contractors</h3>
+        <p><strong>Selection Method:</strong> ${data.procurement?.selectionMethod || 'N/A'}</p>
+        <p><strong>Min Qualifications:</strong> ${data.procurement?.minQualifications || 'N/A'}</p>
+        <p><strong>Required Docs:</strong> ${Object.keys(data.procurement?.requiredDocs || {}).filter(k => data.procurement.requiredDocs[k]).map(k => k.toUpperCase()).join(', ')}</p>
+        
+        <h3>Volunteers</h3>
+        <p><strong>Allowed Scopes:</strong> ${data.volunteerStandards?.allowedScopes || 'N/A'}</p>
+        <p><strong>Supervision:</strong> ${data.volunteerStandards?.supervision || 'N/A'}</p>
+        <p><strong>Training:</strong> ${data.volunteerStandards?.training || 'N/A'}</p>
+        
+        <h3>Safety</h3>
+        <p><strong>Risk Screening:</strong> ${data.safety?.riskScreening || 'N/A'}</p>
+        <p><strong>Safety Plan:</strong> ${data.safety?.safetyPlan || 'N/A'}</p>
+        <p><strong>Specialty Contractor Triggers:</strong> ${data.safety?.specialtyContractorTriggers || 'N/A'}</p>
+
+        <h2>10. Sustainability & Performance</h2>
+        <p><strong>Funding Mix:</strong> ${data.sustainability?.fundingMix || 'N/A'}</p>
+        <p><strong>Cost Controls:</strong> ${data.sustainability?.costControls || 'N/A'}</p>
+        <p><strong>Pipeline Targets:</strong> ${data.sustainability?.pipelineTargets || 'N/A'}</p>
+        <p><strong>Reporting Schedule:</strong> ${data.reportingSchedule}</p>
+        <p><strong>Feedback Mechanism:</strong> ${data.feedbackMechanism}</p>
+        <p><strong>Tracked KPIs:</strong></p>
+        <ul>
+            ${Object.keys(data.kpis).filter(k => data.kpis[k]).map(k => `<li>${k.replace(/([A-Z])/g, ' $1')}</li>`).join('')}
+        </ul>
+
+        <h2>11. Compliance Declaration</h2>
+        <p><strong>Policy 33 Alignment:</strong> ${data.policy33Aligned ? 'Compliant' : 'Pending'}</p>
+        <p><strong>Governance:</strong> Approved by ${data.governance.approverRole} on ${data.governance.approvalDate}.</p>
+      </body>
+      </html>
+    `;
+    
+    const blob = new Blob(['\ufeff', content], {
+      type: 'application/msword'
+    });
+    
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Repair_Manual_${data.orgName.replace(/\s+/g, '_')}_Draft.doc`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center h-full py-12">
+      <div className="bg-white p-10 rounded-2xl shadow-sm border border-gray-200 text-center max-w-lg w-full">
+        <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-green-50 mb-6"><CheckCircle className="h-10 w-10 text-green-500" /></div>
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">Ready to Publish</h3>
+        <p className="text-gray-500 mb-8 leading-relaxed">Your draft is compliant with the standard structure. Export it to Word to add final branding and signatures.</p>
+        <button onClick={handleExport} className="w-full flex justify-center items-center px-6 py-4 border border-transparent text-base font-bold rounded-xl shadow-lg text-white bg-blue-600 hover:bg-blue-700 transition-all"><Download className="mr-2 h-5 w-5" /> Export to Word (.doc)</button>
       </div>
     </div>
   );
@@ -1976,95 +1438,262 @@ const ReportView: React.FC<ReportViewProps> = ({ selections }) => {
 
 // --- Main App Component ---
 
-export default function App() {
-  const [view, setView] = useState<'landing' | 'learn' | 'catalog' | 'report'>('landing');
-  const [selections, setSelections] = useState<SelectionsMap>({});
+export default function RepairManualBuilder() {
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [currentView, setCurrentView] = useState('landing'); // 'landing' | 'builder'
+  const [manualData, setManualData] = useState(INITIAL_DATA);
+  const [saveStatus, setSaveStatus] = useState('saved');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Load Data from LocalStorage
+  // --- Auth & Data Loading ---
+  
   useEffect(() => {
-    const loadData = () => {
+    // 1. Check LocalStorage First
+    const localData = localStorage.getItem(STORAGE_KEY);
+    if (localData) {
       try {
-        const saved = localStorage.getItem('repair_catalog_selections');
-        if (saved) {
-          setSelections(JSON.parse(saved));
-        }
+        setManualData(JSON.parse(localData));
       } catch (e) {
-        console.error("Failed to load selections", e);
-      } finally {
-        setLoading(false);
+        console.error("Error parsing local data", e);
       }
-    };
-    loadData();
+    }
+    
+    // Simulate Loading for smoother UX
+    setTimeout(() => setLoading(false), 500);
+
+    // Removed Firebase Auth logic to fix reference errors
+    setUser({ uid: 'local-user' }); // Mock user for local mode
   }, []);
 
-  const handleUpdateSelection = (interventionId: string, data: Selection) => {
-    setSelections(prev => {
-      const next = { ...prev, [interventionId]: data };
-      localStorage.setItem('repair_catalog_selections', JSON.stringify(next));
-      return next;
+
+  // --- Auto-Save Logic (Local Only) ---
+  const saveTimeoutRef = useRef(null);
+
+  const handleDataChange = useCallback((field, value) => {
+    setManualData(prev => {
+        const newData = { ...prev, [field]: value, lastUpdated: new Date().toISOString() };
+        
+        // Immediate Local Save
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newData));
+
+        setSaveStatus('saving');
+        if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+
+        saveTimeoutRef.current = setTimeout(async () => {
+            setSaveStatus('saved'); // Optimistic local save
+        }, 1000);
+
+        return newData;
     });
+  }, []);
+
+  // --- Rendering Helpers ---
+
+  const renderStepContent = () => {
+    const commonProps = { data: manualData, onChange: handleDataChange };
+    switch (STEPS[currentStep].id) {
+      case 'foundations': return <FoundationsStep {...commonProps} />;
+      case 'compliance': return <ComplianceStep {...commonProps} />;
+      case 'policyMap': return <PolicyMapStep {...commonProps} />;
+      case 'programModel': return <ProgramModelStep {...commonProps} />;
+      case 'scope': return <ScopeStep {...commonProps} />;
+      case 'clientServices': return <ClientServicesStep {...commonProps} />;
+      case 'screening': return <ClientScreeningStep {...commonProps} />;
+      case 'lifecycle': return <LifecycleStep {...commonProps} />;
+      case 'workforce': return <WorkforceStep {...commonProps} />;
+      case 'performance': return <PerformanceStep {...commonProps} />;
+      case 'export': return <ExportStep data={manualData} />;
+      default: return <div>Unknown Step</div>;
+    }
+  };
+
+  const isStepComplete = (stepId, data) => {
+    if (stepId === 'scope') return data.constructionActivities?.hasCatalog === true;
+    if (stepId === 'foundations') {
+        return !!(data.orgName && data.orgAddress && data.orgPhone && data.orgEmail && data.serviceArea);
+    }
+    if (stepId === 'policyMap') {
+        const categories = Object.values(data.policyMap || {});
+        return categories.length > 0 && categories.every(cat => cat.org || cat.program);
+    }
+    if (stepId === 'clientServices') {
+      return data.clientServices?.participation?.required !== '';
+    }
+    // Default simplified logic for other steps
+    return false;
+  };
+
+  const isStepWarning = (stepId, data) => {
+    if (stepId === 'scope') return data.constructionActivities?.hasCatalog === false;
+    if (stepId === 'foundations') {
+         return !(data.orgName && data.orgAddress && data.orgPhone && data.orgEmail && data.serviceArea);
+    }
+    if (stepId === 'policyMap') {
+        const categories = Object.values(data.policyMap || {});
+        return categories.length === 0 || !categories.every(cat => cat.org || cat.program);
+    }
+    if (stepId === 'clientServices') {
+      return data.clientServices?.participation?.required === '';
+    }
+    return false;
   };
 
   if (loading) return (
-    <div className="flex items-center justify-center h-screen bg-slate-50">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0099CC]"></div>
-    </div>
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+          <div className="flex flex-col items-center">
+             <Activity className="w-10 h-10 text-blue-600 animate-spin mb-4" />
+             <p className="text-gray-500 font-medium">Loading Builder...</p>
+          </div>
+      </div>
   );
 
+  if (currentView === 'landing') {
+    return <LandingPage onStart={() => setCurrentView('builder')} />;
+  }
+
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-black flex flex-col">
-      {/* Navigation */}
-      {view !== 'landing' && (
-        <nav className="bg-white border-b border-[#88888D]/20 shadow-sm print:hidden">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="flex items-center justify-between h-20">
-              <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setView('landing')}>
-                <img 
-                  src="https://github.com/jerryzuniga/repairs-catalog/blob/fd2b835413161d9a35a156dbe830f8ecc911531f/public/catalog.png?raw=true" 
-                  alt="Catalog Builder" 
-                  className="h-10 w-auto" 
-                />
-                <div className="flex flex-col">
-                    <span className="font-extrabold text-xl tracking-tight text-black leading-none">
-                      Catalog<span className="text-[#E55025]">Builder</span>
-                    </span>
-                    <span className="text-[10px] font-bold text-[#88888D] tracking-widest uppercase leading-none mt-1">FOR REPAIRS ACTIVITIES</span>
-                </div>
-              </div>
-              <div className="hidden md:flex items-center gap-1">
-                <button 
-                  onClick={() => setView('learn')}
-                  className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${view === 'learn' ? 'bg-slate-100 text-black' : 'text-black hover:bg-slate-50'}`}
-                >
-                  <GraduationCap size={18} /> Learn
-                </button>
-                <button 
-                  onClick={() => setView('catalog')}
-                  className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${view === 'catalog' ? 'bg-[#E55025]/10 text-[#E55025]' : 'text-black hover:bg-slate-50'}`}
-                >
-                  <Wrench size={18} /> Builder
-                </button>
-                <div className="h-6 w-px bg-[#88888D]/20 mx-2"></div>
-                <button 
-                  onClick={() => setView('report')}
-                  className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${view === 'report' ? 'bg-slate-100 text-black' : 'text-black hover:bg-slate-50'}`}
-                >
-                  <Download size={18} /> Export Activities
-                </button>
-              </div>
+    <div className="flex h-screen bg-slate-50 font-sans text-slate-900">
+      {/* Dark Sidebar Navigation */}
+      <div className={`fixed inset-y-0 left-0 transform ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 transition duration-200 ease-in-out z-30 w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl`}>
+        <div className="p-6 border-b border-slate-800">
+          <div className="flex items-center space-x-3 mb-1">
+            <div className="bg-blue-600 p-2 rounded-lg shadow-lg shadow-blue-900/50">
+              <Book className="h-6 w-6 text-white" />
+            </div>
+            <div className="flex flex-col">
+                <span className="text-xl font-bold text-gray-900 tracking-tight leading-none text-white">P&P Builder</span>
+                <span className="text-xs text-blue-400 font-medium">for Repair programs</span>
             </div>
           </div>
+        </div>
+        
+        <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+          {STEPS.map((step, index) => {
+            const Icon = step.icon;
+            const isActive = currentStep === index;
+            // Custom status logic
+            const isCustomStep = ['scope', 'foundations', 'policyMap', 'clientServices'].includes(step.id);
+            const complete = isStepComplete(step.id, manualData) || (!isCustomStep && index < currentStep); 
+            const warning = isStepWarning(step.id, manualData);
+
+            return (
+              <button
+                key={step.id}
+                onClick={() => { setCurrentStep(index); setMobileMenuOpen(false); }}
+                className={`w-full flex items-center p-3 rounded-lg text-sm font-medium transition-all duration-200 group ${
+                  isActive 
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' 
+                    : 'hover:bg-slate-800 text-slate-400 hover:text-white'
+                }`}
+              >
+                <Icon className={`mr-3 h-5 w-5 ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-white'}`} />
+                <div className="flex-1 text-left">
+                  {step.title}
+                </div>
+                {warning && <AlertCircle className="h-4 w-4 text-amber-500" />}
+                {complete && !warning && <CheckCircle className="h-4 w-4 text-emerald-500" />}
+              </button>
+            );
+          })}
         </nav>
-      )}
+        
+        <div className="p-4 border-t border-slate-800 bg-slate-900/50 space-y-3">
+            {/* Home Navigation */}
+            <button 
+                onClick={() => setCurrentView('landing')}
+                className="w-full flex items-center p-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            >
+                <Home className="w-4 h-4 mr-3" />
+                Back to Home
+            </button>
+
+            {/* Access Guide Button (Placeholder) */}
+            <button 
+                onClick={() => window.open('#', '_blank')} 
+                className="w-full flex items-center p-2 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            >
+                <ExternalLink className="w-4 h-4 mr-3" />
+                Access Guide
+            </button>
+
+            <div className="pt-3 border-t border-slate-800">
+                <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Project</span>
+                </div>
+                <div className="text-sm font-medium text-white truncate mb-1">
+                    {manualData.orgName || 'New Project'}
+                </div>
+                <div className="flex justify-between items-center text-xs">
+                    <span className="font-mono text-slate-600">v{APP_VERSION}</span>
+                    <span className={`flex items-center ${saveStatus === 'saved' ? 'text-emerald-500' : 'text-amber-500'}`}>
+                        {saveStatus === 'saving' ? <Activity className="w-3 h-3 mr-1 animate-pulse"/> : <Save className="w-3 h-3 mr-1"/>}
+                        {saveStatus === 'saved' ? 'Saved' : 'Saving...'}
+                    </span>
+                </div>
+            </div>
+        </div>
+      </div>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-hidden relative">
-        {view === 'landing' && <LandingView onStart={() => setView('catalog')} onLearn={() => setView('learn')} />}
-        {view === 'learn' && <LearnView onComplete={() => setView('catalog')} onHome={() => setView('landing')} />}
-        {view === 'catalog' && <CatalogView selections={selections} onUpdateSelection={handleUpdateSelection} onHome={() => setView('landing')} />}
-        {view === 'report' && <ReportView selections={selections} />}
-      </main>
+      <div className="flex-1 flex flex-col overflow-hidden h-screen">
+        {/* Mobile Header */}
+        <div className="md:hidden bg-white p-4 shadow-sm flex items-center justify-between border-b border-gray-200 z-20">
+           <div className="flex items-center">
+                <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="mr-3 text-gray-600">
+                    {mobileMenuOpen ? <X /> : <Menu />}
+                </button>
+                <span className="font-bold text-gray-800">P&P Builder</span>
+           </div>
+        </div>
+
+        {/* Desktop Header */}
+        <header className="bg-white border-b border-gray-200 px-8 py-5 flex justify-between items-center shrink-0">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">{STEPS[currentStep].title}</h2>
+            <p className="mt-1 text-sm text-gray-500">{STEPS[currentStep].description}</p>
+          </div>
+          <div className="flex space-x-3">
+             <button 
+               onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
+               disabled={currentStep === 0}
+               className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors text-sm"
+             >
+               Back
+             </button>
+             <button 
+               onClick={() => setCurrentStep(Math.min(STEPS.length - 1, currentStep + 1))}
+               disabled={currentStep === STEPS.length - 1}
+               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-sm flex items-center disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all text-sm"
+             >
+               Next Step <ChevronRight className="ml-2 h-4 w-4" />
+             </button>
+          </div>
+        </header>
+
+        <main className="flex-1 overflow-hidden flex">
+           {/* Scrollable Form Content */}
+           <div className="flex-1 overflow-y-auto p-8 lg:p-12">
+             <div className="max-w-3xl mx-auto pb-12">
+                {renderStepContent()}
+             </div>
+           </div>
+
+           {/* Fixed Guide Panel (Right Sidebar) */}
+           <div className="w-80 border-l border-gray-200 bg-white hidden lg:block overflow-y-auto shrink-0 shadow-[rgba(0,0,15,0.05)_0px_0px_10px_0px]">
+              <GuidePanel stepId={STEPS[currentStep].id} />
+           </div>
+        </main>
+      </div>
+
+      {/* Mobile Overlay */}
+      {mobileMenuOpen && (
+        <div 
+            className="fixed inset-0 bg-gray-600 bg-opacity-75 z-20 md:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+        ></div>
+      )}
     </div>
   );
 }
