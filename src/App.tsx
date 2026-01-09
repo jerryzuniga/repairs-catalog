@@ -24,7 +24,8 @@ import {
   GraduationCap,
   Activity,
   MousePointerClick,
-  Ban
+  Ban,
+  Wrench
 } from 'lucide-react';
 
 // --- Types & Interfaces ---
@@ -769,7 +770,7 @@ const LearnSidebar: React.FC<LearnSidebarProps> = ({ currentStep, steps, onStepC
   return (
     <div className="w-72 bg-slate-50 border-r border-slate-200 flex flex-col h-full hidden md:flex shrink-0">
       <div className="p-4 border-b border-slate-200">
-        <h3 className="font-semibold text-[#002F6C] flex items-center gap-2">
+        <h3 className="font-semibold text-black flex items-center gap-2">
           <BookOpen size={18} /> Learning Guide
         </h3>
       </div>
@@ -796,7 +797,7 @@ const LearnSidebar: React.FC<LearnSidebarProps> = ({ currentStep, steps, onStepC
                         }`}>
                             {idx < currentStep ? <CheckCircle size={12} /> : idx + 1}
                         </div>
-                        <span className={`text-sm py-0.5 ${idx === currentStep ? 'font-semibold text-[#002F6C]' : 'text-[#88888D]'}`}>
+                        <span className={`text-sm py-0.5 ${idx === currentStep ? 'font-semibold text-black' : 'text-[#88888D]'}`}>
                             {s.title.split(':')[0]}
                         </span>
                     </button>
@@ -805,10 +806,10 @@ const LearnSidebar: React.FC<LearnSidebarProps> = ({ currentStep, steps, onStepC
         </div>
 
         <div className="bg-[#0099CC]/5 p-4 rounded-lg border border-[#0099CC]/20">
-            <h4 className="font-bold text-[#002F6C] text-sm mb-2 flex items-center gap-2">
+            <h4 className="font-bold text-black text-sm mb-2 flex items-center gap-2">
                 <Info size={14}/> Guidance
             </h4>
-            <p className="text-xs text-[#002F6C] leading-relaxed">
+            <p className="text-xs text-black leading-relaxed">
                 Use this module to understand the core taxonomy before building your catalog. 
                 <br/><br/>
                 <strong>Tip:</strong> Don't rush through the definitions. Understanding the difference between <strong>Critical</strong> and <strong>Emergent</strong> is key to building a defensible policy.
@@ -819,13 +820,13 @@ const LearnSidebar: React.FC<LearnSidebarProps> = ({ currentStep, steps, onStepC
       <div className="p-4 bg-slate-50 border-t border-slate-200">
         <button 
           onClick={() => window.open('#', '_blank')}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 mb-2 bg-white border border-slate-300 rounded-lg text-[#002F6C] hover:bg-slate-100 transition-colors shadow-sm text-sm"
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 mb-2 bg-white border border-slate-300 rounded-lg text-black hover:bg-slate-100 transition-colors shadow-sm text-sm"
         >
           <BookOpen size={16} /> Access Guide
         </button>
         <button 
           onClick={onHome}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded-lg text-[#002F6C] hover:bg-slate-100 transition-colors shadow-sm text-sm"
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded-lg text-black hover:bg-slate-100 transition-colors shadow-sm text-sm"
         >
           <Home size={16} /> Back to Home
         </button>
@@ -885,7 +886,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activePillar, onPillarChange, activeS
   return (
     <div className="w-72 bg-slate-50 border-r border-slate-200 flex flex-col h-full hidden md:flex shrink-0">
       <div className="p-4 border-b border-slate-200">
-        <h3 className="font-semibold text-[#002F6C] flex items-center gap-2">
+        <h3 className="font-semibold text-black flex items-center gap-2">
           <Filter size={18} /> Filters
         </h3>
       </div>
@@ -898,7 +899,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activePillar, onPillarChange, activeS
               onSubCatChange('all');
               onTypeChange('all');
             }}
-            className={`w-full text-left px-3 py-2 rounded text-sm mb-2 ${activePillar === 'all' ? 'bg-[#002F6C] font-bold text-white' : 'hover:bg-slate-100 text-[#002F6C]'}`}
+            className={`w-full text-left px-3 py-2 rounded text-sm mb-2 ${activePillar === 'all' ? 'bg-black font-bold text-white' : 'hover:bg-slate-100 text-black'}`}
           >
             All Pillars
           </button>
@@ -909,13 +910,13 @@ const Sidebar: React.FC<SidebarProps> = ({ activePillar, onPillarChange, activeS
               <div key={p.id} className="space-y-1">
                 <button 
                   onClick={() => togglePillar(p.id)}
-                  className={`w-full text-left px-3 py-2 rounded text-sm flex items-center justify-between group ${isActivePillar ? 'bg-white shadow-sm ring-1 ring-slate-200 font-medium' : 'hover:bg-slate-100 text-[#002F6C]'}`}
+                  className={`w-full text-left px-3 py-2 rounded text-sm flex items-center justify-between group ${isActivePillar ? 'bg-white shadow-sm ring-1 ring-slate-200 font-medium' : 'hover:bg-slate-100 text-black'}`}
                 >
                   <div className="flex items-center gap-2">
                     <div className={`w-2 h-2 rounded-full ${p.color.replace('text', 'bg')}`}></div>
                     <span className="truncate">{p.name}</span>
                   </div>
-                  {isActivePillar ? <ChevronDown size={14} className="text-[#88888D]"/> : <ChevronRight size={14} className="text-[#88888D] group-hover:text-[#002F6C]"/>}
+                  {isActivePillar ? <ChevronDown size={14} className="text-[#88888D]"/> : <ChevronRight size={14} className="text-[#88888D] group-hover:text-black"/>}
                 </button>
 
                 {isActivePillar && (
@@ -927,7 +928,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activePillar, onPillarChange, activeS
                         <div key={sc.id}>
                           <button
                             onClick={() => toggleSubCat(sc.id)}
-                            className={`w-full text-left px-2 py-1.5 rounded text-xs flex items-center justify-between ${isActiveSub ? 'bg-slate-100 text-[#002F6C] font-medium' : 'text-[#88888D] hover:text-[#002F6C] hover:bg-slate-50'}`}
+                            className={`w-full text-left px-2 py-1.5 rounded text-xs flex items-center justify-between ${isActiveSub ? 'bg-slate-100 text-black font-medium' : 'text-[#88888D] hover:text-black hover:bg-slate-50'}`}
                           >
                              <span className="truncate">{sc.name} <span className="text-[#88888D] text-[10px]">({activityCount})</span></span>
                              {isActiveSub ? <ChevronDown size={12}/> : <ChevronRight size={12} className="opacity-0 group-hover:opacity-100"/>}
@@ -939,7 +940,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activePillar, onPillarChange, activeS
                                 <button
                                   key={t.id}
                                   onClick={() => onTypeChange(t.id === activeType ? 'all' : t.id)}
-                                  className={`w-full text-left px-2 py-1.5 rounded text-[11px] leading-tight ${activeType === t.id ? 'bg-[#0099CC]/10 text-[#0099CC] font-semibold shadow-sm' : 'text-[#88888D] hover:text-[#002F6C] truncate'}`}
+                                  className={`w-full text-left px-2 py-1.5 rounded text-[11px] leading-tight ${activeType === t.id ? 'bg-[#0099CC]/10 text-[#0099CC] font-semibold shadow-sm' : 'text-[#88888D] hover:text-black truncate'}`}
                                 >
                                   {t.name}
                                 </button>
@@ -979,13 +980,13 @@ const Sidebar: React.FC<SidebarProps> = ({ activePillar, onPillarChange, activeS
         </div>
         <button 
           onClick={() => window.open('#', '_blank')}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 mt-4 mb-2 bg-white border border-slate-300 rounded-lg text-[#002F6C] hover:bg-slate-100 transition-colors shadow-sm text-sm"
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 mt-4 mb-2 bg-white border border-slate-300 rounded-lg text-black hover:bg-slate-100 transition-colors shadow-sm text-sm"
         >
           <BookOpen size={16} /> Access Guide
         </button>
         <button 
           onClick={onHome}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded-lg text-[#002F6C] hover:bg-slate-100 transition-colors shadow-sm text-sm"
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded-lg text-black hover:bg-slate-100 transition-colors shadow-sm text-sm"
         >
           <Home size={16} /> Back to Home
         </button>
@@ -1007,18 +1008,18 @@ const MatrixGrid = () => {
     { u: 'Non-Critical', c: 'Passive', color: 'bg-[#88888D]/50 text-white', label: 'Priority 4: Defer' },
     { u: 'Critical', c: 'Inactive', color: 'bg-[#FFD100] text-black', label: 'Priority 3: Investigate' },
     { u: 'Emergent', c: 'Inactive', color: 'bg-[#88888D]/50 text-white', label: 'Priority 4: Defer' },
-    { u: 'Non-Critical', c: 'Inactive', color: 'bg-[#88888D]/20 text-[#002F6C]', label: 'Priority 5: No Action' },
+    { u: 'Non-Critical', c: 'Inactive', color: 'bg-[#88888D]/20 text-black', label: 'Priority 5: No Action' },
   ];
 
   return (
     <div className="grid grid-cols-[100px_1fr_1fr_1fr] gap-3 text-xs sm:text-sm">
       {/* Header Row */}
-      <div className="col-start-2 text-center font-bold text-[#002F6C]">Active Condition</div>
-      <div className="text-center font-bold text-[#002F6C]">Passive Condition</div>
-      <div className="text-center font-bold text-[#002F6C]">Inactive Condition</div>
+      <div className="col-start-2 text-center font-bold text-black">Active Condition</div>
+      <div className="text-center font-bold text-black">Passive Condition</div>
+      <div className="text-center font-bold text-black">Inactive Condition</div>
 
       {/* Rows */}
-      <div className="flex items-center justify-end pr-4 font-bold text-[#002F6C]">Critical</div>
+      <div className="flex items-center justify-end pr-4 font-bold text-black">Critical</div>
       <div className={`h-24 md:h-32 rounded-lg p-3 flex flex-col justify-between shadow-sm transition-transform hover:scale-105 ${cells[0].color}`}>
         <span className="font-bold">Critical / Active</span>
         <span className="opacity-90">{cells[0].label}</span>
@@ -1032,7 +1033,7 @@ const MatrixGrid = () => {
         <span className="opacity-90">{cells[6].label}</span>
       </div>
 
-      <div className="flex items-center justify-end pr-4 font-bold text-[#002F6C]">Emergent</div>
+      <div className="flex items-center justify-end pr-4 font-bold text-black">Emergent</div>
       <div className={`h-24 md:h-32 rounded-lg p-3 flex flex-col justify-between shadow-sm transition-transform hover:scale-105 ${cells[1].color}`}>
         <span className="font-bold">Emergent / Active</span>
         <span className="opacity-90">{cells[1].label}</span>
@@ -1046,7 +1047,7 @@ const MatrixGrid = () => {
         <span className="opacity-90">{cells[7].label}</span>
       </div>
 
-      <div className="flex items-center justify-end pr-4 font-bold text-[#002F6C]">Non-Critical</div>
+      <div className="flex items-center justify-end pr-4 font-bold text-black">Non-Critical</div>
       <div className={`h-24 md:h-32 rounded-lg p-3 flex flex-col justify-between shadow-sm transition-transform hover:scale-105 ${cells[2].color}`}>
         <span className="font-bold">Non-Critical / Active</span>
         <span className="opacity-90">{cells[2].label}</span>
@@ -1073,30 +1074,30 @@ interface LandingViewProps {
 const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
   <div className="h-full overflow-y-auto bg-white">
     {/* Hero Section */}
-    <div className="bg-[#002F6C] text-white relative overflow-hidden">
-      <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#0099CC] via-[#002F6C] to-[#002F6C]"></div>
+    <div className="bg-[#E55025] text-white relative overflow-hidden">
+      <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-orange-400 via-orange-600 to-[#E55025]"></div>
       <div className="max-w-7xl mx-auto px-6 py-24 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0099CC]/20 border border-[#0099CC]/30 text-[#0099CC] text-sm font-medium mb-6">
-            <span className="flex h-2 w-2 rounded-full bg-[#0099CC]"></span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-sm font-medium mb-6">
+            <span className="flex h-2 w-2 rounded-full bg-white"></span>
             Version 1.1.2.1 Available
           </div>
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 leading-tight">
-            Standardize Your <span className="text-[#C4D600]">Home Repair</span> Program
+            Standardize Your <span className="text-white">Home Repair</span> Program
           </h1>
-          <p className="text-xl text-slate-300 mb-10 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-xl text-white/90 mb-10 leading-relaxed max-w-2xl mx-auto">
             A unified taxonomy to categorize activities, prioritize based on criticality, and automatically generate your "Eligible Activities" policy manual.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={onStart}
-              className="flex items-center justify-center gap-2 px-8 py-4 bg-[#0099CC] text-white rounded-lg font-bold text-lg hover:bg-[#0099CC]/90 transition-all shadow-lg hover:shadow-[#0099CC]/25"
+              className="flex items-center justify-center gap-2 px-8 py-4 bg-white text-[#E55025] rounded-lg font-bold text-lg hover:bg-slate-50 transition-all shadow-lg shadow-black/10"
             >
               Start Activity Builder <ArrowRight size={20} />
             </button>
             <button
               onClick={onLearn}
-              className="flex items-center justify-center gap-2 px-8 py-4 bg-[#002F6C] text-white border border-[#88888D] rounded-lg font-bold text-lg hover:bg-[#002F6C]/80 transition-all"
+              className="flex items-center justify-center gap-2 px-8 py-4 bg-transparent text-white border border-white rounded-lg font-bold text-lg hover:bg-white/10 transition-all"
             >
               Learn the Framework
             </button>
@@ -1116,7 +1117,7 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
     <div className="py-24 bg-slate-50">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl font-bold text-[#002F6C] mb-4">Why use the Framework?</h2>
+          <h2 className="text-3xl font-bold text-black mb-4">Why use the Framework?</h2>
           <p className="text-[#88888D] text-lg">Move beyond "roofs and ramps" to a data-driven approach that supports funding, reporting, and impact measurement.</p>
         </div>
 
@@ -1125,7 +1126,7 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
             <div className="w-12 h-12 bg-[#0099CC]/10 text-[#0099CC] rounded-xl flex items-center justify-center mb-6">
               <Layers size={24} />
             </div>
-            <h3 className="text-xl font-bold text-[#002F6C] mb-3">Unified Taxonomy</h3>
+            <h3 className="text-xl font-bold text-black mb-3">Unified Taxonomy</h3>
             <p className="text-[#88888D] leading-relaxed">
               Standardize your work into 4 Pillars, Sub-Categories, and Types. Eliminate ambiguity in your program data.
             </p>
@@ -1134,7 +1135,7 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
             <div className="w-12 h-12 bg-[#E55025]/10 text-[#E55025] rounded-xl flex items-center justify-center mb-6">
               <AlertTriangle size={24} />
             </div>
-            <h3 className="text-xl font-bold text-[#002F6C] mb-3">Smart Prioritization</h3>
+            <h3 className="text-xl font-bold text-black mb-3">Smart Prioritization</h3>
             <p className="text-[#88888D] leading-relaxed">
               Use the Criticality Matrix (Urgency + Condition) to objectively rank repairs and defend your scope decisions.
             </p>
@@ -1143,7 +1144,7 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
             <div className="w-12 h-12 bg-[#3AA047]/10 text-[#3AA047] rounded-xl flex items-center justify-center mb-6">
               <FileText size={24} />
             </div>
-            <h3 className="text-xl font-bold text-[#002F6C] mb-3">Instant Policy</h3>
+            <h3 className="text-xl font-bold text-black mb-3">Instant Policy</h3>
             <p className="text-[#88888D] leading-relaxed">
               Stop writing manuals from scratch. Select your activities and export a formatted "Eligible Activities" document instantly.
             </p>
@@ -1153,7 +1154,7 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
     </div>
 
     {/* Call to Action Footer */}
-    <div className="bg-[#002F6C] text-white py-20">
+    <div className="bg-slate-900 text-white py-20">
       <div className="max-w-4xl mx-auto px-6 text-center">
         <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to define your program?</h2>
         <p className="text-[#88888D] text-lg mb-8">
@@ -1186,13 +1187,13 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
           <div className="flex items-start gap-4 p-4 bg-[#0099CC]/5 rounded-lg border border-[#0099CC]/20">
             <Info className="text-[#0099CC] min-w-[24px]" />
             <div>
-              <h3 className="font-bold text-[#002F6C] mb-2">The Problem</h3>
-              <p className="text-[#002F6C]">Affiliates use inconsistent language. "Roof repair" might mean a full replacement in one county and a patch in another. This makes it impossible to compare data or define standard policies.</p>
+              <h3 className="font-bold text-black mb-2">The Problem</h3>
+              <p className="text-black">Affiliates use inconsistent language. "Roof repair" might mean a full replacement in one county and a patch in another. This makes it impossible to compare data or define standard policies.</p>
             </div>
           </div>
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div>
-              <p className="text-lg text-[#002F6C] mb-4">The <strong>Housing Preservation Framework</strong> breaks down complex repair work into a standard hierarchy. This allows us to:</p>
+              <p className="text-lg text-black mb-4">The <strong>Housing Preservation Framework</strong> breaks down complex repair work into a standard hierarchy. This allows us to:</p>
               <ul className="space-y-3">
                 <li className="flex items-center gap-2"><CheckCircle size={16} className="text-[#3AA047]"/> <span>Standardize reporting across affiliates</span></li>
                 <li className="flex items-center gap-2"><CheckCircle size={16} className="text-[#3AA047]"/> <span>Define precise eligibility rules</span></li>
@@ -1200,9 +1201,9 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
               </ul>
             </div>
             <div className="bg-slate-100 p-6 rounded-xl border border-slate-200">
-               <h4 className="font-bold text-[#002F6C] mb-4 text-center text-sm uppercase tracking-wide">The Hierarchy</h4>
+               <h4 className="font-bold text-black mb-4 text-center text-sm uppercase tracking-wide">The Hierarchy</h4>
                <div className="space-y-2 max-w-[200px] mx-auto">
-                 <div className="p-2 bg-[#002F6C] text-white text-center rounded text-sm font-semibold">Pillar</div>
+                 <div className="p-2 bg-black text-white text-center rounded text-sm font-semibold">Pillar</div>
                  <div className="flex justify-center"><ChevronDown size={16} className="text-[#88888D]"/></div>
                  <div className="p-2 bg-[#88888D] text-white text-center rounded text-sm font-semibold">Sub-Category</div>
                  <div className="flex justify-center"><ChevronDown size={16} className="text-[#88888D]"/></div>
@@ -1229,9 +1230,9 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
                      <div className={`p-2 bg-white rounded-lg shadow-sm`}>
                        <Icon size={24} className={p.color} />
                      </div>
-                     <h3 className="font-bold text-[#002F6C] text-lg">{p.name}</h3>
+                     <h3 className="font-bold text-black text-lg">{p.name}</h3>
                    </div>
-                   <p className="text-[#002F6C] leading-relaxed">{p.description}</p>
+                   <p className="text-black leading-relaxed">{p.description}</p>
                  </div>
                )
             })}
@@ -1269,12 +1270,12 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
 
             <div className="bg-slate-100 p-6 rounded-xl border border-slate-200">
               <div className="flex items-center gap-2 mb-4">
-                <Activity className="text-[#002F6C]" />
-                <h3 className="text-xl font-bold text-[#002F6C]">2. Condition State</h3>
+                <Activity className="text-black" />
+                <h3 className="text-xl font-bold text-black">2. Condition State</h3>
               </div>
               <ul className="space-y-4">
                 <li className="bg-white p-3 rounded shadow-sm border border-slate-200">
-                  <span className="font-bold text-[#002F6C] block mb-1">Active</span>
+                  <span className="font-bold text-black block mb-1">Active</span>
                   <span className="text-sm text-[#88888D]">The defect is currently causing damage (e.g., active roof leak, live wires).</span>
                 </li>
                 <li className="bg-white p-3 rounded shadow-sm border border-slate-200">
@@ -1296,7 +1297,7 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
       content: (
         <div className="space-y-10 animate-in fade-in duration-500">
           <div>
-            <h3 className="text-xl font-bold text-[#002F6C] mb-4 border-b border-slate-200 pb-2">A. Residential Unit Sub-Categories</h3>
+            <h3 className="text-xl font-bold text-black mb-4 border-b border-slate-200 pb-2">A. Residential Unit Sub-Categories</h3>
             <p className="text-sm text-[#88888D] mb-6">Each sub-category is assigned a default Urgency and Condition State to help prioritization.</p>
             
             {/* Dwelling Safety */}
@@ -1305,10 +1306,10 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
               <div className="grid gap-4">
                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#A4343A] shadow-sm">
                   <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-[#002F6C] text-lg">Structural Components</span>
+                    <span className="font-bold text-black text-lg">Structural Components</span>
                     <div className="flex gap-2 shrink-0 ml-2">
                        <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
-                       <span className="px-2 py-0.5 bg-slate-200 text-[#002F6C] text-xs rounded font-bold uppercase tracking-wide">Active</span>
+                       <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
                     </div>
                   </div>
                   <p className="text-sm text-[#88888D] leading-relaxed">Repairs to the home’s foundational and load-bearing elements (e.g., framing, beams, floor joists) that are essential for ensuring the home’s structural integrity and immediate habitability.</p>
@@ -1316,10 +1317,10 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
 
                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#A4343A] shadow-sm">
                   <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-[#002F6C] text-lg">Critical Home Systems</span>
+                    <span className="font-bold text-black text-lg">Critical Home Systems</span>
                     <div className="flex gap-2 shrink-0 ml-2">
                        <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
-                       <span className="px-2 py-0.5 bg-slate-200 text-[#002F6C] text-xs rounded font-bold uppercase tracking-wide">Active</span>
+                       <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
                     </div>
                   </div>
                   <p className="text-sm text-[#88888D] leading-relaxed">Repairs to major, non-structural systems (e.g., plumbing, electrical, HVAC) that are necessary for maintaining basic living conditions.</p>
@@ -1327,10 +1328,10 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
 
                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#E55025] shadow-sm">
                   <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-[#002F6C] text-lg">Deferred Repair</span>
+                    <span className="font-bold text-black text-lg">Deferred Repair</span>
                     <div className="flex gap-2 shrink-0 ml-2">
                        <span className="px-2 py-0.5 bg-[#E55025]/10 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Emergent</span>
-                       <span className="px-2 py-0.5 bg-slate-200 text-[#002F6C] text-xs rounded font-bold uppercase tracking-wide">Active</span>
+                       <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
                     </div>
                   </div>
                   <p className="text-sm text-[#88888D] leading-relaxed">Deferred maintenance repairs address active, non-critical home systems repair needs that, if left unaddressed, can become critical home repair needs over time and use.</p>
@@ -1344,10 +1345,10 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
               <div className="grid gap-4">
                  <div className="bg-white p-5 rounded-lg border-l-4 border-[#A4343A] shadow-sm">
                   <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-[#002F6C] text-lg">Environmental Hazards Controls</span>
+                    <span className="font-bold text-black text-lg">Environmental Hazards Controls</span>
                     <div className="flex gap-2 shrink-0 ml-2">
                        <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
-                       <span className="px-2 py-0.5 bg-slate-200 text-[#002F6C] text-xs rounded font-bold uppercase tracking-wide">Active</span>
+                       <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
                     </div>
                   </div>
                   <p className="text-sm text-[#88888D] leading-relaxed">Non-architectural interventions that mitigate urgent, health-threatening environmental hazards (e.g., lead, mold, pest infestations) by directly reducing exposure to contaminants or conditions that severely impact resident health.</p>
@@ -1355,10 +1356,10 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
 
                  <div className="bg-white p-5 rounded-lg border-l-4 border-[#A4343A] shadow-sm">
                   <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-[#002F6C] text-lg">Critical Accessibility / Fall Prevention</span>
+                    <span className="font-bold text-black text-lg">Critical Accessibility / Fall Prevention</span>
                     <div className="flex gap-2 shrink-0 ml-2">
                        <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
-                       <span className="px-2 py-0.5 bg-slate-200 text-[#002F6C] text-xs rounded font-bold uppercase tracking-wide">Active</span>
+                       <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
                     </div>
                   </div>
                   <p className="text-sm text-[#88888D] leading-relaxed">Modifications that address urgent barriers preventing residents from safely and independently navigating and utilizing their home environment, ensuring immediate and safe use.</p>
@@ -1366,10 +1367,10 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
 
                  <div className="bg-white p-5 rounded-lg border-l-4 border-[#FFD100] shadow-sm">
                   <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-[#002F6C] text-lg">Non-Critical Accessibility / Aging in Place</span>
+                    <span className="font-bold text-black text-lg">Non-Critical Accessibility / Aging in Place</span>
                     <div className="flex gap-2 shrink-0 ml-2">
                        <span className="px-2 py-0.5 bg-[#FFD100]/20 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Non-Critical</span>
-                       <span className="px-2 py-0.5 bg-slate-200 text-[#002F6C] text-xs rounded font-bold uppercase tracking-wide">Active</span>
+                       <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
                     </div>
                   </div>
                   <p className="text-sm text-[#88888D] leading-relaxed">Non-critical improvements that enhance usability and functional access for individuals facing reduced mobility, visual, or auditory challenges, supporting their long-term independence and comfort.</p>
@@ -1383,7 +1384,7 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
               <div className="grid gap-4">
                  <div className="bg-white p-5 rounded-lg border-l-4 border-[#E55025] shadow-sm">
                   <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-[#002F6C] text-lg">Disaster / Security Readiness</span>
+                    <span className="font-bold text-black text-lg">Disaster / Security Readiness</span>
                     <div className="flex gap-2 shrink-0 ml-2">
                        <span className="px-2 py-0.5 bg-[#E55025]/10 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Emergent</span>
                        <span className="px-2 py-0.5 bg-slate-200 text-[#88888D] text-xs rounded font-bold uppercase tracking-wide">Passive</span>
@@ -1394,7 +1395,7 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
 
                  <div className="bg-white p-5 rounded-lg border-l-4 border-[#FFD100] shadow-sm">
                   <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-[#002F6C] text-lg">Home Utilities Performance</span>
+                    <span className="font-bold text-black text-lg">Home Utilities Performance</span>
                     <div className="flex gap-2 shrink-0 ml-2">
                        <span className="px-2 py-0.5 bg-[#FFD100]/20 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Non-Critical</span>
                        <span className="px-2 py-0.5 bg-slate-200 text-[#88888D] text-xs rounded font-bold uppercase tracking-wide">Passive</span>
@@ -1407,7 +1408,7 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
           </div>
 
           <div>
-            <h3 className="text-xl font-bold text-[#002F6C] mb-4 border-b border-slate-200 pb-2">B. Community-based Sub-Categories</h3>
+            <h3 className="text-xl font-bold text-black mb-4 border-b border-slate-200 pb-2">B. Community-based Sub-Categories</h3>
             <p className="text-sm text-[#88888D] mb-6 bg-slate-100 p-3 rounded-lg border border-slate-200 inline-flex items-center gap-2">
               <Info size={16} className="text-[#88888D]"/> 
               <span><strong>Note:</strong> Criticality currently does not apply for Community Repair sub-categories.</span>
@@ -1417,15 +1418,15 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
                <h4 className="font-bold text-[#3AA047] mb-3 flex items-center gap-2"><Users size={20}/> Community Repair</h4>
                <div className="grid gap-4">
                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#3AA047] shadow-sm">
-                  <span className="font-bold text-[#002F6C] block mb-2 text-lg">Community / Nonprofit Building Repair</span>
+                  <span className="font-bold text-black block mb-2 text-lg">Community / Nonprofit Building Repair</span>
                   <p className="text-sm text-[#88888D] leading-relaxed">Repairs and improvements to all community and nonprofit buildings that stabilize these buildings so that they may continue to serve the community.</p>
                 </div>
                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#3AA047] shadow-sm">
-                  <span className="font-bold text-[#002F6C] block mb-2 text-lg">Community Energy & Performance</span>
+                  <span className="font-bold text-black block mb-2 text-lg">Community Energy & Performance</span>
                   <p className="text-sm text-[#88888D] leading-relaxed">Repairs and improvements to all community and nonprofit buildings that decrease utility consumption and/or increase climate resilience.</p>
                 </div>
                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#3AA047] shadow-sm">
-                  <span className="font-bold text-[#002F6C] block mb-2 text-lg">Public Space Improvements</span>
+                  <span className="font-bold text-black block mb-2 text-lg">Public Space Improvements</span>
                   <p className="text-sm text-[#88888D] leading-relaxed">Non-building repairs and improvements that improve community space conditions.</p>
                 </div>
                </div>
@@ -1439,7 +1440,7 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
       content: (
         <div className="space-y-6">
           <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 mb-6">
-            <h3 className="font-bold text-[#002F6C] mb-2 flex items-center gap-2">
+            <h3 className="font-bold text-black mb-2 flex items-center gap-2">
               <MousePointerClick size={20} /> How to use this Matrix
             </h3>
             <p className="text-[#88888D]">
@@ -1462,23 +1463,23 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
           <div className="bg-[#0099CC]/5 p-4 rounded-lg border border-[#0099CC]/20 flex items-start gap-3">
              <LayoutGrid className="text-[#0099CC] mt-1" size={24} />
              <div>
-               <h3 className="font-bold text-[#002F6C] mb-2">Your Workspace</h3>
-               <p className="text-[#002F6C] text-sm">The Catalog view is your interactive workspace. Here you will make policy decisions for every activity in the framework.</p>
+               <h3 className="font-bold text-black mb-2">Your Workspace</h3>
+               <p className="text-black text-sm">The Catalog view is your interactive workspace. Here you will make policy decisions for every activity in the framework.</p>
              </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
             <div>
-               <h4 className="font-bold text-[#002F6C] mb-4 flex items-center gap-2">
-                 <span className="w-6 h-6 rounded-full bg-slate-200 text-[#002F6C] flex items-center justify-center text-xs">1</span>
+               <h4 className="font-bold text-black mb-4 flex items-center gap-2">
+                 <span className="w-6 h-6 rounded-full bg-slate-200 text-black flex items-center justify-center text-xs">1</span>
                  Navigation & Filters
                </h4>
                <p className="text-[#88888D] text-sm mb-4">
                  Use the left sidebar to drill down into Pillars, Sub-Categories, and Types. You can also use the search bar at the top to find specific keywords like "Roof" or "Mold".
                </p>
                
-               <h4 className="font-bold text-[#002F6C] mb-4 flex items-center gap-2">
-                 <span className="w-6 h-6 rounded-full bg-slate-200 text-[#002F6C] flex items-center justify-center text-xs">2</span>
+               <h4 className="font-bold text-black mb-4 flex items-center gap-2">
+                 <span className="w-6 h-6 rounded-full bg-slate-200 text-black flex items-center justify-center text-xs">2</span>
                  Set Criticality Defaults
                </h4>
                <p className="text-[#88888D] text-sm mb-4">
@@ -1487,7 +1488,7 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
             </div>
             
             <div className="bg-slate-100 p-4 rounded-xl border border-slate-200">
-               <h4 className="font-bold text-[#002F6C] mb-4 text-center">The Decision Buttons</h4>
+               <h4 className="font-bold text-black mb-4 text-center">The Decision Buttons</h4>
                <div className="space-y-3">
                  <div className="bg-white p-3 rounded shadow-sm border-l-4 border-[#3AA047]">
                    <span className="font-bold text-[#3AA047] block text-xs uppercase">Eligible</span>
@@ -1515,7 +1516,7 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
             <CheckCircle size={40} />
           </div>
           <div>
-            <h3 className="text-2xl font-bold text-[#002F6C] mb-4">You're ready to start.</h3>
+            <h3 className="text-2xl font-bold text-black mb-4">You're ready to start.</h3>
             <p className="text-lg text-[#88888D] max-w-xl mx-auto">
               Use the <strong>Catalog</strong> to browse activities. Mark them as Eligible, Not Eligible, or Conditional. 
               Then, use the <strong>Export Activities</strong> tool to generate your manual.
@@ -1539,8 +1540,8 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
         <div className="max-w-5xl mx-auto p-6 min-h-full flex flex-col">
           <div className="flex-1">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-3xl font-bold text-[#002F6C]">{steps[step].title}</h2>
-              <span className="text-sm font-medium px-3 py-1 bg-slate-200 rounded-full text-[#002F6C]">Step {step + 1} of {steps.length}</span>
+              <h2 className="text-3xl font-bold text-black">{steps[step].title}</h2>
+              <span className="text-sm font-medium px-3 py-1 bg-slate-200 rounded-full text-black">Step {step + 1} of {steps.length}</span>
             </div>
             
             <div className="w-full bg-slate-200 h-2 rounded-full mb-8 overflow-hidden">
@@ -1595,11 +1596,11 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ activePillar, activeSubCat, a
 
   return (
     <div className="flex items-center gap-2 text-sm text-[#88888D] mt-2">
-      <span className="font-semibold text-[#002F6C]">{pillar.name}</span>
+      <span className="font-semibold text-black">{pillar.name}</span>
       {subCat && (
         <>
           <ChevronRight size={14} className="text-[#88888D]" />
-          <span className={!type ? "font-semibold text-[#002F6C]" : ""}>{subCat.name}</span>
+          <span className={!type ? "font-semibold text-black" : ""}>{subCat.name}</span>
         </>
       )}
       {type && (
@@ -1697,8 +1698,8 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
                   <div className="flex items-center gap-3">
                     <pillar.icon className={pillar.color} size={24} />
                     <div>
-                      <h2 className="text-lg font-bold text-[#002F6C]">{pillar.name}</h2>
-                      <p className="text-xs text-[#002F6C]">{pillar.description}</p>
+                      <h2 className="text-lg font-bold text-black">{pillar.name}</h2>
+                      <p className="text-xs text-black">{pillar.description}</p>
                     </div>
                   </div>
                 </div>
@@ -1707,13 +1708,13 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
                   {pillar.subCategories.map(sc => (
                     <div key={sc.id} className="bg-white">
                       <div className="px-6 py-3 bg-slate-50 flex items-center justify-between">
-                        <span className="font-semibold text-[#002F6C] text-sm">{sc.name}</span>
+                        <span className="font-semibold text-black text-sm">{sc.name}</span>
                       </div>
                       <div className="p-6 grid gap-6">
                         {sc.types.map(type => (
                           <div key={type.id} className="space-y-3">
                             <div className="border-b border-slate-100 pb-2">
-                              <h4 className="text-sm font-bold text-[#002F6C] flex items-center gap-2">
+                              <h4 className="text-sm font-bold text-black flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 bg-[#88888D] rounded-full"></span>
                                 {type.name}
                               </h4>
@@ -1729,14 +1730,14 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
                                   <div key={int.id} className={`border rounded-lg p-4 transition-all ${sel.status ? 'border-slate-300 bg-white' : 'border-slate-200 bg-slate-50/50 hover:bg-white hover:shadow-sm'}`}>
                                     <div className="flex justify-between items-start mb-3">
                                       <div>
-                                        <h5 className="font-medium text-[#002F6C]">{int.name}</h5>
+                                        <h5 className="font-medium text-black">{int.name}</h5>
                                         <div className="flex flex-wrap gap-2 mt-2">
                                           <div className="flex flex-col">
                                             <label className="text-[10px] text-[#88888D] font-semibold mb-0.5">URGENCY</label>
                                             <select
                                               value={sel.urgency || int.urgency}
                                               onChange={(e) => onUpdateSelection(int.id, { ...sel, urgency: e.target.value })}
-                                              className="text-[10px] uppercase tracking-wider px-2 py-1 bg-slate-100 text-[#002F6C] rounded border border-slate-200 cursor-pointer hover:bg-slate-200 focus:ring-1 focus:ring-[#0099CC] focus:outline-none"
+                                              className="text-[10px] uppercase tracking-wider px-2 py-1 bg-slate-100 text-black rounded border border-slate-200 cursor-pointer hover:bg-slate-200 focus:ring-1 focus:ring-[#0099CC] focus:outline-none"
                                               onClick={(e) => e.stopPropagation()}
                                             >
                                               {['Critical', 'Emergent', 'Non-Critical', 'N/A'].map(o => <option key={o} value={o}>{o}</option>)}
@@ -1747,7 +1748,7 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
                                             <select
                                               value={sel.condition || int.condition}
                                               onChange={(e) => onUpdateSelection(int.id, { ...sel, condition: e.target.value })}
-                                              className="text-[10px] uppercase tracking-wider px-2 py-1 bg-slate-100 text-[#002F6C] rounded border border-slate-200 cursor-pointer hover:bg-slate-200 focus:ring-1 focus:ring-[#0099CC] focus:outline-none"
+                                              className="text-[10px] uppercase tracking-wider px-2 py-1 bg-slate-100 text-black rounded border border-slate-200 cursor-pointer hover:bg-slate-200 focus:ring-1 focus:ring-[#0099CC] focus:outline-none"
                                               onClick={(e) => e.stopPropagation()}
                                             >
                                               {['Active', 'Passive', 'Inactive', 'N/A'].map(o => <option key={o} value={o}>{o}</option>)}
@@ -1768,7 +1769,7 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
                                       </button>
                                       <button 
                                         onClick={() => onUpdateSelection(int.id, { ...sel, status: 'conditional' })}
-                                        className={`flex-1 text-xs py-1.5 rounded border ${sel.status === 'conditional' ? 'bg-[#FFD100] text-[#002F6C] border-[#FFD100]' : 'border-slate-200 text-[#88888D] hover:bg-[#FFD100]/20'}`}
+                                        className={`flex-1 text-xs py-1.5 rounded border ${sel.status === 'conditional' ? 'bg-[#FFD100] text-black border-[#FFD100]' : 'border-slate-200 text-[#88888D] hover:bg-[#FFD100]/20'}`}
                                       >
                                         Conditional
                                       </button>
@@ -1874,7 +1875,7 @@ const ReportView: React.FC<ReportViewProps> = ({ selections }) => {
           const [pillar, subCat] = key.split('::');
           return (
             <div key={key} className="break-inside-avoid">
-              <h4 className="font-bold text-[#002F6C] border-b border-slate-200 pb-1 mb-3">{pillar} - {subCat}</h4>
+              <h4 className="font-bold text-black border-b border-slate-200 pb-1 mb-3">{pillar} - {subCat}</h4>
               <ul className="list-disc pl-5 space-y-4">
                 {groupItems.map(item => {
                   const urgency = selections[item.id]?.urgency || item.urgency;
@@ -1882,7 +1883,7 @@ const ReportView: React.FC<ReportViewProps> = ({ selections }) => {
                   const priority = getPriorityLabel(urgency, condition);
 
                   return (
-                    <li key={item.id} className="text-sm text-[#002F6C]">
+                    <li key={item.id} className="text-sm text-black">
                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1">
                         <span className="font-medium text-base">{item.name}</span>
                         {priority && (
@@ -1898,17 +1899,17 @@ const ReportView: React.FC<ReportViewProps> = ({ selections }) => {
                       
                       {(urgency !== 'N/A' && condition !== 'N/A') && (
                         <div className="text-xs text-[#88888D] mt-1 flex flex-wrap gap-x-4 gap-y-1">
-                          <span className="flex items-center gap-1 font-medium text-[#002F6C]">
+                          <span className="flex items-center gap-1 font-medium text-black">
                             Urgency: <span className="font-normal text-[#88888D]">{urgency}</span>
                           </span>
-                          <span className="flex items-center gap-1 font-medium text-[#002F6C]">
+                          <span className="flex items-center gap-1 font-medium text-black">
                             Condition: <span className="font-normal text-[#88888D]">{condition}</span>
                           </span>
                         </div>
                       )}
 
                       {selections[item.id].notes && (
-                        <div className="mt-1.5 bg-[#FFD100]/20 p-2 rounded border border-[#FFD100]/40 text-xs italic text-[#002F6C]">
+                        <div className="mt-1.5 bg-[#FFD100]/20 p-2 rounded border border-[#FFD100]/40 text-xs italic text-black">
                           <strong>Note:</strong> {selections[item.id].notes}
                         </div>
                       )}
@@ -1927,11 +1928,11 @@ const ReportView: React.FC<ReportViewProps> = ({ selections }) => {
     <div className="p-8 max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-8 print:hidden">
         <div>
-          <h2 className="text-3xl font-bold text-[#002F6C]">Export Activities</h2>
+          <h2 className="text-3xl font-bold text-black">Export Activities</h2>
           <p className="text-[#88888D]">Review your selections and export your policy manual.</p>
         </div>
         <div className="flex gap-3">
-          <button onClick={copyToClipboard} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded hover:bg-slate-50 shadow-sm text-[#002F6C]">
+          <button onClick={copyToClipboard} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded hover:bg-slate-50 shadow-sm text-black">
             <Copy size={18} /> Copy Text
           </button>
           <button onClick={() => window.print()} className="flex items-center gap-2 px-4 py-2 bg-[#0099CC] text-white rounded hover:bg-[#0099CC]/80 shadow-sm">
@@ -1941,26 +1942,26 @@ const ReportView: React.FC<ReportViewProps> = ({ selections }) => {
       </div>
 
       <div ref={reportRef} className="bg-white p-12 shadow-lg border border-slate-200 min-h-[1000px] print:shadow-none print:border-none print:p-0">
-        <div className="text-center border-b-2 border-[#002F6C] pb-6 mb-8">
-          <h1 className="text-3xl font-bold uppercase tracking-wide text-[#002F6C]">Appendix A: Construction Activities</h1>
+        <div className="text-center border-b-2 border-black pb-6 mb-8">
+          <h1 className="text-3xl font-bold uppercase tracking-wide text-black">Appendix A: Construction Activities</h1>
           <p className="text-[#88888D] mt-2">Generated via Repairs Catalog Builder</p>
           <p className="text-sm text-[#88888D] mt-1">{new Date().toLocaleDateString()}</p>
         </div>
 
         <div className="mb-8">
-          <h3 className="text-xl font-bold text-[#002F6C] bg-slate-100 p-2 mb-4 border-l-4 border-[#3AA047]">1. Eligible Repairs</h3>
+          <h3 className="text-xl font-bold text-black bg-slate-100 p-2 mb-4 border-l-4 border-[#3AA047]">1. Eligible Repairs</h3>
           <p className="mb-4 text-sm text-[#88888D]">The following activities have been approved for program funding and execution, subject to standard feasibility assessments.</p>
           <GroupedList items={eligibleItems} />
         </div>
 
         <div className="mb-8">
-          <h3 className="text-xl font-bold text-[#002F6C] bg-slate-100 p-2 mb-4 border-l-4 border-[#FFD100]">2. Conditional Repairs</h3>
+          <h3 className="text-xl font-bold text-black bg-slate-100 p-2 mb-4 border-l-4 border-[#FFD100]">2. Conditional Repairs</h3>
           <p className="mb-4 text-sm text-[#88888D]">The following activities are eligible only when specific conditions are met (see notes).</p>
           <GroupedList items={conditionalItems} />
         </div>
 
         <div className="mb-8">
-          <h3 className="text-xl font-bold text-[#002F6C] bg-slate-100 p-2 mb-4 border-l-4 border-[#A4343A]">3. Non-Eligible Activities</h3>
+          <h3 className="text-xl font-bold text-black bg-slate-100 p-2 mb-4 border-l-4 border-[#A4343A]">3. Non-Eligible Activities</h3>
           <p className="mb-4 text-sm text-[#88888D]">The following activities are strictly outside the current program scope.</p>
           <GroupedList items={notEligibleItems} />
         </div>
@@ -2012,37 +2013,44 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-[#002F6C] flex flex-col">
+    <div className="min-h-screen bg-slate-50 font-sans text-black flex flex-col">
       {/* Navigation */}
       {view !== 'landing' && (
-        <nav className="bg-[#002F6C] text-white shadow-md print:hidden">
+        <nav className="bg-white border-b border-[#88888D]/20 shadow-sm print:hidden">
           <div className="max-w-7xl mx-auto px-4">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center gap-2 cursor-pointer" onClick={() => setView('landing')}>
-                <div className="bg-[#0099CC] p-1.5 rounded">
-                  <Home size={20} className="text-white" />
+            <div className="flex items-center justify-between h-20">
+              <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setView('landing')}>
+                <img 
+                  src="https://github.com/jerryzuniga/repairs-catalog/blob/fd2b835413161d9a35a156dbe830f8ecc911531f/public/catalog.png?raw=true" 
+                  alt="Catalog Builder" 
+                  className="h-10 w-auto" 
+                />
+                <div className="flex flex-col">
+                    <span className="font-extrabold text-xl tracking-tight text-black leading-none">
+                      Catalog<span className="text-[#E55025]">Builder</span>
+                    </span>
+                    <span className="text-[10px] font-bold text-[#88888D] tracking-widest uppercase leading-none mt-1">FOR REPAIRS ACTIVITIES</span>
                 </div>
-                <span className="font-bold text-lg tracking-tight">Catalog Builder</span>
               </div>
-              <div className="hidden md:flex space-x-4">
+              <div className="hidden md:flex items-center gap-1">
                 <button 
                   onClick={() => setView('learn')}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${view === 'learn' ? 'bg-[#002F6C] brightness-125 text-white' : 'text-slate-300 hover:text-white hover:bg-[#002F6C]/80'}`}
+                  className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${view === 'learn' ? 'bg-slate-100 text-black' : 'text-black hover:bg-slate-50'}`}
                 >
-                  <GraduationCap size={16} /> Learn
+                  <GraduationCap size={18} /> Learn
                 </button>
                 <button 
                   onClick={() => setView('catalog')}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${view === 'catalog' ? 'bg-[#002F6C] brightness-125 text-white' : 'text-slate-300 hover:text-white hover:bg-[#002F6C]/80'}`}
+                  className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${view === 'catalog' ? 'bg-[#E55025]/10 text-[#E55025]' : 'text-black hover:bg-slate-50'}`}
                 >
-                  <LayoutGrid size={16} /> Catalog
+                  <Wrench size={18} /> Builder
                 </button>
-                {/* Matrix button removed as it is now inside Learn */}
+                <div className="h-6 w-px bg-[#88888D]/20 mx-2"></div>
                 <button 
                   onClick={() => setView('report')}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${view === 'report' ? 'bg-[#3AA047] text-white' : 'bg-[#3AA047] text-white hover:bg-[#3AA047]/90'}`}
+                  className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${view === 'report' ? 'bg-slate-100 text-black' : 'text-black hover:bg-slate-50'}`}
                 >
-                  <Download size={16} /> Export Activities
+                  <Download size={18} /> Export Activities
                 </button>
               </div>
             </div>
