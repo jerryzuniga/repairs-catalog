@@ -1078,6 +1078,7 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
       <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-orange-400 via-orange-600 to-[#E55025]"></div>
       <div className="max-w-7xl mx-auto px-6 py-24 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
+          
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-sm font-medium mb-6">
             <span className="flex h-2 w-2 rounded-full bg-white"></span>
             Version 1.1.2.1 Available
@@ -1116,8 +1117,20 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
     {/* Value Props */}
     <div className="py-24 bg-slate-50">
       <div className="max-w-7xl mx-auto px-6">
+        
+        {/* Logo Moved Here */}
+        <div className="mb-12 flex justify-center">
+           <div className="">
+              <img 
+                src="https://github.com/jerryzuniga/repairs-catalog/blob/fd2b835413161d9a35a156dbe830f8ecc911531f/public/catalog.png?raw=true" 
+                alt="Catalog Builder Logo" 
+                className="w-24 h-24"
+              />
+           </div>
+        </div>
+
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl font-bold text-black mb-4">Why use the Framework?</h2>
+          <h2 className="text-3xl font-bold text-black mb-4">Why use the Catalog Builder?</h2>
           <p className="text-[#88888D] text-lg">Move beyond "roofs and ramps" to a data-driven approach that supports funding, reporting, and impact measurement.</p>
         </div>
 
@@ -1996,6 +2009,15 @@ export default function App() {
       }
     };
     loadData();
+  }, []);
+
+  // Set Favicon
+  useEffect(() => {
+    const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+    link.type = 'image/png';
+    link.rel = 'shortcut icon';
+    link.href = 'https://github.com/jerryzuniga/repairs-catalog/blob/fd2b835413161d9a35a156dbe830f8ecc911531f/public/catalog.png?raw=true';
+    document.getElementsByTagName('head')[0].appendChild(link);
   }, []);
 
   const handleUpdateSelection = (interventionId: string, data: Selection) => {
