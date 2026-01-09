@@ -81,23 +81,10 @@ interface SelectionsMap {
 // --- Brand Colors ---
 // Primary
 const C_BRIGHT_BLUE = 'text-[#0099CC]';
-const BG_BRIGHT_BLUE = 'bg-[#0099CC]';
-const C_BRIGHT_GREEN = 'text-[#C4D600]';
-const BG_BRIGHT_GREEN = 'bg-[#C4D600]';
-const C_COOL_GRAY = 'text-[#88888D]';
-const BG_COOL_GRAY = 'bg-[#88888D]';
-
 // Secondary
-const C_TRAD_BLUE = 'text-[#002F6C]';
-const BG_TRAD_BLUE = 'bg-[#002F6C]';
 const C_TRAD_GREEN = 'text-[#3AA047]';
-const BG_TRAD_GREEN = 'bg-[#3AA047]';
 const C_ORANGE = 'text-[#E55025]';
-const BG_ORANGE = 'bg-[#E55025]';
 const C_RED = 'text-[#A4343A]';
-const BG_RED = 'bg-[#A4343A]';
-const C_YELLOW = 'text-[#FFD100]';
-const BG_YELLOW = 'bg-[#FFD100]';
 
 // --- Mock Data: Taxonomy Framework ---
 const TAXONOMY_DATA: Pillar[] = [
@@ -1185,11 +1172,10 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
 
 interface LearnViewProps {
   onComplete: () => void;
-  selections: SelectionsMap;
   onHome: () => void;
 }
 
-const LearnView: React.FC<LearnViewProps> = ({ onComplete, selections, onHome }) => {
+const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
   const [step, setStep] = useState(0);
   
   const steps = [
@@ -2067,7 +2053,7 @@ export default function App() {
       {/* Main Content Area */}
       <main className="flex-1 overflow-hidden relative">
         {view === 'landing' && <LandingView onStart={() => setView('catalog')} onLearn={() => setView('learn')} />}
-        {view === 'learn' && <LearnView onComplete={() => setView('catalog')} selections={selections} onHome={() => setView('landing')} />}
+        {view === 'learn' && <LearnView onComplete={() => setView('catalog')} onHome={() => setView('landing')} />}
         {view === 'catalog' && <CatalogView selections={selections} onUpdateSelection={handleUpdateSelection} onHome={() => setView('landing')} />}
         {view === 'report' && <ReportView selections={selections} />}
       </main>
