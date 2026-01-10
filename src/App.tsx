@@ -25,7 +25,7 @@ import {
   Activity,
   MousePointerClick,
   Ban,
-  Wrench
+  Hammer
 } from 'lucide-react';
 
 // --- Types & Interfaces ---
@@ -822,7 +822,7 @@ const LearnSidebar: React.FC<LearnSidebarProps> = ({ currentStep, steps, onStepC
           onClick={() => window.open('#', '_blank')}
           className="w-full flex items-center justify-center gap-2 px-4 py-2 mb-2 bg-white border border-slate-300 rounded-lg text-black hover:bg-slate-100 transition-colors shadow-sm text-sm"
         >
-          <BookOpen size={16} /> Access Guide
+          <BookOpen size={16} /> Download Guide
         </button>
         <button 
           onClick={onHome}
@@ -831,7 +831,7 @@ const LearnSidebar: React.FC<LearnSidebarProps> = ({ currentStep, steps, onStepC
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.1.2.1
+          Version 1.2.1
         </div>
       </div>
     </div>
@@ -982,7 +982,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activePillar, onPillarChange, activeS
           onClick={() => window.open('#', '_blank')}
           className="w-full flex items-center justify-center gap-2 px-4 py-2 mt-4 mb-2 bg-white border border-slate-300 rounded-lg text-black hover:bg-slate-100 transition-colors shadow-sm text-sm"
         >
-          <BookOpen size={16} /> Access Guide
+          <BookOpen size={16} /> Download Guide
         </button>
         <button 
           onClick={onHome}
@@ -991,7 +991,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activePillar, onPillarChange, activeS
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.1.2.1
+          Version 1.2.1
         </div>
       </div>
     </div>
@@ -1076,12 +1076,12 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
     {/* Hero Section */}
     <div className="bg-[#E55025] text-white relative overflow-hidden">
       <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-orange-400 via-orange-600 to-[#E55025]"></div>
-      <div className="max-w-7xl mx-auto px-6 py-24 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 pt-24 pb-12 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-sm font-medium mb-6">
             <span className="flex h-2 w-2 rounded-full bg-white"></span>
-            Version 1.1.2.1 Available
+            Version 1.2.1 Available
           </div>
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 leading-tight">
             Standardize Your <span className="text-white">Home Repair</span> Program
@@ -1115,7 +1115,7 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
     </div>
 
     {/* Value Props */}
-    <div className="py-24 bg-slate-50">
+    <div className="pt-12 pb-24 bg-slate-50">
       <div className="max-w-7xl mx-auto px-6">
         
         {/* Logo Moved Here */}
@@ -1129,9 +1129,8 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
            </div>
         </div>
 
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl font-bold text-black mb-4">Why use the Catalog Builder?</h2>
-          <p className="text-[#88888D] text-lg">Move beyond "roofs and ramps" to a data-driven approach that supports funding, reporting, and impact measurement.</p>
+        <div className="text-center max-w-2xl mx-auto mb-10">
+          <h2 className="text-3xl font-bold text-black">Why use the Catalog Builder?</h2>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
@@ -2038,8 +2037,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-black flex flex-col">
       {/* Navigation */}
-      {view !== 'landing' && (
-        <nav className="bg-white border-b border-[#88888D]/20 shadow-sm print:hidden">
+      <nav className="bg-white border-b border-[#88888D]/20 shadow-sm print:hidden">
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-center justify-between h-20">
               <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setView('landing')}>
@@ -2064,22 +2062,26 @@ export default function App() {
                 </button>
                 <button 
                   onClick={() => setView('catalog')}
-                  className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${view === 'catalog' ? 'bg-[#E55025]/10 text-[#E55025]' : 'text-black hover:bg-slate-50'}`}
+                  className="px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-black text-white hover:bg-gray-800 shadow-sm"
                 >
-                  <Wrench size={18} /> Builder
+                  <Hammer size={18} /> Launch Builder
                 </button>
-                <div className="h-6 w-px bg-[#88888D]/20 mx-2"></div>
-                <button 
-                  onClick={() => setView('report')}
-                  className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${view === 'report' ? 'bg-slate-100 text-black' : 'text-black hover:bg-slate-50'}`}
-                >
-                  <Download size={18} /> Export Activities
-                </button>
+                
+                {view !== 'landing' && (
+                  <>
+                    <div className="h-6 w-px bg-[#88888D]/20 mx-2"></div>
+                    <button 
+                      onClick={() => setView('report')}
+                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${view === 'report' ? 'bg-slate-100 text-black' : 'text-black hover:bg-slate-50'}`}
+                    >
+                      <Download size={18} /> Export Activities
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>
         </nav>
-      )}
 
       {/* Main Content Area */}
       <main className="flex-1 overflow-hidden relative">
