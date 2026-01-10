@@ -2013,11 +2013,12 @@ export default function App() {
 
   // Set Favicon
   useEffect(() => {
-    const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-    link.type = 'image/png';
-    link.rel = 'shortcut icon';
-    link.href = 'https://github.com/jerryzuniga/repairs-catalog/blob/fd2b835413161d9a35a156dbe830f8ecc911531f/public/catalog.png?raw=true';
-    document.getElementsByTagName('head')[0].appendChild(link);
+    const link = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
+    const finalLink = link || document.createElement('link');
+    finalLink.type = 'image/png';
+    finalLink.rel = 'shortcut icon';
+    finalLink.href = 'https://github.com/jerryzuniga/repairs-catalog/blob/fd2b835413161d9a35a156dbe830f8ecc911531f/public/catalog.png?raw=true';
+    document.getElementsByTagName('head')[0].appendChild(finalLink);
   }, []);
 
   const handleUpdateSelection = (interventionId: string, data: Selection) => {
