@@ -25,7 +25,6 @@ import {
   Activity,
   MousePointerClick,
   Ban,
-  Wrench,
   Hammer
 } from 'lucide-react';
 
