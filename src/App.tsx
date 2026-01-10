@@ -25,6 +25,7 @@ import {
   Activity,
   MousePointerClick,
   Ban,
+  Wrench,
   Hammer
 } from 'lucide-react';
 
@@ -1084,10 +1085,10 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
             Version 1.2.1 Available
           </div>
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 leading-tight">
-            Standardize Your <span className="text-white">Home Repair</span> Program
+            Standardize Your <span className="text-white">Home Repair</span> Program Offerings
           </h1>
           <p className="text-xl text-white/90 mb-10 leading-relaxed max-w-2xl mx-auto">
-            A unified taxonomy to categorize activities, prioritize based on criticality, and automatically generate your "Eligible Activities" policy manual.
+            The builder creates a unified taxonomy to categorize activities, prioritize based on criticality, and automatically generate your "Eligible Activities" list for your policy manual.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
