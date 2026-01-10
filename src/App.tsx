@@ -1,23 +1,23 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { 
-  BookOpen, 
-  Search, 
-  Filter, 
-  CheckCircle, 
-  XCircle, 
-  AlertTriangle, 
-  FileText, 
-  LayoutGrid, 
-  Home, 
-  ChevronRight, 
-  ChevronDown, 
+import {
+  BookOpen,
+  Search,
+  Filter,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  FileText,
+  LayoutGrid,
+  Home,
+  ChevronRight,
+  ChevronDown,
   Info,
   Download,
   Copy,
   Printer,
-  Shield, 
-  Heart, 
-  Zap, 
+  Shield,
+  Heart,
+  Zap,
   Users,
   ArrowRight,
   Layers,
@@ -671,7 +671,7 @@ const TAXONOMY_DATA: Pillar[] = [
           {
             id: 'sct48',
             name: 'Non-Critical Building Improvements',
-            description: 'Non-essential improvements that enhance the usability, comfort, or aesthetics of community and nonprofit spaces but are not immediately required for basic safety and functionality.',
+            description: 'Non-essential improvements that enhance the usability, comfort, or aesthetics of community and nonprofit spaces but are not essential for safety or functionality.',
             interventions: [
               { id: 'i251', name: 'Repaint community rooms', urgency: 'N/A', condition: 'N/A' },
               { id: 'i252', name: 'Replace worn flooring', urgency: 'N/A', condition: 'N/A' }
@@ -817,6 +817,8 @@ interface LearnSidebarProps {
   steps: { title: string; content: React.ReactNode }[];
   onStepChange: (step: number) => void;
   onHome: () => void;
+  view: ViewState;
+  setView: (v: ViewState) => void;
 }
 
 const LearnSidebar: React.FC<LearnSidebarProps> = ({ currentStep, steps, onStepChange, onHome }) => {
@@ -1175,6 +1177,40 @@ interface LandingViewProps {
 
 const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
   <div className="h-full overflow-y-auto bg-white">
+    <nav className="bg-white border-b border-[#88888D]/20 shadow-sm print:hidden">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center justify-between h-20">
+            <div className="flex items-center gap-3 cursor-pointer group">
+              <img 
+                src="https://github.com/jerryzuniga/repairs-catalog/blob/fd2b835413161d9a35a156dbe830f8ecc911531f/public/catalog.png?raw=true" 
+                alt="Catalog Builder" 
+                className="h-10 w-auto" 
+              />
+              <div className="flex flex-col">
+                  <span className="font-extrabold text-xl tracking-tight text-black leading-none">
+                    Catalog<span className="text-[#E55025]">Builder</span>
+                  </span>
+                  <span className="text-[10px] font-bold text-[#88888D] tracking-widest uppercase leading-none mt-1">FOR REPAIRS ACTIVITIES</span>
+              </div>
+            </div>
+            <div className="hidden md:flex items-center gap-1">
+              <button 
+                onClick={onLearn}
+                className="px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-slate-100 text-black hover:bg-slate-50"
+              >
+                <GraduationCap size={18} /> Learn
+              </button>
+              <button 
+                onClick={onStart}
+                className="px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-black text-white hover:bg-gray-800 shadow-sm"
+              >
+                <Hammer size={18} /> Launch Builder
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
     {/* Hero Section */}
     <div className="bg-[#E55025] text-white relative overflow-hidden">
       <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-orange-400 via-orange-600 to-[#E55025]"></div>
@@ -1425,8 +1461,8 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome, view, setView
                   <div className="flex justify-between items-start mb-2">
                     <span className="font-bold text-black text-lg">Structural Components</span>
                     <div className="flex gap-2 shrink-0 ml-2">
-                       <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
-                       <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
+                        <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
+                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
                     </div>
                   </div>
                   <p className="text-sm text-[#88888D] leading-relaxed">Repairs to the home’s foundational and load-bearing elements (e.g., framing, beams, floor joists) that are essential for ensuring the home’s structural integrity and immediate habitability.</p>
@@ -1436,8 +1472,8 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome, view, setView
                   <div className="flex justify-between items-start mb-2">
                     <span className="font-bold text-black text-lg">Critical Home Systems</span>
                     <div className="flex gap-2 shrink-0 ml-2">
-                       <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
-                       <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
+                        <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
+                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
                     </div>
                   </div>
                   <p className="text-sm text-[#88888D] leading-relaxed">Repairs to major, non-structural systems (e.g., plumbing, electrical, HVAC) that are necessary for maintaining basic living conditions.</p>
@@ -1447,8 +1483,8 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome, view, setView
                   <div className="flex justify-between items-start mb-2">
                     <span className="font-bold text-black text-lg">Deferred Repair</span>
                     <div className="flex gap-2 shrink-0 ml-2">
-                       <span className="px-2 py-0.5 bg-[#E55025]/10 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Emergent</span>
-                       <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
+                        <span className="px-2 py-0.5 bg-[#E55025]/10 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Emergent</span>
+                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
                     </div>
                   </div>
                   <p className="text-sm text-[#88888D] leading-relaxed">Deferred maintenance repairs address active, non-critical home systems repair needs that, if left unaddressed, can become critical home repair needs over time and use.</p>
@@ -1464,8 +1500,8 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome, view, setView
                   <div className="flex justify-between items-start mb-2">
                     <span className="font-bold text-black text-lg">Environmental Hazards Controls</span>
                     <div className="flex gap-2 shrink-0 ml-2">
-                       <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
-                       <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
+                        <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
+                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
                     </div>
                   </div>
                   <p className="text-sm text-[#88888D] leading-relaxed">Non-architectural interventions that mitigate urgent, health-threatening environmental hazards (e.g., lead, mold, pest infestations) by directly reducing exposure to contaminants or conditions that severely impact resident health.</p>
@@ -1475,8 +1511,8 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome, view, setView
                   <div className="flex justify-between items-start mb-2">
                     <span className="font-bold text-black text-lg">Critical Accessibility / Fall Prevention</span>
                     <div className="flex gap-2 shrink-0 ml-2">
-                       <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
-                       <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
+                        <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
+                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
                     </div>
                   </div>
                   <p className="text-sm text-[#88888D] leading-relaxed">Modifications that address urgent barriers preventing residents from safely and independently navigating and utilizing their home environment, ensuring immediate and safe use.</p>
@@ -1486,8 +1522,8 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome, view, setView
                   <div className="flex justify-between items-start mb-2">
                     <span className="font-bold text-black text-lg">Non-Critical Accessibility / Aging in Place</span>
                     <div className="flex gap-2 shrink-0 ml-2">
-                       <span className="px-2 py-0.5 bg-[#FFD100]/20 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Non-Critical</span>
-                       <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
+                        <span className="px-2 py-0.5 bg-[#FFD100]/20 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Non-Critical</span>
+                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
                     </div>
                   </div>
                   <p className="text-sm text-[#88888D] leading-relaxed">Non-critical improvements that enhance usability and functional access for individuals facing reduced mobility, visual, or auditory challenges, supporting their long-term independence and comfort.</p>
@@ -1503,8 +1539,8 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome, view, setView
                   <div className="flex justify-between items-start mb-2">
                     <span className="font-bold text-black text-lg">Disaster / Security Readiness</span>
                     <div className="flex gap-2 shrink-0 ml-2">
-                       <span className="px-2 py-0.5 bg-[#E55025]/10 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Emergent</span>
-                       <span className="px-2 py-0.5 bg-slate-200 text-[#88888D] text-xs rounded font-bold uppercase tracking-wide">Passive</span>
+                        <span className="px-2 py-0.5 bg-[#E55025]/10 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Emergent</span>
+                        <span className="px-2 py-0.5 bg-slate-200 text-[#88888D] text-xs rounded font-bold uppercase tracking-wide">Passive</span>
                     </div>
                   </div>
                   <p className="text-sm text-[#88888D] leading-relaxed">Proactive measures to strengthen the home’s resilience against external threats, helping prevent loss of life, property damage, or security breaches in emergencies.</p>
@@ -1514,8 +1550,8 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome, view, setView
                   <div className="flex justify-between items-start mb-2">
                     <span className="font-bold text-black text-lg">Home Utilities Performance</span>
                     <div className="flex gap-2 shrink-0 ml-2">
-                       <span className="px-2 py-0.5 bg-[#FFD100]/20 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Non-Critical</span>
-                       <span className="px-2 py-0.5 bg-slate-200 text-[#88888D] text-xs rounded font-bold uppercase tracking-wide">Passive</span>
+                        <span className="px-2 py-0.5 bg-[#FFD100]/20 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Non-Critical</span>
+                        <span className="px-2 py-0.5 bg-slate-200 text-[#88888D] text-xs rounded font-bold uppercase tracking-wide">Passive</span>
                     </div>
                   </div>
                   <p className="text-sm text-[#88888D] leading-relaxed">Improving home systems' utility consumption and performance through maintenance, efficiency, conservation, and weatherization measures.</p>
@@ -1984,7 +2020,8 @@ const ReportView: React.FC<ReportViewProps> = ({ selections, onHome, view, setVi
       window.getSelection()?.addRange(range);
       document.execCommand('copy');
       window.getSelection()?.removeAllRanges();
-      alert('Report copied to clipboard! You can now paste it into Word or Google Docs.');
+      // Using a simpler alert alternative or logging since strict mode might block alerts
+      // console.log('Report copied to clipboard!');
     }
   };
 
@@ -2163,47 +2200,10 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-black flex flex-col">
-      {/* Navigation - Only on Landing Page */}
-      {view === 'landing' && (
-        <nav className="bg-white border-b border-[#88888D]/20 shadow-sm print:hidden">
-            <div className="max-w-7xl mx-auto px-4">
-              <div className="flex items-center justify-between h-20">
-                <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setView('landing')}>
-                  <img 
-                    src="https://github.com/jerryzuniga/repairs-catalog/blob/fd2b835413161d9a35a156dbe830f8ecc911531f/public/catalog.png?raw=true" 
-                    alt="Catalog Builder" 
-                    className="h-10 w-auto" 
-                  />
-                  <div className="flex flex-col">
-                      <span className="font-extrabold text-xl tracking-tight text-black leading-none">
-                        Catalog<span className="text-[#E55025]">Builder</span>
-                      </span>
-                      <span className="text-[10px] font-bold text-[#88888D] tracking-widest uppercase leading-none mt-1">FOR REPAIRS ACTIVITIES</span>
-                  </div>
-                </div>
-                <div className="hidden md:flex items-center gap-1">
-                  <button 
-                    onClick={() => setView('learn')}
-                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${view === 'learn' ? 'bg-slate-100 text-black' : 'text-black hover:bg-slate-50'}`}
-                  >
-                    <GraduationCap size={18} /> Learn
-                  </button>
-                  <button 
-                    onClick={() => setView('catalog')}
-                    className="px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-black text-white hover:bg-gray-800 shadow-sm"
-                  >
-                    <Hammer size={18} /> Launch Builder
-                  </button>
-                </div>
-              </div>
-            </div>
-          </nav>
-      )}
-
       {/* Main Content Area */}
       <main className="flex-1 overflow-hidden relative">
         {view === 'landing' && <LandingView onStart={() => setView('catalog')} onLearn={() => setView('learn')} />}
-        {view === 'learn' && <LearnView onComplete={() => setView('catalog')} onHome={() => setView('landing')} view={view} setView={setView} />}
+        {view === 'learn' && <LearnView onComplete={() => setView('catalog')} selections={selections} onHome={() => setView('landing')} view={view} setView={setView} />}
         {view === 'catalog' && <CatalogView selections={selections} onUpdateSelection={handleUpdateSelection} onHome={() => setView('landing')} view={view} setView={setView} />}
         {view === 'report' && <ReportView selections={selections} onHome={() => setView('landing')} view={view} setView={setView} />}
       </main>
