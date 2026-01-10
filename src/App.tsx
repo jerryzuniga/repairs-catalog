@@ -29,8 +29,6 @@ import {
 } from 'lucide-react';
 
 // --- Types & Interfaces ---
-// Defined to prevent Vercel build failures (noImplicitAny)
-
 interface Intervention {
   id: string;
   name: string;
@@ -745,6 +743,22 @@ const ALL_INTERVENTIONS = flattenInterventions();
 
 // --- Components ---
 
+const Branding = () => (
+  <div className="flex items-center gap-3 px-2 py-1 group">
+    <img 
+      src="https://github.com/jerryzuniga/repairs-catalog/blob/fd2b835413161d9a35a156dbe830f8ecc911531f/public/catalog.png?raw=true" 
+      alt="Catalog Builder" 
+      className="h-10 w-auto" 
+    />
+    <div className="flex flex-col">
+        <span className="font-extrabold text-xl tracking-tight text-black leading-none">
+          Catalog<span className="text-[#E55025]">Builder</span>
+        </span>
+        <span className="text-[10px] font-bold text-[#88888D] tracking-widest uppercase leading-none mt-1">FOR REPAIRS ACTIVITIES</span>
+    </div>
+  </div>
+);
+
 interface StatusBadgeProps {
   status?: string;
 }
@@ -759,6 +773,42 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   }
 };
 
+const TopNav = ({ view, setView }: { view: string, setView: (v: string) => void }) => {
+  const getButtonClass = (isActive: boolean) => 
+    `px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 border ${
+      isActive 
+        ? 'bg-[#E55025]/10 text-[#E55025] border-[#E55025]' 
+        : 'bg-transparent text-black border-transparent hover:bg-slate-50'
+    }`;
+
+  return (
+    <div className="bg-white border-b border-slate-200 h-20 px-6 flex justify-end items-center gap-1">
+        <button 
+          onClick={() => setView('learn')}
+          className={getButtonClass(view === 'learn')}
+        >
+          <GraduationCap size={18} /> Learn
+        </button>
+        <button 
+          onClick={() => setView('catalog')}
+          className={getButtonClass(view === 'catalog')}
+        >
+          <Hammer size={18} /> Builder
+        </button>
+        
+        {/* Divider */}
+        <div className="h-6 w-px bg-[#88888D]/20 mx-2"></div>
+        
+        <button 
+          onClick={() => setView('report')}
+          className={getButtonClass(view === 'report')}
+        >
+          <Download size={18} /> Export Activities
+        </button>
+    </div>
+  );
+};
+
 interface LearnSidebarProps {
   currentStep: number;
   steps: { title: string; content: React.ReactNode }[];
@@ -769,14 +819,17 @@ interface LearnSidebarProps {
 const LearnSidebar: React.FC<LearnSidebarProps> = ({ currentStep, steps, onStepChange, onHome }) => {
   return (
     <div className="w-72 bg-slate-50 border-r border-slate-200 flex flex-col h-full hidden md:flex shrink-0">
-      <div className="p-4 border-b border-slate-200">
-        <h3 className="font-semibold text-black flex items-center gap-2">
-          <BookOpen size={18} /> Learning Guide
-        </h3>
+      <div className="h-20 flex items-center px-4 border-b border-slate-200">
+        <Branding />
       </div>
       
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
         <div>
+           <div className="flex items-center gap-2 mb-3">
+             <BookOpen size={18} className="text-black" />
+             <h3 className="font-semibold text-black">Learning Guide</h3>
+           </div>
+           
             <h4 className="text-xs font-semibold text-[#88888D] uppercase mb-3">Module Progress</h4>
             <div className="space-y-2 relative">
                 {/* Visual connecting line */}
@@ -831,7 +884,50 @@ const LearnSidebar: React.FC<LearnSidebarProps> = ({ currentStep, steps, onStepC
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.2.1
+          Version 1.2.2
+        </div>
+      </div>
+    </div>
+  );
+};
+
+interface ExportSidebarProps {
+  onHome: () => void;
+}
+
+const ExportSidebar: React.FC<ExportSidebarProps> = ({ onHome }) => {
+  return (
+    <div className="w-72 bg-slate-50 border-r border-slate-200 flex flex-col h-full hidden md:flex shrink-0">
+      <div className="h-20 flex items-center px-4 border-b border-slate-200">
+        <Branding />
+      </div>
+      
+      <div className="flex-1 overflow-y-auto p-4 space-y-6">
+        <div className="bg-[#0099CC]/5 p-4 rounded-lg border border-[#0099CC]/20">
+            <h4 className="font-bold text-black text-sm mb-2 flex items-center gap-2">
+                <Info size={14}/> Export
+            </h4>
+            <p className="text-xs text-black leading-relaxed">
+                Review your final selection of activities. You can copy the text directly or print to PDF to include in your official policy manual.
+            </p>
+        </div>
+      </div>
+
+      <div className="p-4 bg-slate-50 border-t border-slate-200">
+        <button 
+          onClick={() => window.open('#', '_blank')}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 mb-2 bg-white border border-slate-300 rounded-lg text-black hover:bg-slate-100 transition-colors shadow-sm text-sm"
+        >
+          <BookOpen size={16} /> Download Guide
+        </button>
+        <button 
+          onClick={onHome}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded-lg text-black hover:bg-slate-100 transition-colors shadow-sm text-sm"
+        >
+          <Home size={16} /> Back to Home
+        </button>
+        <div className="mt-4 text-center text-xs text-[#88888D]">
+          Version 1.2.2
         </div>
       </div>
     </div>
@@ -885,13 +981,16 @@ const Sidebar: React.FC<SidebarProps> = ({ activePillar, onPillarChange, activeS
 
   return (
     <div className="w-72 bg-slate-50 border-r border-slate-200 flex flex-col h-full hidden md:flex shrink-0">
-      <div className="p-4 border-b border-slate-200">
-        <h3 className="font-semibold text-black flex items-center gap-2">
-          <Filter size={18} /> Filters
-        </h3>
+      <div className="h-20 flex items-center px-4 border-b border-slate-200">
+        <Branding />
       </div>
       
       <div className="flex-1 overflow-y-auto p-2">
+        <div className="px-3 pt-4 pb-2">
+            <h3 className="font-semibold text-black flex items-center gap-2 mb-2">
+            <Filter size={18} /> Filters
+            </h3>
+        </div>
         <div className="space-y-1">
           <button 
             onClick={() => {
@@ -991,7 +1090,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activePillar, onPillarChange, activeS
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.2.1
+          Version 1.2.2
         </div>
       </div>
     </div>
@@ -1081,7 +1180,7 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
           
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-sm font-medium mb-6">
             <span className="flex h-2 w-2 rounded-full bg-white"></span>
-            Version 1.2.1 Available
+            Version 1.2.2 Available
           </div>
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 leading-tight">
             Standardize Your <span className="text-white">Home Repair</span> Program Offerings
@@ -1185,10 +1284,13 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
 
 interface LearnViewProps {
   onComplete: () => void;
+  selections: SelectionsMap;
   onHome: () => void;
+  view: string;
+  setView: (v: string) => void;
 }
 
-const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
+const LearnView: React.FC<LearnViewProps> = ({ onComplete, selections, onHome, view, setView }) => {
   const [step, setStep] = useState(0);
   
   const steps = [
@@ -1540,7 +1642,7 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
   ];
 
   return (
-    <div className="flex h-[calc(100vh-80px)]">
+    <div className="flex h-screen bg-slate-50">
       <LearnSidebar 
         currentStep={step}
         steps={steps}
@@ -1548,45 +1650,48 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome }) => {
         onHome={onHome}
       />
       
-      <div className="flex-1 overflow-y-auto bg-slate-50">
-        <div className="max-w-5xl mx-auto p-6 min-h-full flex flex-col">
-          <div className="flex-1">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-3xl font-bold text-black">{steps[step].title}</h2>
-              <span className="text-sm font-medium px-3 py-1 bg-slate-200 rounded-full text-black">Step {step + 1} of {steps.length}</span>
-            </div>
-            
-            <div className="w-full bg-slate-200 h-2 rounded-full mb-8 overflow-hidden">
-              <div 
-                className="bg-[#0099CC] h-2 rounded-full transition-all duration-500 ease-out"
-                style={{ width: `${((step + 1) / steps.length) * 100}%` }}
-              />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <TopNav view={view} setView={setView} />
+        <div className="flex-1 overflow-y-auto bg-slate-50 p-6">
+            <div className="max-w-5xl mx-auto flex flex-col h-full">
+            <div className="flex-1">
+                <div className="flex justify-between items-center mb-6">
+                <h2 className="text-3xl font-bold text-black">{steps[step].title}</h2>
+                <span className="text-sm font-medium px-3 py-1 bg-slate-200 rounded-full text-black">Step {step + 1} of {steps.length}</span>
+                </div>
+                
+                <div className="w-full bg-slate-200 h-2 rounded-full mb-8 overflow-hidden">
+                <div 
+                    className="bg-[#0099CC] h-2 rounded-full transition-all duration-500 ease-out"
+                    style={{ width: `${((step + 1) / steps.length) * 100}%` }}
+                />
+                </div>
+
+                <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 min-h-[400px] animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {steps[step].content}
+                </div>
             </div>
 
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 min-h-[400px] animate-in fade-in slide-in-from-bottom-4 duration-500">
-              {steps[step].content}
+            <div className="flex justify-between mt-8 pt-6 border-t border-slate-200 sticky bottom-0 bg-slate-50/90 backdrop-blur pb-4">
+                <button 
+                onClick={() => setStep(Math.max(0, step - 1))}
+                disabled={step === 0}
+                className="px-6 py-3 rounded-lg text-[#88888D] font-medium disabled:opacity-30 hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200 transition-all"
+                >
+                Back
+                </button>
+                <button 
+                onClick={() => {
+                    if (step === steps.length - 1) onComplete();
+                    else setStep(step + 1);
+                }}
+                className="px-8 py-3 bg-[#0099CC] text-white font-bold rounded-lg hover:bg-[#0099CC]/80 shadow-md hover:shadow-lg transition-all flex items-center gap-2"
+                >
+                {step === steps.length - 1 ? "Start Activity Builder" : "Next Step"}
+                {step !== steps.length - 1 && <ChevronRight size={18} />}
+                </button>
             </div>
-          </div>
-
-          <div className="flex justify-between mt-8 pt-6 border-t border-slate-200 sticky bottom-0 bg-slate-50/90 backdrop-blur pb-4">
-            <button 
-              onClick={() => setStep(Math.max(0, step - 1))}
-              disabled={step === 0}
-              className="px-6 py-3 rounded-lg text-[#88888D] font-medium disabled:opacity-30 hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200 transition-all"
-            >
-              Back
-            </button>
-            <button 
-              onClick={() => {
-                if (step === steps.length - 1) onComplete();
-                else setStep(step + 1);
-              }}
-              className="px-8 py-3 bg-[#0099CC] text-white font-bold rounded-lg hover:bg-[#0099CC]/80 shadow-md hover:shadow-lg transition-all flex items-center gap-2"
-            >
-              {step === steps.length - 1 ? "Start Activity Builder" : "Next Step"}
-              {step !== steps.length - 1 && <ChevronRight size={18} />}
-            </button>
-          </div>
+            </div>
         </div>
       </div>
     </div>
@@ -1629,9 +1734,11 @@ interface CatalogViewProps {
   selections: SelectionsMap;
   onUpdateSelection: (id: string, data: Selection) => void;
   onHome: () => void;
+  view: string;
+  setView: (v: string) => void;
 }
 
-const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection, onHome }) => {
+const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection, onHome, view, setView }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activePillar, setActivePillar] = useState("all");
   const [activeSubCat, setActiveSubCat] = useState("all");
@@ -1672,7 +1779,7 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
   }, [searchTerm, activePillar, activeSubCat, activeType]);
 
   return (
-    <div className="flex h-[calc(100vh-80px)]">
+    <div className="flex h-screen bg-slate-50">
       <Sidebar 
         activePillar={activePillar} 
         onPillarChange={setActivePillar}
@@ -1685,141 +1792,144 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
       />
 
       {/* Main Content */}
-      <div className="flex-1 overflow-y-auto bg-white">
-        <div className="sticky top-0 bg-white border-b border-slate-200 z-10 px-6 py-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#88888D]" size={20} />
-            <input 
-              type="text" 
-              placeholder="Search activities (e.g., 'mold', 'foundation', 'roof')..." 
-              className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#0099CC] focus:outline-none"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <Breadcrumbs activePillar={activePillar} activeSubCat={activeSubCat} activeType={activeType} />
-        </div>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <TopNav view={view} setView={setView} />
+        <div className="flex-1 overflow-y-auto bg-white">
+            <div className="sticky top-0 bg-white border-b border-slate-200 z-10 px-6 py-4">
+            <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#88888D]" size={20} />
+                <input 
+                type="text" 
+                placeholder="Search activities (e.g., 'mold', 'foundation', 'roof')..." 
+                className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-[#0099CC] focus:outline-none"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+            <Breadcrumbs activePillar={activePillar} activeSubCat={activeSubCat} activeType={activeType} />
+            </div>
 
-        <div className="p-6 space-y-8">
-          {filteredData.length === 0 ? (
-            <div className="text-center text-[#88888D] py-12">No activities found matching your filters.</div>
-          ) : (
-            filteredData.map(pillar => (
-              <div key={pillar.id} className="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                <div className={`${pillar.bgColor} px-6 py-4 border-b border-slate-200 flex items-center justify-between`}>
-                  <div className="flex items-center gap-3">
-                    <pillar.icon className={pillar.color} size={24} />
-                    <div>
-                      <h2 className="text-lg font-bold text-black">{pillar.name}</h2>
-                      <p className="text-xs text-black">{pillar.description}</p>
+            <div className="p-6 space-y-8">
+            {filteredData.length === 0 ? (
+                <div className="text-center text-[#88888D] py-12">No activities found matching your filters.</div>
+            ) : (
+                filteredData.map(pillar => (
+                <div key={pillar.id} className="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                    <div className={`${pillar.bgColor} px-6 py-4 border-b border-slate-200 flex items-center justify-between`}>
+                    <div className="flex items-center gap-3">
+                        <pillar.icon className={pillar.color} size={24} />
+                        <div>
+                        <h2 className="text-lg font-bold text-black">{pillar.name}</h2>
+                        <p className="text-xs text-black">{pillar.description}</p>
+                        </div>
                     </div>
-                  </div>
-                </div>
+                    </div>
 
-                <div className="divide-y divide-slate-100">
-                  {pillar.subCategories.map(sc => (
-                    <div key={sc.id} className="bg-white">
-                      <div className="px-6 py-3 bg-slate-50 flex items-center justify-between">
-                        <span className="font-semibold text-black text-sm">{sc.name}</span>
-                      </div>
-                      <div className="p-6 grid gap-6">
-                        {sc.types.map(type => (
-                          <div key={type.id} className="space-y-3">
-                            <div className="border-b border-slate-100 pb-2">
-                              <h4 className="text-sm font-bold text-black flex items-center gap-2">
-                                <span className="w-1.5 h-1.5 bg-[#88888D] rounded-full"></span>
-                                {type.name}
-                              </h4>
-                              {type.description && (
-                                <p className="text-xs text-[#88888D] mt-1 ml-3.5 leading-relaxed">{type.description}</p>
-                              )}
-                            </div>
-                            
-                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                              {type.interventions.map(int => {
-                                const sel = selections[int.id] || {};
-                                return (
-                                  <div key={int.id} className={`border rounded-lg p-4 transition-all ${sel.status ? 'border-slate-300 bg-white' : 'border-slate-200 bg-slate-50/50 hover:bg-white hover:shadow-sm'}`}>
-                                    <div className="flex justify-between items-start mb-3">
-                                      <div>
-                                        <h5 className="font-medium text-black">{int.name}</h5>
-                                        <div className="flex flex-wrap gap-2 mt-2">
-                                          <div className="flex flex-col">
-                                            <label className="text-[10px] text-[#88888D] font-semibold mb-0.5">URGENCY</label>
-                                            <select
-                                              value={sel.urgency || int.urgency}
-                                              onChange={(e) => onUpdateSelection(int.id, { ...sel, urgency: e.target.value })}
-                                              className="text-[10px] uppercase tracking-wider px-2 py-1 bg-slate-100 text-black rounded border border-slate-200 cursor-pointer hover:bg-slate-200 focus:ring-1 focus:ring-[#0099CC] focus:outline-none"
-                                              onClick={(e) => e.stopPropagation()}
-                                            >
-                                              {['Critical', 'Emergent', 'Non-Critical', 'N/A'].map(o => <option key={o} value={o}>{o}</option>)}
-                                            </select>
-                                          </div>
-                                          <div className="flex flex-col">
-                                            <label className="text-[10px] text-[#88888D] font-semibold mb-0.5">CONDITION</label>
-                                            <select
-                                              value={sel.condition || int.condition}
-                                              onChange={(e) => onUpdateSelection(int.id, { ...sel, condition: e.target.value })}
-                                              className="text-[10px] uppercase tracking-wider px-2 py-1 bg-slate-100 text-black rounded border border-slate-200 cursor-pointer hover:bg-slate-200 focus:ring-1 focus:ring-[#0099CC] focus:outline-none"
-                                              onClick={(e) => e.stopPropagation()}
-                                            >
-                                              {['Active', 'Passive', 'Inactive', 'N/A'].map(o => <option key={o} value={o}>{o}</option>)}
-                                            </select>
-                                          </div>
+                    <div className="divide-y divide-slate-100">
+                    {pillar.subCategories.map(sc => (
+                        <div key={sc.id} className="bg-white">
+                        <div className="px-6 py-3 bg-slate-50 flex items-center justify-between">
+                            <span className="font-semibold text-black text-sm">{sc.name}</span>
+                        </div>
+                        <div className="p-6 grid gap-6">
+                            {sc.types.map(type => (
+                            <div key={type.id} className="space-y-3">
+                                <div className="border-b border-slate-100 pb-2">
+                                <h4 className="text-sm font-bold text-black flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 bg-[#88888D] rounded-full"></span>
+                                    {type.name}
+                                </h4>
+                                {type.description && (
+                                    <p className="text-xs text-[#88888D] mt-1 ml-3.5 leading-relaxed">{type.description}</p>
+                                )}
+                                </div>
+                                
+                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                                {type.interventions.map(int => {
+                                    const sel = selections[int.id] || {};
+                                    return (
+                                    <div key={int.id} className={`border rounded-lg p-4 transition-all ${sel.status ? 'border-slate-300 bg-white' : 'border-slate-200 bg-slate-50/50 hover:bg-white hover:shadow-sm'}`}>
+                                        <div className="flex justify-between items-start mb-3">
+                                        <div>
+                                            <h5 className="font-medium text-black">{int.name}</h5>
+                                            <div className="flex flex-wrap gap-2 mt-2">
+                                            <div className="flex flex-col">
+                                                <label className="text-[10px] text-[#88888D] font-semibold mb-0.5">URGENCY</label>
+                                                <select
+                                                value={sel.urgency || int.urgency}
+                                                onChange={(e) => onUpdateSelection(int.id, { ...sel, urgency: e.target.value })}
+                                                className="text-[10px] uppercase tracking-wider px-2 py-1 bg-slate-100 text-black rounded border border-slate-200 cursor-pointer hover:bg-slate-200 focus:ring-1 focus:ring-[#0099CC] focus:outline-none"
+                                                onClick={(e) => e.stopPropagation()}
+                                                >
+                                                {['Critical', 'Emergent', 'Non-Critical', 'N/A'].map(o => <option key={o} value={o}>{o}</option>)}
+                                                </select>
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <label className="text-[10px] text-[#88888D] font-semibold mb-0.5">CONDITION</label>
+                                                <select
+                                                value={sel.condition || int.condition}
+                                                onChange={(e) => onUpdateSelection(int.id, { ...sel, condition: e.target.value })}
+                                                className="text-[10px] uppercase tracking-wider px-2 py-1 bg-slate-100 text-black rounded border border-slate-200 cursor-pointer hover:bg-slate-200 focus:ring-1 focus:ring-[#0099CC] focus:outline-none"
+                                                onClick={(e) => e.stopPropagation()}
+                                                >
+                                                {['Active', 'Passive', 'Inactive', 'N/A'].map(o => <option key={o} value={o}>{o}</option>)}
+                                                </select>
+                                            </div>
+                                            </div>
                                         </div>
-                                      </div>
-                                      <StatusBadge status={sel.status} />
+                                        <StatusBadge status={sel.status} />
+                                        </div>
+                                        
+                                        {/* Action Buttons */}
+                                        <div className="flex gap-2 mt-4 pt-3 border-t border-slate-100">
+                                        <button 
+                                            onClick={() => onUpdateSelection(int.id, { ...sel, status: 'eligible' })}
+                                            className={`flex-1 text-xs py-1.5 rounded border ${sel.status === 'eligible' ? 'bg-[#3AA047] text-white border-[#3AA047]' : 'border-slate-200 text-[#88888D] hover:bg-[#3AA047]/10'}`}
+                                        >
+                                            Eligible
+                                        </button>
+                                        <button 
+                                            onClick={() => onUpdateSelection(int.id, { ...sel, status: 'conditional' })}
+                                            className={`flex-1 text-xs py-1.5 rounded border ${sel.status === 'conditional' ? 'bg-[#FFD100] text-black border-[#FFD100]' : 'border-slate-200 text-[#88888D] hover:bg-[#FFD100]/20'}`}
+                                        >
+                                            Conditional
+                                        </button>
+                                        <button 
+                                            onClick={() => onUpdateSelection(int.id, { ...sel, status: 'not_eligible' })}
+                                            className={`flex-1 text-xs py-1.5 rounded border ${sel.status === 'not_eligible' ? 'bg-[#A4343A] text-white border-[#A4343A]' : 'border-slate-200 text-[#88888D] hover:bg-[#A4343A]/10'}`}
+                                        >
+                                            No
+                                        </button>
+                                        <button 
+                                            onClick={() => onUpdateSelection(int.id, { ...sel, status: 'na' })}
+                                            className={`flex-1 text-xs py-1.5 rounded border ${sel.status === 'na' ? 'bg-[#88888D] text-white border-[#88888D]' : 'border-slate-200 text-[#88888D] hover:bg-slate-100'}`}
+                                        >
+                                            N/A
+                                        </button>
+                                        </div>
+                                        {sel.status && (
+                                        <input 
+                                            type="text"
+                                            placeholder="Add notes/conditions..."
+                                            className="w-full mt-2 text-xs border border-slate-200 rounded px-2 py-1 focus:ring-1 focus:ring-[#0099CC] focus:border-[#0099CC]"
+                                            value={sel.notes || ''}
+                                            onChange={(e) => onUpdateSelection(int.id, { ...sel, notes: e.target.value })}
+                                        />
+                                        )}
                                     </div>
-                                    
-                                    {/* Action Buttons */}
-                                    <div className="flex gap-2 mt-4 pt-3 border-t border-slate-100">
-                                      <button 
-                                        onClick={() => onUpdateSelection(int.id, { ...sel, status: 'eligible' })}
-                                        className={`flex-1 text-xs py-1.5 rounded border ${sel.status === 'eligible' ? 'bg-[#3AA047] text-white border-[#3AA047]' : 'border-slate-200 text-[#88888D] hover:bg-[#3AA047]/10'}`}
-                                      >
-                                        Eligible
-                                      </button>
-                                      <button 
-                                        onClick={() => onUpdateSelection(int.id, { ...sel, status: 'conditional' })}
-                                        className={`flex-1 text-xs py-1.5 rounded border ${sel.status === 'conditional' ? 'bg-[#FFD100] text-black border-[#FFD100]' : 'border-slate-200 text-[#88888D] hover:bg-[#FFD100]/20'}`}
-                                      >
-                                        Conditional
-                                      </button>
-                                      <button 
-                                        onClick={() => onUpdateSelection(int.id, { ...sel, status: 'not_eligible' })}
-                                        className={`flex-1 text-xs py-1.5 rounded border ${sel.status === 'not_eligible' ? 'bg-[#A4343A] text-white border-[#A4343A]' : 'border-slate-200 text-[#88888D] hover:bg-[#A4343A]/10'}`}
-                                      >
-                                        No
-                                      </button>
-                                      <button 
-                                        onClick={() => onUpdateSelection(int.id, { ...sel, status: 'na' })}
-                                        className={`flex-1 text-xs py-1.5 rounded border ${sel.status === 'na' ? 'bg-[#88888D] text-white border-[#88888D]' : 'border-slate-200 text-[#88888D] hover:bg-slate-100'}`}
-                                      >
-                                        N/A
-                                      </button>
-                                    </div>
-                                    {sel.status && (
-                                      <input 
-                                        type="text"
-                                        placeholder="Add notes/conditions..."
-                                        className="w-full mt-2 text-xs border border-slate-200 rounded px-2 py-1 focus:ring-1 focus:ring-[#0099CC] focus:border-[#0099CC]"
-                                        value={sel.notes || ''}
-                                        onChange={(e) => onUpdateSelection(int.id, { ...sel, notes: e.target.value })}
-                                      />
-                                    )}
-                                  </div>
-                                );
-                              })}
+                                    );
+                                })}
+                                </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
+                            ))}
+                        </div>
+                        </div>
+                    ))}
                     </div>
-                  ))}
                 </div>
-              </div>
-            ))
-          )}
+                ))
+            )}
+            </div>
         </div>
       </div>
     </div>
@@ -1828,9 +1938,12 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
 
 interface ReportViewProps {
   selections: SelectionsMap;
+  onHome: () => void;
+  view: string;
+  setView: (v: string) => void;
 }
 
-const ReportView: React.FC<ReportViewProps> = ({ selections }) => {
+const ReportView: React.FC<ReportViewProps> = ({ selections, onHome, view, setView }) => {
   const reportRef = useRef<HTMLDivElement>(null);
 
   const getFilteredInterventions = (status: string) => {
@@ -1937,51 +2050,60 @@ const ReportView: React.FC<ReportViewProps> = ({ selections }) => {
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-8 print:hidden">
-        <div>
-          <h2 className="text-3xl font-bold text-black">Export Activities</h2>
-          <p className="text-[#88888D]">Review your selections and export your policy manual.</p>
-        </div>
-        <div className="flex gap-3">
-          <button onClick={copyToClipboard} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded hover:bg-slate-50 shadow-sm text-black">
-            <Copy size={18} /> Copy Text
-          </button>
-          <button onClick={() => window.print()} className="flex items-center gap-2 px-4 py-2 bg-[#0099CC] text-white rounded hover:bg-[#0099CC]/80 shadow-sm">
-            <Printer size={18} /> Print / Save PDF
-          </button>
-        </div>
-      </div>
+    <div className="flex h-screen bg-slate-50">
+        <ExportSidebar onHome={onHome} />
+        
+        <div className="flex-1 flex flex-col overflow-hidden">
+            <TopNav view={view} setView={setView} />
+            <div className="flex-1 overflow-y-auto bg-white p-8">
+                <div className="max-w-4xl mx-auto">
+                    <div className="flex justify-between items-center mb-8 print:hidden">
+                        <div>
+                        <h2 className="text-3xl font-bold text-black">Export Activities</h2>
+                        <p className="text-[#88888D]">Review your selections and export your policy manual.</p>
+                        </div>
+                        <div className="flex gap-3">
+                        <button onClick={copyToClipboard} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded hover:bg-slate-50 shadow-sm text-black">
+                            <Copy size={18} /> Copy Text
+                        </button>
+                        <button onClick={() => window.print()} className="flex items-center gap-2 px-4 py-2 bg-[#0099CC] text-white rounded hover:bg-[#0099CC]/80 shadow-sm">
+                            <Printer size={18} /> Print / Save PDF
+                        </button>
+                        </div>
+                    </div>
 
-      <div ref={reportRef} className="bg-white p-12 shadow-lg border border-slate-200 min-h-[1000px] print:shadow-none print:border-none print:p-0">
-        <div className="text-center border-b-2 border-black pb-6 mb-8">
-          <h1 className="text-3xl font-bold uppercase tracking-wide text-black">Appendix A: Construction Activities</h1>
-          <p className="text-[#88888D] mt-2">Generated via Repairs Catalog Builder</p>
-          <p className="text-sm text-[#88888D] mt-1">{new Date().toLocaleDateString()}</p>
-        </div>
+                    <div ref={reportRef} className="bg-white p-12 shadow-lg border border-slate-200 min-h-[1000px] print:shadow-none print:border-none print:p-0">
+                        <div className="text-center border-b-2 border-black pb-6 mb-8">
+                        <h1 className="text-3xl font-bold uppercase tracking-wide text-black">Appendix A: Construction Activities</h1>
+                        <p className="text-[#88888D] mt-2">Generated via Repairs Catalog Builder</p>
+                        <p className="text-sm text-[#88888D] mt-1">{new Date().toLocaleDateString()}</p>
+                        </div>
 
-        <div className="mb-8">
-          <h3 className="text-xl font-bold text-black bg-slate-100 p-2 mb-4 border-l-4 border-[#3AA047]">1. Eligible Repairs</h3>
-          <p className="mb-4 text-sm text-[#88888D]">The following activities have been approved for program funding and execution, subject to standard feasibility assessments.</p>
-          <GroupedList items={eligibleItems} />
-        </div>
+                        <div className="mb-8">
+                        <h3 className="text-xl font-bold text-black bg-slate-100 p-2 mb-4 border-l-4 border-[#3AA047]">1. Eligible Repairs</h3>
+                        <p className="mb-4 text-sm text-[#88888D]">The following activities have been approved for program funding and execution, subject to standard feasibility assessments.</p>
+                        <GroupedList items={eligibleItems} />
+                        </div>
 
-        <div className="mb-8">
-          <h3 className="text-xl font-bold text-black bg-slate-100 p-2 mb-4 border-l-4 border-[#FFD100]">2. Conditional Repairs</h3>
-          <p className="mb-4 text-sm text-[#88888D]">The following activities are eligible only when specific conditions are met (see notes).</p>
-          <GroupedList items={conditionalItems} />
-        </div>
+                        <div className="mb-8">
+                        <h3 className="text-xl font-bold text-black bg-slate-100 p-2 mb-4 border-l-4 border-[#FFD100]">2. Conditional Repairs</h3>
+                        <p className="mb-4 text-sm text-[#88888D]">The following activities are eligible only when specific conditions are met (see notes).</p>
+                        <GroupedList items={conditionalItems} />
+                        </div>
 
-        <div className="mb-8">
-          <h3 className="text-xl font-bold text-black bg-slate-100 p-2 mb-4 border-l-4 border-[#A4343A]">3. Non-Eligible Activities</h3>
-          <p className="mb-4 text-sm text-[#88888D]">The following activities are strictly outside the current program scope.</p>
-          <GroupedList items={notEligibleItems} />
-        </div>
+                        <div className="mb-8">
+                        <h3 className="text-xl font-bold text-black bg-slate-100 p-2 mb-4 border-l-4 border-[#A4343A]">3. Non-Eligible Activities</h3>
+                        <p className="mb-4 text-sm text-[#88888D]">The following activities are strictly outside the current program scope.</p>
+                        <GroupedList items={notEligibleItems} />
+                        </div>
 
-        <div className="mt-12 pt-8 border-t border-slate-200 text-center text-xs text-[#88888D]">
-          <p>End of Policy Section</p>
+                        <div className="mt-12 pt-8 border-t border-slate-200 text-center text-xs text-[#88888D]">
+                        <p>End of Policy Section</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
   );
 };
@@ -2036,59 +2158,49 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-black flex flex-col">
-      {/* Navigation */}
-      <nav className="bg-white border-b border-[#88888D]/20 shadow-sm print:hidden">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="flex items-center justify-between h-20">
-              <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setView('landing')}>
-                <img 
-                  src="https://github.com/jerryzuniga/repairs-catalog/blob/fd2b835413161d9a35a156dbe830f8ecc911531f/public/catalog.png?raw=true" 
-                  alt="Catalog Builder" 
-                  className="h-10 w-auto" 
-                />
-                <div className="flex flex-col">
-                    <span className="font-extrabold text-xl tracking-tight text-black leading-none">
-                      Catalog<span className="text-[#E55025]">Builder</span>
-                    </span>
-                    <span className="text-[10px] font-bold text-[#88888D] tracking-widest uppercase leading-none mt-1">FOR REPAIRS ACTIVITIES</span>
+      {/* Navigation - Only on Landing Page */}
+      {view === 'landing' && (
+        <nav className="bg-white border-b border-[#88888D]/20 shadow-sm print:hidden">
+            <div className="max-w-7xl mx-auto px-4">
+              <div className="flex items-center justify-between h-20">
+                <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setView('landing')}>
+                  <img 
+                    src="https://github.com/jerryzuniga/repairs-catalog/blob/fd2b835413161d9a35a156dbe830f8ecc911531f/public/catalog.png?raw=true" 
+                    alt="Catalog Builder" 
+                    className="h-10 w-auto" 
+                  />
+                  <div className="flex flex-col">
+                      <span className="font-extrabold text-xl tracking-tight text-black leading-none">
+                        Catalog<span className="text-[#E55025]">Builder</span>
+                      </span>
+                      <span className="text-[10px] font-bold text-[#88888D] tracking-widest uppercase leading-none mt-1">FOR REPAIRS ACTIVITIES</span>
+                  </div>
+                </div>
+                <div className="hidden md:flex items-center gap-1">
+                  <button 
+                    onClick={() => setView('learn')}
+                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${view === 'learn' ? 'bg-slate-100 text-black' : 'text-black hover:bg-slate-50'}`}
+                  >
+                    <GraduationCap size={18} /> Learn
+                  </button>
+                  <button 
+                    onClick={() => setView('catalog')}
+                    className="px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-black text-white hover:bg-gray-800 shadow-sm"
+                  >
+                    <Hammer size={18} /> Launch Builder
+                  </button>
                 </div>
               </div>
-              <div className="hidden md:flex items-center gap-1">
-                <button 
-                  onClick={() => setView('learn')}
-                  className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${view === 'learn' ? 'bg-slate-100 text-black' : 'text-black hover:bg-slate-50'}`}
-                >
-                  <GraduationCap size={18} /> Learn
-                </button>
-                <button 
-                  onClick={() => setView('catalog')}
-                  className="px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-black text-white hover:bg-gray-800 shadow-sm"
-                >
-                  <Hammer size={18} /> Launch Builder
-                </button>
-                
-                {view !== 'landing' && (
-                  <>
-                    <div className="h-6 w-px bg-[#88888D]/20 mx-2"></div>
-                    <button 
-                      onClick={() => setView('report')}
-                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${view === 'report' ? 'bg-slate-100 text-black' : 'text-black hover:bg-slate-50'}`}
-                    >
-                      <Download size={18} /> Export Activities
-                    </button>
-                  </>
-                )}
-              </div>
             </div>
-          </div>
-        </nav>
+          </nav>
+      )}
 
       {/* Main Content Area */}
       <main className="flex-1 overflow-hidden relative">
         {view === 'landing' && <LandingView onStart={() => setView('catalog')} onLearn={() => setView('learn')} />}
-        {view === 'learn' && <LearnView onComplete={() => setView('catalog')} onHome={() => setView('landing')} />}
-        {view === 'catalog' && <CatalogView selections={selections} onUpdateSelection={handleUpdateSelection} onHome={() => setView('landing')} />}
-        {view === 'report' && <ReportView selections={selections} />}
+        {view === 'learn' && <LearnView onComplete={() => setView('catalog')} selections={selections} onHome={() => setView('landing')} view={view} setView={setView} />}
+        {view === 'catalog' && <CatalogView selections={selections} onUpdateSelection={handleUpdateSelection} onHome={() => setView('landing')} view={view} setView={setView} />}
+        {view === 'report' && <ReportView selections={selections} onHome={() => setView('landing')} view={view} setView={setView} />}
       </main>
     </div>
   );
