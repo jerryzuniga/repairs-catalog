@@ -29,6 +29,9 @@ import {
 } from 'lucide-react';
 
 // --- Types & Interfaces ---
+
+type ViewState = 'landing' | 'learn' | 'catalog' | 'report';
+
 interface Intervention {
   id: string;
   name: string;
@@ -773,7 +776,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   }
 };
 
-const TopNav = ({ view, setView }: { view: string, setView: (v: string) => void }) => {
+const TopNav = ({ view, setView }: { view: ViewState, setView: (v: ViewState) => void }) => {
   const getButtonClass = (isActive: boolean) => 
     `px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 border ${
       isActive 
@@ -1286,11 +1289,11 @@ interface LearnViewProps {
   onComplete: () => void;
   selections: SelectionsMap;
   onHome: () => void;
-  view: string;
-  setView: (v: string) => void;
+  view: ViewState;
+  setView: (v: ViewState) => void;
 }
 
-const LearnView: React.FC<LearnViewProps> = ({ onComplete, selections, onHome, view, setView }) => {
+const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome, view, setView }) => {
   const [step, setStep] = useState(0);
   
   const steps = [
@@ -1648,6 +1651,8 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, selections, onHome, v
         steps={steps}
         onStepChange={setStep}
         onHome={onHome}
+        view={view}
+        setView={setView}
       />
       
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -1734,8 +1739,8 @@ interface CatalogViewProps {
   selections: SelectionsMap;
   onUpdateSelection: (id: string, data: Selection) => void;
   onHome: () => void;
-  view: string;
-  setView: (v: string) => void;
+  view: ViewState;
+  setView: (v: ViewState) => void;
 }
 
 const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection, onHome, view, setView }) => {
@@ -1939,8 +1944,8 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
 interface ReportViewProps {
   selections: SelectionsMap;
   onHome: () => void;
-  view: string;
-  setView: (v: string) => void;
+  view: ViewState;
+  setView: (v: ViewState) => void;
 }
 
 const ReportView: React.FC<ReportViewProps> = ({ selections, onHome, view, setView }) => {
@@ -2198,7 +2203,7 @@ export default function App() {
       {/* Main Content Area */}
       <main className="flex-1 overflow-hidden relative">
         {view === 'landing' && <LandingView onStart={() => setView('catalog')} onLearn={() => setView('learn')} />}
-        {view === 'learn' && <LearnView onComplete={() => setView('catalog')} selections={selections} onHome={() => setView('landing')} view={view} setView={setView} />}
+        {view === 'learn' && <LearnView onComplete={() => setView('catalog')} onHome={() => setView('landing')} view={view} setView={setView} />}
         {view === 'catalog' && <CatalogView selections={selections} onUpdateSelection={handleUpdateSelection} onHome={() => setView('landing')} view={view} setView={setView} />}
         {view === 'report' && <ReportView selections={selections} onHome={() => setView('landing')} view={view} setView={setView} />}
       </main>
