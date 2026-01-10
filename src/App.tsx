@@ -890,7 +890,7 @@ const LearnSidebar: React.FC<LearnSidebarProps> = ({ currentStep, steps, onStepC
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.2.2
+          Version 1.2.3
         </div>
       </div>
     </div>
@@ -933,7 +933,7 @@ const ExportSidebar: React.FC<ExportSidebarProps> = ({ onHome }) => {
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.2.2
+          Version 1.2.3
         </div>
       </div>
     </div>
@@ -1104,7 +1104,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activePillar, onPillarChange, activeS
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.2.2
+          Version 1.2.3
         </div>
       </div>
     </div>
@@ -1228,7 +1228,7 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
           
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-sm font-medium mb-6">
             <span className="flex h-2 w-2 rounded-full bg-white"></span>
-            Version 1.2.2 Available
+            Version 1.2.3 Available
           </div>
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 leading-tight">
             Standardize Your <span className="text-white">Home Repair</span> Program Offerings
