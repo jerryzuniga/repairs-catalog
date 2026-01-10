@@ -25,7 +25,8 @@ import {
   Activity,
   MousePointerClick,
   Ban,
-  Hammer
+  Hammer,
+  Circle
 } from 'lucide-react';
 
 // --- Types & Interfaces ---
@@ -959,7 +960,11 @@ const Sidebar: React.FC<SidebarProps> = ({ activePillar, onPillarChange, activeS
       if (s.status === 'conditional') conditional++;
       if (s.status === 'na') na++;
     });
-    return { eligible, notEligible, conditional, na };
+    // Calculate unselected based on total items minus decided items
+    const total = ALL_INTERVENTIONS.length;
+    const unselected = total - (eligible + notEligible + conditional + na);
+    
+    return { eligible, notEligible, conditional, na, unselected };
   }, [selections]);
 
   const togglePillar = (id: string) => {
@@ -1080,6 +1085,10 @@ const Sidebar: React.FC<SidebarProps> = ({ activePillar, onPillarChange, activeS
           <div className="flex justify-between">
             <span className="flex items-center gap-1 text-[#88888D]"><Ban size={14}/> N/A</span>
             <span className="font-mono font-bold">{stats.na}</span>
+          </div>
+          <div className="flex justify-between pt-2 mt-2 border-t border-slate-200">
+            <span className="flex items-center gap-1 text-slate-500"><Circle size={14}/> Unselected</span>
+            <span className="font-mono font-bold text-slate-500">{stats.unselected}</span>
           </div>
         </div>
         <button 
@@ -1924,25 +1933,25 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
                                         {/* Action Buttons */}
                                         <div className="flex gap-2 mt-4 pt-3 border-t border-slate-100">
                                         <button 
-                                            onClick={() => onUpdateSelection(int.id, { ...sel, status: 'eligible' })}
+                                            onClick={() => onUpdateSelection(int.id, { ...sel, status: sel.status === 'eligible' ? undefined : 'eligible' })}
                                             className={`flex-1 text-xs py-1.5 rounded border ${sel.status === 'eligible' ? 'bg-[#3AA047] text-white border-[#3AA047]' : 'border-slate-200 text-[#88888D] hover:bg-[#3AA047]/10'}`}
                                         >
                                             Eligible
                                         </button>
                                         <button 
-                                            onClick={() => onUpdateSelection(int.id, { ...sel, status: 'conditional' })}
+                                            onClick={() => onUpdateSelection(int.id, { ...sel, status: sel.status === 'conditional' ? undefined : 'conditional' })}
                                             className={`flex-1 text-xs py-1.5 rounded border ${sel.status === 'conditional' ? 'bg-[#FFD100] text-black border-[#FFD100]' : 'border-slate-200 text-[#88888D] hover:bg-[#FFD100]/20'}`}
                                         >
                                             Conditional
                                         </button>
                                         <button 
-                                            onClick={() => onUpdateSelection(int.id, { ...sel, status: 'not_eligible' })}
+                                            onClick={() => onUpdateSelection(int.id, { ...sel, status: sel.status === 'not_eligible' ? undefined : 'not_eligible' })}
                                             className={`flex-1 text-xs py-1.5 rounded border ${sel.status === 'not_eligible' ? 'bg-[#A4343A] text-white border-[#A4343A]' : 'border-slate-200 text-[#88888D] hover:bg-[#A4343A]/10'}`}
                                         >
                                             No
                                         </button>
                                         <button 
-                                            onClick={() => onUpdateSelection(int.id, { ...sel, status: 'na' })}
+                                            onClick={() => onUpdateSelection(int.id, { ...sel, status: sel.status === 'na' ? undefined : 'na' })}
                                             className={`flex-1 text-xs py-1.5 rounded border ${sel.status === 'na' ? 'bg-[#88888D] text-white border-[#88888D]' : 'border-slate-200 text-[#88888D] hover:bg-slate-100'}`}
                                         >
                                             N/A
