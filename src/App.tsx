@@ -1234,7 +1234,7 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
             Standardize Your <span className="text-white">Home Repair</span> Program Offerings
           </h1>
           <p className="text-xl text-white/90 mb-10 leading-relaxed max-w-2xl mx-auto">
-            The builder creates a unified taxonomy to categorize activities, prioritize based on criticality, and automatically generate your "Eligible Activities" list for your policy manual.
+            The Builder uses one shared catalog to standardize activities, prioritize and sequence repairs, generate consistent eligible-activities policy, and strengthen network-wide learning and research.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
@@ -1280,32 +1280,41 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
           <h2 className="text-3xl font-bold text-black">Why use the Catalog Builder?</h2>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
             <div className="w-12 h-12 bg-[#0099CC]/10 text-[#0099CC] rounded-xl flex items-center justify-center mb-6">
               <Layers size={24} />
             </div>
-            <h3 className="text-xl font-bold text-black mb-3">Unified Taxonomy</h3>
-            <p className="text-[#88888D] leading-relaxed">
-              Standardize your work into 4 Pillars, Sub-Categories, and Types. Eliminate ambiguity in your program data.
+            <h3 className="text-lg font-bold text-black mb-3">Unified Taxonomy</h3>
+            <p className="text-sm text-[#88888D] leading-relaxed">
+              Build your catalog once, then use it everywhere. A shared structure keeps your activity list consistent across tools, teams, and reporting, so data rolls up cleanly across the network.
             </p>
           </div>
-          <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
             <div className="w-12 h-12 bg-[#E55025]/10 text-[#E55025] rounded-xl flex items-center justify-center mb-6">
               <AlertTriangle size={24} />
             </div>
-            <h3 className="text-xl font-bold text-black mb-3">Smart Prioritization</h3>
-            <p className="text-[#88888D] leading-relaxed">
-              Use the Criticality Matrix (Urgency + Condition) to objectively rank repairs and defend your scope decisions.
+            <h3 className="text-lg font-bold text-black mb-3">Smart Prioritization</h3>
+            <p className="text-sm text-[#88888D] leading-relaxed">
+              Use a simple prioritization method (based on urgency and condition) to rank and sequence repairs consistently, while staying flexible for local housing stock, climate, and capacity.
             </p>
           </div>
-          <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
             <div className="w-12 h-12 bg-[#3AA047]/10 text-[#3AA047] rounded-xl flex items-center justify-center mb-6">
               <FileText size={24} />
             </div>
-            <h3 className="text-xl font-bold text-black mb-3">Instant Policy</h3>
-            <p className="text-[#88888D] leading-relaxed">
-              Stop writing manuals from scratch. Select your activities and export a formatted "Eligible Activities" document instantly.
+            <h3 className="text-lg font-bold text-black mb-3">Standardized Policy</h3>
+            <p className="text-sm text-[#88888D] leading-relaxed">
+              Generate a standardized eligible activities document in minutes, iterate as your scope evolves, and re-export anytime without rewriting or drifting out of sync.
+            </p>
+          </div>
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+            <div className="w-12 h-12 bg-[#A4343A]/10 text-[#A4343A] rounded-xl flex items-center justify-center mb-6">
+              <Users size={24} />
+            </div>
+            <h3 className="text-lg font-bold text-black mb-3">Stronger Network</h3>
+            <p className="text-sm text-[#88888D] leading-relaxed">
+              Together, we can aggregate data across affiliates, spot trends, and strengthen research that improves guidance and investment across the network.
             </p>
           </div>
         </div>
