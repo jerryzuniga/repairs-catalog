@@ -895,7 +895,7 @@ const LearnSidebar: React.FC<LearnSidebarProps> = ({ currentStep, steps, onStepC
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.2.4
+          Version 1.2.4.1
         </div>
       </div>
     </div>
