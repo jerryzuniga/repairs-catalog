@@ -89,6 +89,9 @@ const C_TRAD_GREEN = 'text-[#3AA047]';
 const C_ORANGE = 'text-[#E55025]';
 const C_RED = 'text-[#A4343A]';
 
+// --- Assets ---
+const LOGO_URL = 'https://github.com/jerryzuniga/repairs-catalog/blob/fd2b835413161d9a35a156dbe830f8ecc911531f/public/catalog.png?raw=true';
+
 // --- Mock Data: Taxonomy Framework ---
 const TAXONOMY_DATA: Pillar[] = [
   {
@@ -750,9 +753,10 @@ const ALL_INTERVENTIONS = flattenInterventions();
 const Branding = () => (
   <div className="flex items-center gap-3 px-2 py-1 group">
     <img 
-      src="https://github.com/jerryzuniga/repairs-catalog/blob/fd2b835413161d9a35a156dbe830f8ecc911531f/public/catalog.png?raw=true" 
+      src={LOGO_URL}
       alt="Catalog Builder" 
       className="h-10 w-auto" 
+      loading="eager"
     />
     <div className="flex flex-col">
         <span className="font-extrabold text-xl tracking-tight text-black leading-none">
@@ -1216,9 +1220,10 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center gap-3 cursor-pointer group">
               <img 
-                src="https://github.com/jerryzuniga/repairs-catalog/blob/fd2b835413161d9a35a156dbe830f8ecc911531f/public/catalog.png?raw=true" 
+                src={LOGO_URL}
                 alt="Catalog Builder" 
                 className="h-10 w-auto" 
+                loading="eager"
               />
               <div className="flex flex-col">
                   <span className="font-extrabold text-xl tracking-tight text-black leading-none">
@@ -2243,14 +2248,22 @@ export default function App() {
     loadData();
   }, []);
 
-  // Set Favicon
+  // Set Favicon & Preload Logo
   useEffect(() => {
+    // Favicon
     const link = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
     const finalLink = link || document.createElement('link');
     finalLink.type = 'image/png';
     finalLink.rel = 'shortcut icon';
-    finalLink.href = 'https://github.com/jerryzuniga/repairs-catalog/blob/fd2b835413161d9a35a156dbe830f8ecc911531f/public/catalog.png?raw=true';
+    finalLink.href = LOGO_URL;
     document.getElementsByTagName('head')[0].appendChild(finalLink);
+
+    // Preload Image to reduce loading delay
+    const preloadLink = document.createElement('link');
+    preloadLink.rel = 'preload';
+    preloadLink.as = 'image';
+    preloadLink.href = LOGO_URL;
+    document.head.appendChild(preloadLink);
   }, []);
 
   const handleUpdateSelection = (interventionId: string, data: Selection) => {
