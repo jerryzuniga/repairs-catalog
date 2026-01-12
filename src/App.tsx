@@ -890,7 +890,7 @@ const LearnSidebar: React.FC<LearnSidebarProps> = ({ currentStep, steps, onStepC
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.2.3
+          Version 1.2.4
         </div>
       </div>
     </div>
@@ -933,7 +933,7 @@ const ExportSidebar: React.FC<ExportSidebarProps> = ({ onHome }) => {
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.2.3
+          Version 1.2.4
         </div>
       </div>
     </div>
@@ -948,10 +948,23 @@ interface SidebarProps {
   activeType: string;
   onTypeChange: (id: string) => void;
   selections: SelectionsMap;
+  activeStatusFilter: string | null;
+  onStatusFilterChange: (status: string | null) => void;
   onHome: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ activePillar, onPillarChange, activeSubCat, onSubCatChange, activeType, onTypeChange, selections, onHome }) => {
+const Sidebar: React.FC<SidebarProps> = ({ 
+  activePillar, 
+  onPillarChange, 
+  activeSubCat, 
+  onSubCatChange, 
+  activeType, 
+  onTypeChange, 
+  selections, 
+  activeStatusFilter,
+  onStatusFilterChange,
+  onHome 
+}) => {
   const stats = useMemo(() => {
     let eligible = 0, notEligible = 0, conditional = 0, na = 0;
     Object.values(selections).forEach(s => {
@@ -964,8 +977,17 @@ const Sidebar: React.FC<SidebarProps> = ({ activePillar, onPillarChange, activeS
     const total = ALL_INTERVENTIONS.length;
     const unselected = total - (eligible + notEligible + conditional + na);
     
-    return { eligible, notEligible, conditional, na, unselected };
+    // Fix: Key must match statConfig ('not_eligible') not variable name ('notEligible')
+    return { eligible, not_eligible: notEligible, conditional, na, unselected };
   }, [selections]);
+
+  const statConfig = useMemo(() => [
+    { key: 'eligible', label: 'Eligible', icon: CheckCircle, color: 'text-[#3AA047]', bgActive: 'bg-[#3AA047]/10 ring-[#3AA047]' },
+    { key: 'not_eligible', label: 'Not Eligible', icon: XCircle, color: 'text-[#A4343A]', bgActive: 'bg-[#A4343A]/10 ring-[#A4343A]' },
+    { key: 'conditional', label: 'Conditional', icon: AlertTriangle, color: 'text-[#E55025]', bgActive: 'bg-[#E55025]/10 ring-[#E55025]' },
+    { key: 'na', label: 'N/A', icon: Ban, color: 'text-[#88888D]', bgActive: 'bg-[#88888D]/10 ring-[#88888D]' },
+    { key: 'unselected', label: 'Unselected', icon: Circle, color: 'text-slate-500', bgActive: 'bg-slate-200 ring-slate-400' },
+  ], []);
 
   const togglePillar = (id: string) => {
     if (activePillar !== id) {
@@ -1068,28 +1090,31 @@ const Sidebar: React.FC<SidebarProps> = ({ activePillar, onPillarChange, activeS
       </div>
 
       <div className="p-4 bg-slate-50 border-t border-slate-200">
-        <h4 className="text-xs font-semibold text-[#88888D] uppercase mb-3">Your Policy Stats</h4>
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="flex items-center gap-1 text-[#3AA047]"><CheckCircle size={14}/> Eligible</span>
-            <span className="font-mono font-bold">{stats.eligible}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="flex items-center gap-1 text-[#A4343A]"><XCircle size={14}/> Not Eligible</span>
-            <span className="font-mono font-bold">{stats.notEligible}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="flex items-center gap-1 text-[#E55025]"><AlertTriangle size={14}/> Conditional</span>
-            <span className="font-mono font-bold">{stats.conditional}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="flex items-center gap-1 text-[#88888D]"><Ban size={14}/> N/A</span>
-            <span className="font-mono font-bold">{stats.na}</span>
-          </div>
-          <div className="flex justify-between pt-2 mt-2 border-t border-slate-200">
-            <span className="flex items-center gap-1 text-slate-500"><Circle size={14}/> Unselected</span>
-            <span className="font-mono font-bold text-slate-500">{stats.unselected}</span>
-          </div>
+        <div className="flex items-center justify-between mb-3">
+            <h4 className="text-xs font-semibold text-[#88888D] uppercase">Your Policy Stats</h4>
+        </div>
+        <div className="space-y-1 text-sm">
+          {statConfig.map((item) => {
+             const isActive = activeStatusFilter === item.key;
+             return (
+             <button 
+                key={item.key} 
+                onClick={() => onStatusFilterChange(isActive ? null : item.key)}
+                className={`w-full flex justify-between items-center px-2 py-1.5 rounded transition-all ${
+                    isActive 
+                    ? `${item.bgActive} ring-1 font-semibold` 
+                    : 'hover:bg-slate-100'
+                }`}
+             >
+                <span className={`flex items-center gap-2 ${item.color} ${isActive ? 'font-bold' : ''}`}>
+                    <item.icon size={14}/> {item.label}
+                </span>
+                <span className={`font-mono font-bold ${isActive ? 'text-black' : (item.key === 'unselected' ? 'text-slate-500' : 'text-black')}`}>
+                    {stats[item.key as keyof typeof stats]}
+                </span>
+             </button>
+             );
+          })}
         </div>
         <button 
           onClick={() => window.open('#', '_blank')}
@@ -1104,7 +1129,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activePillar, onPillarChange, activeS
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.2.3
+          Version 1.2.4
         </div>
       </div>
     </div>
@@ -1228,7 +1253,7 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
           
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-sm font-medium mb-6">
             <span className="flex h-2 w-2 rounded-full bg-white"></span>
-            Version 1.2.3 Available
+            Version 1.2.4 Available
           </div>
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 leading-tight">
             Standardize Your <span className="text-white">Home Repair</span> Program Offerings
@@ -1802,6 +1827,7 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
   const [activePillar, setActivePillar] = useState("all");
   const [activeSubCat, setActiveSubCat] = useState("all");
   const [activeType, setActiveType] = useState("all");
+  const [activeStatusFilter, setActiveStatusFilter] = useState<string | null>(null);
 
   const filteredData = useMemo(() => {
     let data = TAXONOMY_DATA;
@@ -1818,10 +1844,23 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
         ...sc,
         types: sc.types.map(t => ({
           ...t,
-          interventions: t.interventions.filter(i => 
+          interventions: t.interventions.filter(i => {
             // Search text filter
-            (!searchTerm || i.name.toLowerCase().includes(searchTerm.toLowerCase()) || t.name.toLowerCase().includes(searchTerm.toLowerCase()))
-          )
+            const textMatch = (!searchTerm || i.name.toLowerCase().includes(searchTerm.toLowerCase()) || t.name.toLowerCase().includes(searchTerm.toLowerCase()));
+            
+            // Status filter
+            let statusMatch = true;
+            if (activeStatusFilter) {
+              const status = selections[i.id]?.status;
+              if (activeStatusFilter === 'unselected') {
+                statusMatch = !status;
+              } else {
+                statusMatch = status === activeStatusFilter;
+              }
+            }
+            
+            return textMatch && statusMatch;
+          })
         })).filter(t => {
            // Type filter logic
            const typeMatch = activeType === 'all' || t.id === activeType;
@@ -1835,7 +1874,7 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
           return subCatMatch && hasTypes;
       })
     })).filter(p => p.subCategories.length > 0);
-  }, [searchTerm, activePillar, activeSubCat, activeType]);
+  }, [searchTerm, activePillar, activeSubCat, activeType, activeStatusFilter, selections]);
 
   return (
     <div className="flex h-screen bg-slate-50">
@@ -1847,6 +1886,8 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
         activeType={activeType}
         onTypeChange={setActiveType}
         selections={selections}
+        activeStatusFilter={activeStatusFilter}
+        onStatusFilterChange={setActiveStatusFilter}
         onHome={onHome}
       />
 
@@ -1865,7 +1906,17 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
                 onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
-            <Breadcrumbs activePillar={activePillar} activeSubCat={activeSubCat} activeType={activeType} />
+            <div className="flex items-center justify-between mt-2">
+              <Breadcrumbs activePillar={activePillar} activeSubCat={activeSubCat} activeType={activeType} />
+              {activeStatusFilter && (
+                <button 
+                  onClick={() => setActiveStatusFilter(null)}
+                  className="text-xs font-medium text-[#E55025] hover:text-[#A4343A] flex items-center gap-1"
+                >
+                  <XCircle size={12} /> Clear "{activeStatusFilter === 'unselected' ? 'Unselected' : activeStatusFilter}" filter
+                </button>
+              )}
+            </div>
             </div>
 
             <div className="p-6 space-y-8">
