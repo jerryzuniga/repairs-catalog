@@ -26,7 +26,8 @@ import {
   MousePointerClick,
   Ban,
   Hammer,
-  Circle
+  Circle,
+  FileSpreadsheet
 } from 'lucide-react';
 
 // --- Types & Interfaces ---
@@ -2099,6 +2100,54 @@ const ReportView: React.FC<ReportViewProps> = ({ selections, onHome, view, setVi
     }
   };
 
+  const downloadCSV = () => {
+    // CSV Headers
+    const headers = [
+      'Pillar', 
+      'Sub-Category', 
+      'Type', 
+      'Activity Name', 
+      'Selected Status', 
+      'Priority Label',
+      'Final Urgency', 
+      'Final Condition', 
+      'Notes'
+    ];
+
+    // Map all interventions to rows
+    const rows = ALL_INTERVENTIONS.map(item => {
+      const sel = selections[item.id] || {};
+      const finalUrgency = sel.urgency || item.urgency;
+      const finalCondition = sel.condition || item.condition;
+      const priority = getPriorityLabel(finalUrgency, finalCondition) || 'N/A';
+      
+      return [
+        item.pillarName,
+        item.subCatName,
+        item.typeName,
+        item.name,
+        sel.status ? sel.status.replace('_', ' ').toUpperCase() : 'UNSELECTED',
+        priority,
+        finalUrgency,
+        finalCondition,
+        sel.notes || ''
+      ].map(field => `"${String(field || '').replace(/"/g, '""')}"`).join(','); // Escape quotes and wrap in quotes
+    });
+
+    const csvContent = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `repairs_catalog_export_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   const GroupedList: React.FC<{ items: Intervention[] }> = ({ items }) => {
     if (items.length === 0) return <p className="italic text-[#88888D]">None selected.</p>;
     
@@ -2179,6 +2228,9 @@ const ReportView: React.FC<ReportViewProps> = ({ selections, onHome, view, setVi
                         <p className="text-[#88888D]">Review your selections and export your policy manual.</p>
                         </div>
                         <div className="flex gap-3">
+                        <button onClick={downloadCSV} className="flex items-center gap-2 px-4 py-2 bg-[#3AA047] text-white rounded hover:bg-[#3AA047]/80 shadow-sm transition-colors">
+                            <FileSpreadsheet size={18} /> Export CSV
+                        </button>
                         <button onClick={copyToClipboard} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded hover:bg-slate-50 shadow-sm text-black">
                             <Copy size={18} /> Copy Text
                         </button>
