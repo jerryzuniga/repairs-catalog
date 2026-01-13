@@ -28,7 +28,7 @@ import {
   Circle,
   FileSpreadsheet,
   Settings,
-  Image as ImageIcon
+  FileImage
 } from 'lucide-react';
 
 // --- Types & Interfaces ---
@@ -805,6 +805,10 @@ const Branding = () => (
   </div>
 );
 
+interface StatusBadgeProps {
+  status?: string;
+}
+
 const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   switch (status) {
     case 'eligible': return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#C4D600]/20 text-[#3AA047]"><CheckCircle className="w-3 h-3 mr-1" /> Eligible</span>;
@@ -865,7 +869,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, config, onCo
                    onClick={() => onConfigChange({ ...config, format: 'image' })}
                    className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all ${config.format === 'image' ? 'border-[#3AA047] bg-[#3AA047]/5 text-[#3AA047]' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-600'}`}
                 >
-                  <ImageIcon size={32} className="mb-2" />
+                  <FileImage size={32} className="mb-2" />
                   <span className="font-bold text-sm">Image</span>
                 </button>
              </div>
