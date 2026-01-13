@@ -2149,6 +2149,228 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
   );
 };
 
+interface ReportViewProps {
+  selections: SelectionsMap;
+  onHome: () => void;
+  view: ViewState;
+  setView: (v: ViewState) => void;
+}
+
+const ReportView: React.FC<ReportViewProps> = ({ selections, onHome, view, setView }) => {
+  const reportRef = useRef<HTMLDivElement>(null);
+
+  const getFilteredInterventions = (status: string) => {
+    return ALL_INTERVENTIONS.filter(i => (selections[i.id]?.status === status));
+  };
+
+  const getPriorityLabel = (urgency?: string, condition?: string) => {
+    if (!urgency || !condition || urgency === 'N/A' || condition === 'N/A') return null;
+    
+    const map: { [key: string]: string } = {
+      'Critical-Active': 'Priority 1: Immediate Action',
+      'Emergent-Active': 'Priority 2: High Urgency',
+      'Non-Critical-Active': 'Priority 4: Monitor',
+      'Critical-Passive': 'Priority 2: Address Soon',
+      'Emergent-Passive': 'Priority 3: Plan',
+      'Non-Critical-Passive': 'Priority 5: Defer',
+      'Critical-Inactive': 'Priority 3: Investigate',
+      'Emergent-Inactive': 'Priority 5: Defer',
+      'Non-Critical-Inactive': 'Priority 6: No Action',
+    };
+    return map[`${urgency}-${condition}`] || null;
+  };
+
+  const eligibleItems = getFilteredInterventions('eligible');
+  const conditionalItems = getFilteredInterventions('conditional');
+  const notEligibleItems = getFilteredInterventions('not_eligible');
+
+  const copyToClipboard = () => {
+    if (reportRef.current) {
+      const range = document.createRange();
+      range.selectNode(reportRef.current);
+      window.getSelection()?.removeAllRanges();
+      window.getSelection()?.addRange(range);
+      document.execCommand('copy');
+      window.getSelection()?.removeAllRanges();
+    }
+  };
+
+  const downloadCSV = () => {
+    // CSV Headers
+    const headers = [
+      'Pillar', 
+      'Sub-Category', 
+      'Type', 
+      'Activity Name', 
+      'Selected Status', 
+      'Priority Label',
+      'Final Urgency', 
+      'Final Condition', 
+      'Notes'
+    ];
+
+    // Map all interventions to rows
+    const rows = ALL_INTERVENTIONS.map(item => {
+      const sel = selections[item.id] || {};
+      const finalUrgency = sel.urgency || item.urgency;
+      const finalCondition = sel.condition || item.condition;
+      const priority = getPriorityLabel(finalUrgency, finalCondition) || 'N/A';
+      
+      return [
+        item.pillarName,
+        item.subCatName,
+        item.typeName,
+        item.name,
+        sel.status ? sel.status.replace('_', ' ').toUpperCase() : 'UNSELECTED',
+        priority,
+        finalUrgency,
+        finalCondition,
+        sel.notes || ''
+      ].map(field => `"${String(field || '').replace(/"/g, '""')}"`).join(','); // Escape quotes and wrap in quotes
+    });
+
+    const csvContent = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `repairs_catalog_export_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  const GroupedList: React.FC<{ items: Intervention[] }> = ({ items }) => {
+    if (items.length === 0) return <p className="italic text-[#88888D]">None selected.</p>;
+    
+    // Group by Pillar -> SubCategory
+    const grouped = items.reduce((acc, item) => {
+      const key = `${item.pillarName}::${item.subCatName}`;
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(item);
+      return acc;
+    }, {} as { [key: string]: Intervention[] });
+
+    return (
+      <div className="space-y-6">
+        {Object.entries(grouped).map(([key, groupItems]) => {
+          const [pillar, subCat] = key.split('::');
+          return (
+            <div key={key} className="break-inside-avoid">
+              <h4 className="font-bold text-black border-b border-slate-200 pb-1 mb-3">{pillar} - {subCat}</h4>
+              <ul className="list-disc pl-5 space-y-4">
+                {groupItems.map(item => {
+                  const urgency = selections[item.id]?.urgency || item.urgency;
+                  const condition = selections[item.id]?.condition || item.condition;
+                  const priority = getPriorityLabel(urgency, condition);
+
+                  return (
+                    <li key={item.id} className="text-sm text-black">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1">
+                        <span className="font-medium text-base">{item.name}</span>
+                        {priority && (
+                          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border shrink-0 ${
+                            priority.includes('Priority 1') ? 'bg-[#A4343A]/10 text-[#A4343A] border-[#A4343A]/20' :
+                            priority.includes('Priority 2') ? 'bg-[#E55025]/10 text-[#E55025] border-[#E55025]/20' :
+                            'bg-slate-100 text-[#88888D] border-slate-200'
+                          }`}>
+                            {priority}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {(urgency !== 'N/A' && condition !== 'N/A') && (
+                        <div className="text-xs text-[#88888D] mt-1 flex flex-wrap gap-x-4 gap-y-1">
+                          <span className="flex items-center gap-1 font-medium text-black">
+                            Urgency: <span className="font-normal text-[#88888D]">{urgency}</span>
+                          </span>
+                          <span className="flex items-center gap-1 font-medium text-black">
+                            Condition: <span className="font-normal text-[#88888D]">{condition}</span>
+                          </span>
+                        </div>
+                      )}
+
+                      {selections[item.id].notes && (
+                        <div className="mt-1.5 bg-[#FFD100]/20 p-2 rounded border border-[#FFD100]/40 text-xs italic text-black">
+                          <strong>Note:</strong> {selections[item.id].notes}
+                        </div>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  return (
+    <div className="flex h-screen bg-slate-50">
+        <ExportSidebar onHome={onHome} />
+        
+        <div className="flex-1 flex flex-col overflow-hidden">
+            <TopNav view={view} setView={setView} />
+            <div className="flex-1 overflow-y-auto bg-white p-8">
+                <div className="max-w-4xl mx-auto">
+                    <div className="flex justify-between items-center mb-8 print:hidden">
+                        <div>
+                        <h2 className="text-3xl font-bold text-black">Export Activities</h2>
+                        <p className="text-[#88888D]">Review your selections and export your policy manual.</p>
+                        </div>
+                        <div className="flex gap-3">
+                        <button onClick={downloadCSV} className="flex items-center gap-2 px-4 py-2 bg-[#3AA047] text-white rounded hover:bg-[#3AA047]/80 shadow-sm transition-colors">
+                            <FileSpreadsheet size={18} /> Export CSV
+                        </button>
+                        <button onClick={copyToClipboard} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded hover:bg-slate-50 shadow-sm text-black">
+                            <Copy size={18} /> Copy Text
+                        </button>
+                        <button onClick={() => window.print()} className="flex items-center gap-2 px-4 py-2 bg-[#0099CC] text-white rounded hover:bg-[#0099CC]/80 shadow-sm">
+                            <Printer size={18} /> Print / Save PDF
+                        </button>
+                        </div>
+                    </div>
+
+                    <div ref={reportRef} className="bg-white p-12 shadow-lg border border-slate-200 min-h-[1000px] print:shadow-none print:border-none print:p-0">
+                        <div className="text-center border-b-2 border-black pb-6 mb-8">
+                        <h1 className="text-3xl font-bold uppercase tracking-wide text-black">Appendix A: Construction Activities</h1>
+                        <p className="text-[#88888D] mt-2">Generated via Repairs Catalog Builder</p>
+                        <p className="text-sm text-[#88888D] mt-1">{new Date().toLocaleDateString()}</p>
+                        </div>
+
+                        <div className="mb-8">
+                        <h3 className="text-xl font-bold text-black bg-slate-100 p-2 mb-4 border-l-4 border-[#3AA047]">1. Eligible Repairs</h3>
+                        <p className="mb-4 text-sm text-[#88888D]">The following activities have been approved for program funding and execution, subject to standard feasibility assessments.</p>
+                        <GroupedList items={eligibleItems} />
+                        </div>
+
+                        <div className="mb-8">
+                        <h3 className="text-xl font-bold text-black bg-slate-100 p-2 mb-4 border-l-4 border-[#FFD100]">2. Conditional Repairs</h3>
+                        <p className="mb-4 text-sm text-[#88888D]">The following activities are eligible only when specific conditions are met (see notes).</p>
+                        <GroupedList items={conditionalItems} />
+                        </div>
+
+                        <div className="mb-8">
+                        <h3 className="text-xl font-bold text-black bg-slate-100 p-2 mb-4 border-l-4 border-[#A4343A]">3. Non-Eligible Activities</h3>
+                        <p className="mb-4 text-sm text-[#88888D]">The following activities are strictly outside the current program scope.</p>
+                        <GroupedList items={notEligibleItems} />
+                        </div>
+
+                        <div className="mt-12 pt-8 border-t border-slate-200 text-center text-xs text-[#88888D]">
+                        <p>End of Policy Section</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  );
+};
+
 // --- Main App Component ---
 
 export default function App() {
