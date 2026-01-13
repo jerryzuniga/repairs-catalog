@@ -106,7 +106,7 @@ const TAXONOMY_DATA: Pillar[] = [
       {
         id: 'sc1',
         name: 'Structural Components',
-        description: 'Repairs to the home’s foundational and load-bearing elements.',
+        description: 'Restores the home’s essential structural integrity to meet minimum building safety standards by addressing active, critical issues that could lead to immediate failure or unsafe living conditions.',
         types: [
           {
             id: 'sct1',
@@ -158,12 +158,12 @@ const TAXONOMY_DATA: Pillar[] = [
       },
       {
         id: 'sc2',
-        name: 'Critical Home Systems',
-        description: 'Repairs to major systems necessary for basic living conditions.',
+        name: 'Essential Home Systems (EHS)',
+        description: 'Addresses urgent, active failures in essential operational systems (e.g., HVAC, electrical, plumbing) necessary for maintaining safety, habitability, and basic home functionality.',
         types: [
           {
             id: 'sct5',
-            name: 'Critical Roofing - Replacement',
+            name: 'EHS Roofing - Replacement',
             description: 'Full replacement of roofing systems that are in critical condition, posing immediate risks such as leaks, structural damage, or compromised safety.',
             interventions: [
               { id: 'i119', name: 'Complete shingle replacement', urgency: 'Critical', condition: 'Active' },
@@ -174,7 +174,7 @@ const TAXONOMY_DATA: Pillar[] = [
           },
           {
             id: 'sct6',
-            name: 'Critical Roofing - Repair',
+            name: 'EHS Roofing - Repair',
             description: 'Repairs to damaged roofing components that are essential to prevent water intrusion, structural failure, or other significant risks to the home.',
             interventions: [
               { id: 'i123', name: 'Repair damaged flashing', urgency: 'Critical', condition: 'Active' },
@@ -185,7 +185,7 @@ const TAXONOMY_DATA: Pillar[] = [
           },
           {
             id: 'sct7',
-            name: 'Critical Wall Systems',
+            name: 'EHS Wall Systems',
             description: 'Repair or replacement of wall components, both interior and exterior, that are critical to maintaining structural integrity, safety, and habitability.',
             interventions: [
               { id: 'i127', name: 'Replace compromised siding', urgency: 'Critical', condition: 'Active' },
@@ -194,7 +194,7 @@ const TAXONOMY_DATA: Pillar[] = [
           },
           {
             id: 'sct8',
-            name: 'Critical HVAC',
+            name: 'EHS HVAC',
             description: 'Repairs or replacements necessary for heating, ventilation, and air conditioning systems that ensure safe indoor temperatures, proper ventilation, and air quality.',
             interventions: [
               { id: 'i129', name: 'Replace inoperable furnace/AC', urgency: 'Critical', condition: 'Active' },
@@ -205,7 +205,7 @@ const TAXONOMY_DATA: Pillar[] = [
           },
           {
             id: 'sct9',
-            name: 'Critical Electrical',
+            name: 'EHS Electrical',
             description: 'Electrical system repairs or upgrades addressing immediate safety concerns or severe deficiencies that pose risks of fire, electrocution, or system failures.',
             interventions: [
               { id: 'i133', name: 'Upgrade sub-standard panels', urgency: 'Critical', condition: 'Active' },
@@ -216,7 +216,7 @@ const TAXONOMY_DATA: Pillar[] = [
           },
           {
             id: 'sct10',
-            name: 'Critical Plumbing',
+            name: 'EHS Plumbing',
             description: 'Essential repairs to water, sewage, and gas supply systems that address active failures or risks that directly impact health and safety.',
             interventions: [
               { id: 'i137', name: 'Fix burst water pipes', urgency: 'Critical', condition: 'Active' },
@@ -227,7 +227,7 @@ const TAXONOMY_DATA: Pillar[] = [
           },
           {
             id: 'sct11',
-            name: 'Critical Flooring',
+            name: 'EHS Flooring',
             description: 'Repairs to floors that have become unstable, unsafe, or compromised due to issues like rot, water damage, or subfloor failure.',
             interventions: [
               { id: 'i141', name: 'Replace rotted subfloors', urgency: 'Critical', condition: 'Active' },
@@ -237,7 +237,7 @@ const TAXONOMY_DATA: Pillar[] = [
           },
           {
             id: 'sct12',
-            name: 'Critical Walkways / Decks / Steps',
+            name: 'EHS Walkways / Decks / Steps',
             description: 'Repairs to exterior pathways that address safety hazards, such as instability, collapse risks, or severe trip hazards, ensuring safe movement across the property.',
             interventions: [
               { id: 'i144', name: 'Rebuild deteriorated steps', urgency: 'Critical', condition: 'Active' },
@@ -247,7 +247,7 @@ const TAXONOMY_DATA: Pillar[] = [
           },
           {
             id: 'sct13',
-            name: 'Critical Water Heater',
+            name: 'EHS Water Heater',
             description: 'Replacement or repair of water heaters that are non-functional or failing, resulting in unreliable hot water supply critical for daily living.',
             interventions: [
               { id: 'i147', name: 'Install new water heater', urgency: 'Critical', condition: 'Active' },
@@ -257,7 +257,7 @@ const TAXONOMY_DATA: Pillar[] = [
           },
           {
             id: 'sct14',
-            name: 'Critical Doors & Windows',
+            name: 'EHS Doors & Windows',
             description: 'Repairs or replacements that address immediate safety, security, or severe weatherproofing issues, ensuring proper insulation, entry, and exit functionality.',
             interventions: [
               { id: 'i150', name: 'Replace shattered windows', urgency: 'Critical', condition: 'Active' },
@@ -269,12 +269,12 @@ const TAXONOMY_DATA: Pillar[] = [
       },
       {
         id: 'sc3',
-        name: 'Deferred Repair',
-        description: 'Active non-critical issues that will become critical if ignored.',
+        name: 'Home Systems Maintenance (HSM)',
+        description: 'Focuses on visible, active issues that are non-critical but need addressing to prevent deterioration into critical problems, maintaining long-term home stability.',
         types: [
           {
             id: 'sct15',
-            name: 'Deferred Plumbing & Water Heater',
+            name: 'HSM Plumbing & Water Heater',
             description: 'Repairs addressing active, non-critical plumbing and water heater issues that display visible symptoms of disrepair and, if left unattended, could escalate into critical problems.',
             interventions: [
               { id: 'i153', name: 'Fix dripping faucets', urgency: 'Emergent', condition: 'Active' },
@@ -285,7 +285,7 @@ const TAXONOMY_DATA: Pillar[] = [
           },
           {
             id: 'sct16',
-            name: 'Deferred Electrical',
+            name: 'HSM Electrical',
             description: 'Addressing active electrical issues that present visible signs of disrepair but do not immediately threaten safety or function; these repairs prevent future critical failures.',
             interventions: [
               { id: 'i157', name: 'Replace worn switches/outlets', urgency: 'Emergent', condition: 'Active' },
@@ -295,7 +295,7 @@ const TAXONOMY_DATA: Pillar[] = [
           },
           {
             id: 'sct17',
-            name: 'Deferred Door and Window',
+            name: 'HSM Door and Window',
             description: 'Repairs to doors and windows showing visible signs of deterioration, such as drafts, alignment issues, or minor damage, that need attention before escalating into more serious problems.',
             interventions: [
               { id: 'i160', name: 'Re-align sagging doors', urgency: 'Emergent', condition: 'Active' },
@@ -306,7 +306,7 @@ const TAXONOMY_DATA: Pillar[] = [
           },
           {
             id: 'sct18',
-            name: 'Deferred Exterior Paint',
+            name: 'HSM Exterior Paint',
             description: 'Addressing visible exterior paint damage that, while not immediately threatening the home’s integrity, can lead to more significant wear if neglected.',
             interventions: [
               { id: 'i164', name: 'Repaint peeling areas', urgency: 'Emergent', condition: 'Active' },
@@ -316,7 +316,7 @@ const TAXONOMY_DATA: Pillar[] = [
           },
           {
             id: 'sct19',
-            name: 'Deferred Interior Paint',
+            name: 'HSM Interior Paint',
             description: 'Repairs focusing on visible interior paint damage that could worsen over time if unaddressed, such as peeling, chipping, or staining.',
             interventions: [
               { id: 'i167', name: 'Repaint chipped/peeling walls', urgency: 'Emergent', condition: 'Active' },
@@ -325,7 +325,7 @@ const TAXONOMY_DATA: Pillar[] = [
           },
           {
             id: 'sct20',
-            name: 'Deferred Appliance',
+            name: 'HSM Appliance',
             description: 'Repairing or replacing appliances with visible, active issues such as diminished efficiency, malfunctioning parts, or minor damage that can lead to complete breakdowns if left unattended.',
             interventions: [
               { id: 'i169', name: 'Repair refrigerator compressor', urgency: 'Emergent', condition: 'Active' },
@@ -335,7 +335,7 @@ const TAXONOMY_DATA: Pillar[] = [
           },
           {
             id: 'sct21',
-            name: 'Deferred Cabinetry',
+            name: 'HSM Cabinetry',
             description: 'Repairs to cabinetry that shows signs of active deterioration, such as misalignment, wear, or minor damage that, if left unaddressed, can impact functionality or lead to more significant repair needs.',
             interventions: [
               { id: 'i172', name: 'Re-align cabinet doors', urgency: 'Emergent', condition: 'Active' },
@@ -345,7 +345,7 @@ const TAXONOMY_DATA: Pillar[] = [
           },
           {
             id: 'sct22',
-            name: 'Deferred Flooring',
+            name: 'HSM Flooring',
             description: 'Addressing active flooring issues such as looseness, visible damage, or wear that, while not yet critical, can lead to safety hazards or more severe deterioration if not repaired.',
             interventions: [
               { id: 'i175', name: 'Secure loose tiles/boards', urgency: 'Emergent', condition: 'Active' },
@@ -355,7 +355,7 @@ const TAXONOMY_DATA: Pillar[] = [
           },
           {
             id: 'sct23',
-            name: 'Deferred Exterior Decks/Walkways',
+            name: 'HSM Exterior Decks/Walkways',
             description: 'Repairs focused on visible signs of wear or damage to exterior surfaces that, while not immediately hazardous, can worsen and create safety risks or structural issues if left untreated.',
             interventions: [
               { id: 'i178', name: 'Replace rotting deck boards', urgency: 'Emergent', condition: 'Active' },
@@ -378,7 +378,7 @@ const TAXONOMY_DATA: Pillar[] = [
       {
         id: 'sc4',
         name: 'Environmental Hazards Controls',
-        description: 'Mitigation of health-threatening hazards.',
+        description: 'Targets active environmental and architectural hazards directly impacting health and safety, requiring immediate attention to ensure healthy living conditions.',
         types: [
           {
             id: 'sct24',
@@ -425,7 +425,7 @@ const TAXONOMY_DATA: Pillar[] = [
       {
         id: 'sc5',
         name: 'Critical Accessibility / Fall Prevention',
-        description: 'Modifications for urgent mobility barriers.',
+        description: 'Provides essential modifications for individuals with mobility challenges, addressing active, emergent needs in key areas like ingress/egress, bathing, and movement to ensure safety and independence.',
         types: [
           {
             id: 'sct28',
@@ -482,7 +482,7 @@ const TAXONOMY_DATA: Pillar[] = [
       {
         id: 'sc6',
         name: 'Non-Critical Accessibility / Aging in Place',
-        description: 'Enhancements for usability and comfort.',
+        description: 'Includes active, non-critical interventions that support daily living and independence for aging residents, ensuring accessibility and convenience while addressing non-urgent needs.',
         types: [
           {
             id: 'sct33',
@@ -549,7 +549,7 @@ const TAXONOMY_DATA: Pillar[] = [
       {
         id: 'sc7',
         name: 'Disaster / Security Readiness',
-        description: 'Proactive resilience measures.',
+        description: 'Focuses on active, emergent interventions that prepare homes for disasters or enhance security, ensuring residents safety and resilience during emergencies.',
         types: [
           {
             id: 'sct38',
@@ -597,7 +597,7 @@ const TAXONOMY_DATA: Pillar[] = [
       {
         id: 'sc8',
         name: 'Home Utilities Performance',
-        description: 'Efficiency and conservation measures.',
+        description: 'Addresses passive, non-critical upgrades and maintenance aimed at improving energy efficiency, water conservation, and overall utility management, optimizing home performance without urgent risks.',
         types: [
           {
             id: 'sct42',
@@ -661,7 +661,7 @@ const TAXONOMY_DATA: Pillar[] = [
       {
         id: 'sc9',
         name: 'Community / Nonprofit Building Repair',
-        description: 'Stabilizing buildings to serve the community.',
+        description: 'Repairs and improvements to all community and nonprofit buildings that stabilize these buildings so that they may continue to serve the community.',
         types: [
           {
             id: 'sct47',
@@ -687,7 +687,7 @@ const TAXONOMY_DATA: Pillar[] = [
       {
         id: 'sc10',
         name: 'Community Energy & Performance',
-        description: 'Decrease utility consumption/increase resilience.',
+        description: 'Repairs and improvements to all community and nonprofit buildings that decrease utility consumption and/or increase climate resilience.',
         types: [
           {
             id: 'sct49',
@@ -704,7 +704,7 @@ const TAXONOMY_DATA: Pillar[] = [
       {
         id: 'sc11',
         name: 'Public Space Improvements',
-        description: 'Improve community space conditions.',
+        description: 'Non-building repairs and improvements that improve community space conditions.',
         types: [
           {
             id: 'sct50',
@@ -776,7 +776,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   switch (status) {
     case 'eligible': return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#C4D600]/20 text-[#3AA047]"><CheckCircle className="w-3 h-3 mr-1" /> Eligible</span>;
     case 'not_eligible': return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#A4343A]/10 text-[#A4343A]"><XCircle className="w-3 h-3 mr-1" /> Not Eligible</span>;
-    case 'conditional': return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#FFD100]/20 text-[#E55025]"><AlertTriangle className="w-3 h-3 mr-1" /> Conditional</span>;
+    case 'conditional': return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#FFD100]/20 text-[#E55025]"><AlertTriangle className="w-3 h-3 mr-1" /> If/When</span>;
     case 'na': return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#88888D]/10 text-[#88888D]"><Ban className="w-3 h-3 mr-1" /> N/A</span>;
     default: return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">Unselected</span>;
   }
@@ -895,7 +895,7 @@ const LearnSidebar: React.FC<LearnSidebarProps> = ({ currentStep, steps, onStepC
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.2.4.1
+          Version 1.2.5
         </div>
       </div>
     </div>
@@ -938,7 +938,7 @@ const ExportSidebar: React.FC<ExportSidebarProps> = ({ onHome }) => {
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.2.4.1
+          Version 1.2.5
         </div>
       </div>
     </div>
@@ -956,6 +956,8 @@ interface SidebarProps {
   activeStatusFilter: string | null;
   onStatusFilterChange: (status: string | null) => void;
   onHome: () => void;
+  showDefinitions: boolean;
+  onToggleDefinitions: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ 
@@ -968,7 +970,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   selections, 
   activeStatusFilter,
   onStatusFilterChange,
-  onHome 
+  onHome,
+  showDefinitions,
+  onToggleDefinitions
 }) => {
   const stats = useMemo(() => {
     let eligible = 0, notEligible = 0, conditional = 0, na = 0;
@@ -989,7 +993,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   const statConfig = useMemo(() => [
     { key: 'eligible', label: 'Eligible', icon: CheckCircle, color: 'text-[#3AA047]', bgActive: 'bg-[#3AA047]/10 ring-[#3AA047]' },
     { key: 'not_eligible', label: 'Not Eligible', icon: XCircle, color: 'text-[#A4343A]', bgActive: 'bg-[#A4343A]/10 ring-[#A4343A]' },
-    { key: 'conditional', label: 'Conditional', icon: AlertTriangle, color: 'text-[#E55025]', bgActive: 'bg-[#E55025]/10 ring-[#E55025]' },
+    { key: 'conditional', label: 'If/When', icon: AlertTriangle, color: 'text-[#E55025]', bgActive: 'bg-[#E55025]/10 ring-[#E55025]' },
     { key: 'na', label: 'N/A', icon: Ban, color: 'text-[#88888D]', bgActive: 'bg-[#88888D]/10 ring-[#88888D]' },
     { key: 'unselected', label: 'Unselected', icon: Circle, color: 'text-slate-500', bgActive: 'bg-slate-200 ring-slate-400' },
   ], []);
@@ -1028,6 +1032,22 @@ const Sidebar: React.FC<SidebarProps> = ({
             <Filter size={18} /> Filters
             </h3>
         </div>
+
+        {/* Definitions Toggle */}
+        <div className="px-3 mb-4">
+             <div className="flex items-center justify-between bg-slate-100 p-2 rounded-lg border border-slate-200">
+                <span className="text-xs font-medium text-slate-700">Show Definitions</span>
+                <button
+                    onClick={onToggleDefinitions}
+                    className={`relative inline-flex h-4 w-8 items-center rounded-full transition-colors focus:outline-none ${showDefinitions ? 'bg-[#0099CC]' : 'bg-slate-300'}`}
+                >
+                    <span
+                        className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${showDefinitions ? 'translate-x-4' : 'translate-x-1'}`}
+                    />
+                </button>
+            </div>
+        </div>
+
         <div className="space-y-1">
           <button 
             onClick={() => {
@@ -1134,7 +1154,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.2.4.1
+          Version 1.2.5
         </div>
       </div>
     </div>
@@ -1259,7 +1279,7 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
           
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-sm font-medium mb-6">
             <span className="flex h-2 w-2 rounded-full bg-white"></span>
-            Version 1.2.4.1 Available
+            Version 1.2.5 Available
           </div>
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 leading-tight">
             Standardize Your <span className="text-white">Home Repair</span> Program Offerings
@@ -1383,7 +1403,31 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome, view, setView
   
   const steps = [
     {
-      title: "Introduction: Why a Taxonomy?",
+      title: "The Four Pillars",
+      content: (
+        <div className="space-y-6">
+          <p className="text-[#88888D]">All repair work falls into one of these four high-level goals. This is the highest level of reporting.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {TAXONOMY_DATA.map(p => {
+               const Icon = p.icon;
+               return (
+                 <div key={p.id} className={`${p.bgColor} p-6 rounded-xl border border-slate-200 hover:shadow-md transition-shadow`}>
+                   <div className="flex items-center gap-3 mb-3">
+                     <div className={`p-2 bg-white rounded-lg shadow-sm`}>
+                       <Icon size={24} className={p.color} />
+                     </div>
+                     <h3 className="font-bold text-black text-lg">{p.name}</h3>
+                   </div>
+                   <p className="text-black leading-relaxed">{p.description}</p>
+                 </div>
+               )
+            })}
+          </div>
+        </div>
+      )
+    },
+    {
+      title: "Taxonomy",
       content: (
         <div className="space-y-6">
           <div className="flex items-start gap-4 p-4 bg-[#0099CC]/5 rounded-lg border border-[#0099CC]/20">
@@ -1419,25 +1463,144 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome, view, setView
       )
     },
     {
-      title: "The Four Pillars",
+      title: "Deep Dive: Sub-Category Definitions",
       content: (
-        <div className="space-y-6">
-          <p className="text-[#88888D]">All repair work falls into one of these four high-level goals. This is the highest level of reporting.</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {TAXONOMY_DATA.map(p => {
-               const Icon = p.icon;
-               return (
-                 <div key={p.id} className={`${p.bgColor} p-6 rounded-xl border border-slate-200 hover:shadow-md transition-shadow`}>
-                   <div className="flex items-center gap-3 mb-3">
-                     <div className={`p-2 bg-white rounded-lg shadow-sm`}>
-                       <Icon size={24} className={p.color} />
-                     </div>
-                     <h3 className="font-bold text-black text-lg">{p.name}</h3>
-                   </div>
-                   <p className="text-black leading-relaxed">{p.description}</p>
-                 </div>
-               )
-            })}
+        <div className="space-y-10 animate-in fade-in duration-500">
+          <div>
+            <h3 className="text-xl font-bold text-black mb-4 border-b border-slate-200 pb-2">A. Residential Unit Sub-Categories</h3>
+            <p className="text-sm text-[#88888D] mb-6">Each sub-category is assigned a default Urgency and Condition State to help prioritization.</p>
+            
+            {/* Dwelling Safety */}
+            <div className="mb-8">
+              <h4 className="font-bold text-[#A4343A] mb-3 flex items-center gap-2"><Shield size={20}/> Dwelling Safety</h4>
+              <div className="grid gap-4">
+                <div className="bg-white p-5 rounded-lg border-l-4 border-[#A4343A] shadow-sm">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="font-bold text-black text-lg">Structural Components</span>
+                    <div className="flex gap-2 shrink-0 ml-2">
+                        <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
+                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-[#88888D] leading-relaxed">Restores the home's essential structural integrity to meet minimum building safety standards by addressing active, critical issues that could lead to immediate failure or unsafe living conditions.</p>
+                </div>
+
+                <div className="bg-white p-5 rounded-lg border-l-4 border-[#A4343A] shadow-sm">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="font-bold text-black text-lg">Essential Home Systems (EHS)</span>
+                    <div className="flex gap-2 shrink-0 ml-2">
+                        <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
+                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-[#88888D] leading-relaxed">Addresses urgent, active failures in essential operational systems (e.g., HVAC, electrical, plumbing) necessary for maintaining safety, habitability, and basic home functionality.</p>
+                </div>
+
+                <div className="bg-white p-5 rounded-lg border-l-4 border-[#E55025] shadow-sm">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="font-bold text-black text-lg">Home Systems Maintenance (HSM)</span>
+                    <div className="flex gap-2 shrink-0 ml-2">
+                        <span className="px-2 py-0.5 bg-[#E55025]/10 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Emergent</span>
+                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-[#88888D] leading-relaxed">Focuses on visible, active issues that are non-critical but need addressing to prevent deterioration into critical problems, maintaining long-term home stability.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Occupant Health */}
+            <div className="mb-8">
+              <h4 className="font-bold text-[#E55025] mb-3 flex items-center gap-2"><Heart size={20}/> Occupant Health</h4>
+              <div className="grid gap-4">
+                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#A4343A] shadow-sm">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="font-bold text-black text-lg">Environmental Hazards Controls</span>
+                    <div className="flex gap-2 shrink-0 ml-2">
+                        <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
+                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-[#88888D] leading-relaxed">Targets active environmental and architectural hazards directly impacting health and safety, requiring immediate attention to ensure healthy living conditions.</p>
+                </div>
+
+                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#A4343A] shadow-sm">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="font-bold text-black text-lg">Critical Accessibility / Fall Prevention</span>
+                    <div className="flex gap-2 shrink-0 ml-2">
+                        <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
+                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-[#88888D] leading-relaxed">Provides essential modifications for individuals with mobility challenges, addressing active, emergent needs in key areas like ingress/egress, bathing, and movement to ensure safety and independence.</p>
+                </div>
+
+                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#FFD100] shadow-sm">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="font-bold text-black text-lg">Non-Critical Accessibility / Aging in Place</span>
+                    <div className="flex gap-2 shrink-0 ml-2">
+                        <span className="px-2 py-0.5 bg-[#FFD100]/20 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Non-Critical</span>
+                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-[#88888D] leading-relaxed">Includes active, non-critical interventions that support daily living and independence for aging residents, ensuring accessibility and convenience while addressing non-urgent needs.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Home Performance */}
+             <div className="mb-8">
+              <h4 className="font-bold text-[#0099CC] mb-3 flex items-center gap-2"><Zap size={20}/> Home Performance</h4>
+              <div className="grid gap-4">
+                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#E55025] shadow-sm">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="font-bold text-black text-lg">Disaster / Security Readiness</span>
+                    <div className="flex gap-2 shrink-0 ml-2">
+                        <span className="px-2 py-0.5 bg-[#E55025]/10 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Emergent</span>
+                        <span className="px-2 py-0.5 bg-slate-200 text-[#88888D] text-xs rounded font-bold uppercase tracking-wide">Passive</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-[#88888D] leading-relaxed">Focuses on active, emergent interventions that prepare homes for disasters or enhance security, ensuring residents safety and resilience during emergencies.</p>
+                </div>
+
+                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#FFD100] shadow-sm">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="font-bold text-black text-lg">Home Utilities Performance</span>
+                    <div className="flex gap-2 shrink-0 ml-2">
+                        <span className="px-2 py-0.5 bg-[#FFD100]/20 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Non-Critical</span>
+                        <span className="px-2 py-0.5 bg-slate-200 text-[#88888D] text-xs rounded font-bold uppercase tracking-wide">Passive</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-[#88888D] leading-relaxed">Addresses passive, non-critical upgrades and maintenance aimed at improving energy efficiency, water conservation, and overall utility management, optimizing home performance without urgent risks.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-xl font-bold text-black mb-4 border-b border-slate-200 pb-2">B. Community-based Sub-Categories</h3>
+            <p className="text-sm text-[#88888D] mb-6 bg-slate-100 p-3 rounded-lg border border-slate-200 inline-flex items-center gap-2">
+              <Info size={16} className="text-[#88888D]"/> 
+              <span><strong>Note:</strong> Criticality currently does not apply for Community Repair sub-categories.</span>
+            </p>
+            
+            <div className="mb-6">
+               <h4 className="font-bold text-[#3AA047] mb-3 flex items-center gap-2"><Users size={20}/> Community Repair</h4>
+               <div className="grid gap-4">
+                <div className="bg-white p-5 rounded-lg border-l-4 border-[#3AA047] shadow-sm">
+                  <span className="font-bold text-black block mb-2 text-lg">Community / Nonprofit Building Repair</span>
+                  <p className="text-sm text-[#88888D] leading-relaxed">Repairs and improvements to all community and nonprofit buildings that stabilize these buildings so that they may continue to serve the community.</p>
+                </div>
+                <div className="bg-white p-5 rounded-lg border-l-4 border-[#3AA047] shadow-sm">
+                  <span className="font-bold text-black block mb-2 text-lg">Community Energy & Performance</span>
+                  <p className="text-sm text-[#88888D] leading-relaxed">Repairs and improvements to all community and nonprofit buildings that decrease utility consumption and/or increase climate resilience.</p>
+                </div>
+                <div className="bg-white p-5 rounded-lg border-l-4 border-[#3AA047] shadow-sm">
+                  <span className="font-bold text-black block mb-2 text-lg">Public Space Improvements</span>
+                  <p className="text-sm text-[#88888D] leading-relaxed">Non-building repairs and improvements that improve community space conditions.</p>
+                </div>
+               </div>
+            </div>
           </div>
         </div>
       )
@@ -1495,150 +1658,7 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome, view, setView
       )
     },
     {
-      title: "Deep Dive: Sub-Category Definitions",
-      content: (
-        <div className="space-y-10 animate-in fade-in duration-500">
-          <div>
-            <h3 className="text-xl font-bold text-black mb-4 border-b border-slate-200 pb-2">A. Residential Unit Sub-Categories</h3>
-            <p className="text-sm text-[#88888D] mb-6">Each sub-category is assigned a default Urgency and Condition State to help prioritization.</p>
-            
-            {/* Dwelling Safety */}
-            <div className="mb-8">
-              <h4 className="font-bold text-[#A4343A] mb-3 flex items-center gap-2"><Shield size={20}/> Dwelling Safety</h4>
-              <div className="grid gap-4">
-                <div className="bg-white p-5 rounded-lg border-l-4 border-[#A4343A] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Structural Components</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                        <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
-                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Repairs to the home’s foundational and load-bearing elements (e.g., framing, beams, floor joists) that are essential for ensuring the home’s structural integrity and immediate habitability.</p>
-                </div>
-
-                <div className="bg-white p-5 rounded-lg border-l-4 border-[#A4343A] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Critical Home Systems</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                        <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
-                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Repairs to major, non-structural systems (e.g., plumbing, electrical, HVAC) that are necessary for maintaining basic living conditions.</p>
-                </div>
-
-                <div className="bg-white p-5 rounded-lg border-l-4 border-[#E55025] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Deferred Repair</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                        <span className="px-2 py-0.5 bg-[#E55025]/10 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Emergent</span>
-                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Deferred maintenance repairs address active, non-critical home systems repair needs that, if left unaddressed, can become critical home repair needs over time and use.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Occupant Health */}
-            <div className="mb-8">
-              <h4 className="font-bold text-[#E55025] mb-3 flex items-center gap-2"><Heart size={20}/> Occupant Health</h4>
-              <div className="grid gap-4">
-                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#A4343A] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Environmental Hazards Controls</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                        <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
-                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Non-architectural interventions that mitigate urgent, health-threatening environmental hazards (e.g., lead, mold, pest infestations) by directly reducing exposure to contaminants or conditions that severely impact resident health.</p>
-                </div>
-
-                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#A4343A] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Critical Accessibility / Fall Prevention</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                        <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
-                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Modifications that address urgent barriers preventing residents from safely and independently navigating and utilizing their home environment, ensuring immediate and safe use.</p>
-                </div>
-
-                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#FFD100] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Non-Critical Accessibility / Aging in Place</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                        <span className="px-2 py-0.5 bg-[#FFD100]/20 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Non-Critical</span>
-                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Non-critical improvements that enhance usability and functional access for individuals facing reduced mobility, visual, or auditory challenges, supporting their long-term independence and comfort.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Home Performance */}
-             <div className="mb-8">
-              <h4 className="font-bold text-[#0099CC] mb-3 flex items-center gap-2"><Zap size={20}/> Home Performance</h4>
-              <div className="grid gap-4">
-                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#E55025] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Disaster / Security Readiness</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                        <span className="px-2 py-0.5 bg-[#E55025]/10 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Emergent</span>
-                        <span className="px-2 py-0.5 bg-slate-200 text-[#88888D] text-xs rounded font-bold uppercase tracking-wide">Passive</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Proactive measures to strengthen the home’s resilience against external threats, helping prevent loss of life, property damage, or security breaches in emergencies.</p>
-                </div>
-
-                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#FFD100] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Home Utilities Performance</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                        <span className="px-2 py-0.5 bg-[#FFD100]/20 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Non-Critical</span>
-                        <span className="px-2 py-0.5 bg-slate-200 text-[#88888D] text-xs rounded font-bold uppercase tracking-wide">Passive</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Improving home systems' utility consumption and performance through maintenance, efficiency, conservation, and weatherization measures.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-xl font-bold text-black mb-4 border-b border-slate-200 pb-2">B. Community-based Sub-Categories</h3>
-            <p className="text-sm text-[#88888D] mb-6 bg-slate-100 p-3 rounded-lg border border-slate-200 inline-flex items-center gap-2">
-              <Info size={16} className="text-[#88888D]"/> 
-              <span><strong>Note:</strong> Criticality currently does not apply for Community Repair sub-categories.</span>
-            </p>
-            
-            <div className="mb-6">
-               <h4 className="font-bold text-[#3AA047] mb-3 flex items-center gap-2"><Users size={20}/> Community Repair</h4>
-               <div className="grid gap-4">
-                <div className="bg-white p-5 rounded-lg border-l-4 border-[#3AA047] shadow-sm">
-                  <span className="font-bold text-black block mb-2 text-lg">Community / Nonprofit Building Repair</span>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Repairs and improvements to all community and nonprofit buildings that stabilize these buildings so that they may continue to serve the community.</p>
-                </div>
-                <div className="bg-white p-5 rounded-lg border-l-4 border-[#3AA047] shadow-sm">
-                  <span className="font-bold text-black block mb-2 text-lg">Community Energy & Performance</span>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Repairs and improvements to all community and nonprofit buildings that decrease utility consumption and/or increase climate resilience.</p>
-                </div>
-                <div className="bg-white p-5 rounded-lg border-l-4 border-[#3AA047] shadow-sm">
-                  <span className="font-bold text-black block mb-2 text-lg">Public Space Improvements</span>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Non-building repairs and improvements that improve community space conditions.</p>
-                </div>
-               </div>
-            </div>
-          </div>
-        </div>
-      )
-    },
-    {
-      title: "Interactive Tool: The Criticality Matrix",
+      title: "Criticality Matrix",
       content: (
         <div className="space-y-6">
           <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 mb-6">
@@ -1696,13 +1716,13 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome, view, setView
                    <span className="font-bold text-[#3AA047] block text-xs uppercase">Eligible</span>
                    <span className="text-xs text-[#88888D]">Standard offer. We do this work.</span>
                  </div>
-                 <div className="bg-white p-3 rounded shadow-sm border-l-4 border-[#FFD100]">
-                   <span className="font-bold text-[#E55025] block text-xs uppercase">Conditional</span>
-                   <span className="text-xs text-[#88888D]">Only under specific circumstances (add a note!).</span>
-                 </div>
                  <div className="bg-white p-3 rounded shadow-sm border-l-4 border-[#A4343A]">
                    <span className="font-bold text-[#A4343A] block text-xs uppercase">Not Eligible</span>
                    <span className="text-xs text-[#88888D]">We do not fund or perform this work.</span>
+                 </div>
+                 <div className="bg-white p-3 rounded shadow-sm border-l-4 border-[#FFD100]">
+                   <span className="font-bold text-[#E55025] block text-xs uppercase">If/When</span>
+                   <span className="text-xs text-[#88888D]">Only under specific circumstances (add a note!).</span>
                  </div>
                </div>
             </div>
@@ -1834,6 +1854,7 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
   const [activeSubCat, setActiveSubCat] = useState("all");
   const [activeType, setActiveType] = useState("all");
   const [activeStatusFilter, setActiveStatusFilter] = useState<string | null>(null);
+  const [showDefinitions, setShowDefinitions] = useState(true);
 
   const filteredData = useMemo(() => {
     let data = TAXONOMY_DATA;
@@ -1895,6 +1916,8 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
         activeStatusFilter={activeStatusFilter}
         onStatusFilterChange={setActiveStatusFilter}
         onHome={onHome}
+        showDefinitions={showDefinitions}
+        onToggleDefinitions={() => setShowDefinitions(!showDefinitions)}
       />
 
       {/* Main Content */}
@@ -1925,353 +1948,203 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
             </div>
             </div>
 
-            <div className="p-6 space-y-8">
+            <div className="p-6 space-y-12">
             {filteredData.length === 0 ? (
                 <div className="text-center text-[#88888D] py-12">No activities found matching your filters.</div>
             ) : (
-                filteredData.map(pillar => (
-                <div key={pillar.id} className="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                    <div className={`${pillar.bgColor} px-6 py-4 border-b border-slate-200 flex items-center justify-between`}>
-                    <div className="flex items-center gap-3">
-                        <pillar.icon className={pillar.color} size={24} />
-                        <div>
-                        <h2 className="text-lg font-bold text-black">{pillar.name}</h2>
-                        <p className="text-xs text-black">{pillar.description}</p>
-                        </div>
-                    </div>
-                    </div>
+                filteredData.map(pillar => {
+                    // Original Data Lookup for Totals
+                    const originalPillar = TAXONOMY_DATA.find(p => p.id === pillar.id);
+                    const totalPillarSubCatCount = originalPillar?.subCategories.length || 0;
+                    const totalPillarActivityCount = originalPillar?.subCategories.reduce((acc, sc) => acc + sc.types.reduce((tAcc, t) => tAcc + t.interventions.length, 0), 0) || 0;
 
-                    <div className="divide-y divide-slate-100">
-                    {pillar.subCategories.map(sc => (
-                        <div key={sc.id} className="bg-white">
-                        <div className="px-6 py-3 bg-slate-50 flex items-center justify-between">
-                            <span className="font-semibold text-black text-sm">{sc.name}</span>
-                        </div>
-                        <div className="p-6 grid gap-6">
-                            {sc.types.map(type => (
-                            <div key={type.id} className="space-y-3">
-                                <div className="border-b border-slate-100 pb-2">
-                                <h4 className="text-sm font-bold text-black flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 bg-[#88888D] rounded-full"></span>
-                                    {type.name}
-                                </h4>
-                                {type.description && (
-                                    <p className="text-xs text-[#88888D] mt-1 ml-3.5 leading-relaxed">{type.description}</p>
-                                )}
+                    // Filtered Counts
+                    const pillarSubCatCount = pillar.subCategories.length;
+                    const pillarActivityCount = pillar.subCategories.reduce((acc, sc) => acc + sc.types.reduce((tAcc, t) => tAcc + t.interventions.length, 0), 0);
+
+                    return (
+                    <div key={pillar.id} className="border border-slate-200 rounded-2xl overflow-hidden shadow-sm bg-white">
+                        {/* Tier 1: Pillar Header */}
+                        <div className={`${pillar.bgColor} px-8 py-6 border-b border-slate-200 flex items-center justify-between`}>
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-white rounded-xl shadow-sm ring-1 ring-black/5">
+                                    <pillar.icon className={pillar.color} size={32} />
                                 </div>
-                                
-                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                                {type.interventions.map(int => {
-                                    const sel = selections[int.id] || {};
-                                    return (
-                                    <div key={int.id} className={`border rounded-lg p-4 transition-all ${sel.status ? 'border-slate-300 bg-white' : 'border-slate-200 bg-slate-50/50 hover:bg-white hover:shadow-sm'}`}>
-                                        <div className="flex justify-between items-start mb-3">
-                                        <div>
-                                            <h5 className="font-medium text-black">{int.name}</h5>
-                                            <div className="flex flex-wrap gap-2 mt-2">
-                                            <div className="flex flex-col">
-                                                <label className="text-[10px] text-[#88888D] font-semibold mb-0.5">URGENCY</label>
-                                                <select
-                                                value={sel.urgency || int.urgency}
-                                                onChange={(e) => onUpdateSelection(int.id, { ...sel, urgency: e.target.value })}
-                                                className="text-[10px] uppercase tracking-wider px-2 py-1 bg-slate-100 text-black rounded border border-slate-200 cursor-pointer hover:bg-slate-200 focus:ring-1 focus:ring-[#0099CC] focus:outline-none"
-                                                onClick={(e) => e.stopPropagation()}
-                                                >
-                                                {['Critical', 'Emergent', 'Non-Critical', 'N/A'].map(o => <option key={o} value={o}>{o}</option>)}
-                                                </select>
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <label className="text-[10px] text-[#88888D] font-semibold mb-0.5">CONDITION</label>
-                                                <select
-                                                value={sel.condition || int.condition}
-                                                onChange={(e) => onUpdateSelection(int.id, { ...sel, condition: e.target.value })}
-                                                className="text-[10px] uppercase tracking-wider px-2 py-1 bg-slate-100 text-black rounded border border-slate-200 cursor-pointer hover:bg-slate-200 focus:ring-1 focus:ring-[#0099CC] focus:outline-none"
-                                                onClick={(e) => e.stopPropagation()}
-                                                >
-                                                {['Active', 'Passive', 'Inactive', 'N/A'].map(o => <option key={o} value={o}>{o}</option>)}
-                                                </select>
-                                            </div>
-                                            </div>
-                                        </div>
-                                        <StatusBadge status={sel.status} />
-                                        </div>
-                                        
-                                        {/* Action Buttons */}
-                                        <div className="flex gap-2 mt-4 pt-3 border-t border-slate-100">
-                                        <button 
-                                            onClick={() => onUpdateSelection(int.id, { ...sel, status: sel.status === 'eligible' ? undefined : 'eligible' })}
-                                            className={`flex-1 text-xs py-1.5 rounded border ${sel.status === 'eligible' ? 'bg-[#3AA047] text-white border-[#3AA047]' : 'border-slate-200 text-[#88888D] hover:bg-[#3AA047]/10'}`}
-                                        >
-                                            Eligible
-                                        </button>
-                                        <button 
-                                            onClick={() => onUpdateSelection(int.id, { ...sel, status: sel.status === 'conditional' ? undefined : 'conditional' })}
-                                            className={`flex-1 text-xs py-1.5 rounded border ${sel.status === 'conditional' ? 'bg-[#FFD100] text-black border-[#FFD100]' : 'border-slate-200 text-[#88888D] hover:bg-[#FFD100]/20'}`}
-                                        >
-                                            Conditional
-                                        </button>
-                                        <button 
-                                            onClick={() => onUpdateSelection(int.id, { ...sel, status: sel.status === 'not_eligible' ? undefined : 'not_eligible' })}
-                                            className={`flex-1 text-xs py-1.5 rounded border ${sel.status === 'not_eligible' ? 'bg-[#A4343A] text-white border-[#A4343A]' : 'border-slate-200 text-[#88888D] hover:bg-[#A4343A]/10'}`}
-                                        >
-                                            No
-                                        </button>
-                                        <button 
-                                            onClick={() => onUpdateSelection(int.id, { ...sel, status: sel.status === 'na' ? undefined : 'na' })}
-                                            className={`flex-1 text-xs py-1.5 rounded border ${sel.status === 'na' ? 'bg-[#88888D] text-white border-[#88888D]' : 'border-slate-200 text-[#88888D] hover:bg-slate-100'}`}
-                                        >
-                                            N/A
-                                        </button>
-                                        </div>
-                                        {sel.status && (
-                                        <input 
-                                            type="text"
-                                            placeholder="Add notes/conditions..."
-                                            className="w-full mt-2 text-xs border border-slate-200 rounded px-2 py-1 focus:ring-1 focus:ring-[#0099CC] focus:border-[#0099CC]"
-                                            value={sel.notes || ''}
-                                            onChange={(e) => onUpdateSelection(int.id, { ...sel, notes: e.target.value })}
-                                        />
-                                        )}
-                                    </div>
-                                    );
-                                })}
+                                <div>
+                                    <h2 className="text-2xl font-bold text-black tracking-tight">{pillar.name}</h2>
+                                    {showDefinitions && <p className="text-sm text-black/80 mt-1 max-w-2xl leading-relaxed">{pillar.description}</p>}
                                 </div>
                             </div>
-                            ))}
+                            <div className="flex flex-col items-end gap-1">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 bg-white/50 border border-black/10 rounded-full text-black/70 text-center min-w-[120px]">
+                                        {pillarSubCatCount} of {totalPillarSubCatCount} Sub-Categories
+                                    </span>
+                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 bg-white/50 border border-black/10 rounded-full text-black/70 text-center min-w-[100px]">
+                                        {pillarActivityCount} of {totalPillarActivityCount} Activities
+                                    </span>
+                                </div>
+                            </div>
                         </div>
+
+                        <div className="divide-y divide-slate-200">
+                        {pillar.subCategories.map(sc => {
+                            // Original Data Lookup for Totals
+                            const originalSubCat = TAXONOMY_DATA.find(p => p.id === pillar.id)?.subCategories.find(s => s.id === sc.id);
+                            const totalScTypeCount = originalSubCat?.types.length || 0;
+                            const totalScActivityCount = originalSubCat?.types.reduce((acc, t) => acc + t.interventions.length, 0) || 0;
+
+                            // Filtered Counts
+                            const scTypeCount = sc.types.length;
+                            const scActivityCount = sc.types.reduce((acc, t) => acc + t.interventions.length, 0);
+
+                            return (
+                            <div key={sc.id} className="group">
+                                {/* Tier 2: Sub-Category Header */}
+                                <div className={`px-8 py-5 bg-slate-50/80 border-l-[6px] ${pillar.color.replace('text', 'border')}`}>
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex flex-col gap-1">
+                                            <span className={`text-[10px] font-extrabold uppercase tracking-widest opacity-60 ${pillar.color}`}>Sub-Category</span>
+                                            <span className="font-bold text-lg text-slate-900">{sc.name}</span>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <span className="text-[10px] font-medium px-2 py-0.5 bg-slate-200 rounded-full text-slate-600 text-center min-w-[60px]">
+                                                {scTypeCount} of {totalScTypeCount} Types
+                                            </span>
+                                            <span className="text-[10px] font-medium px-2 py-0.5 bg-slate-200 rounded-full text-slate-600 text-center min-w-[70px]">
+                                                {scActivityCount} of {totalScActivityCount} Activities
+                                            </span>
+                                        </div>
+                                    </div>
+                                    {showDefinitions && sc.description && (
+                                        <p className="text-sm text-slate-600 mt-2 leading-relaxed max-w-2xl border-l-2 border-slate-200 pl-3">{sc.description}</p>
+                                    )}
+                                </div>
+                                
+                                <div className="p-8 bg-white">
+                                    <div className="grid gap-10">
+                                        {sc.types.map(type => {
+                                            // Original Data Lookup for Totals
+                                            const originalType = TAXONOMY_DATA.find(p => p.id === pillar.id)?.subCategories.find(s => s.id === sc.id)?.types.find(t => t.id === type.id);
+                                            const totalTypeActivityCount = originalType?.interventions.length || 0;
+
+                                            // Filtered Count
+                                            const typeActivityCount = type.interventions.length;
+
+                                            return (
+                                            <div key={type.id} className="relative">
+                                                {/* Tier 3: Type Header */}
+                                                <div className="flex items-center justify-between gap-4 mb-5 border-b border-slate-100 pb-3">
+                                                    <div className="flex items-start gap-4">
+                                                        <div className={`mt-1.5 w-3 h-3 rounded-full shrink-0 shadow-sm ${pillar.color.replace('text', 'bg')}`}></div>
+                                                        <div>
+                                                            <h4 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                                                                {type.name}
+                                                            </h4>
+                                                            {showDefinitions && type.description && (
+                                                                <p className="text-sm text-slate-500 mt-1 leading-relaxed max-w-lg">{type.description}</p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <span className="text-[10px] px-2 py-0.5 bg-slate-100 rounded-full text-slate-500 font-medium border border-slate-200 whitespace-nowrap text-center min-w-[70px]">
+                                                        {typeActivityCount} of {totalTypeActivityCount} Activities
+                                                    </span>
+                                                </div>
+                                                
+                                                {/* Tier 4: Activities Grid */}
+                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pl-7">
+                                                    {type.interventions.map(int => {
+                                                        const sel = selections[int.id] || {};
+                                                        return (
+                                                        <div key={int.id} className={`border-l-4 ${pillar.color.replace('text', 'border')} border-y border-r rounded-r-lg p-4 transition-all flex flex-col justify-between h-full group/card ${sel.status ? 'border-slate-300 bg-white shadow-sm' : 'border-slate-200 bg-slate-50/30 hover:bg-white hover:shadow-md'}`}>
+                                                            <div className="flex flex-col gap-2 mb-3">
+                                                                <div className="flex justify-between items-start">
+                                                                    <h5 className={`font-medium ${pillar.color} text-sm leading-tight pr-2`}>{int.name}</h5>
+                                                                    <StatusBadge status={sel.status} />
+                                                                </div>
+                                                                
+                                                                <div className="flex gap-2 mt-2">
+                                                                    <div className="flex flex-col flex-1 min-w-0">
+                                                                        <label className="text-[10px] text-[#88888D] font-semibold mb-0.5 truncate">URGENCY</label>
+                                                                        <select
+                                                                        value={sel.urgency || int.urgency}
+                                                                        onChange={(e) => onUpdateSelection(int.id, { ...sel, urgency: e.target.value })}
+                                                                        className="w-full text-[10px] uppercase tracking-wider px-2 py-1 bg-slate-100 text-black rounded border border-slate-200 cursor-pointer hover:bg-slate-200 focus:ring-1 focus:ring-[#0099CC] focus:outline-none"
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                        >
+                                                                        {['Critical', 'Emergent', 'Non-Critical', 'N/A'].map(o => <option key={o} value={o}>{o}</option>)}
+                                                                        </select>
+                                                                    </div>
+                                                                    <div className="flex flex-col flex-1 min-w-0">
+                                                                        <label className="text-[10px] text-[#88888D] font-semibold mb-0.5 truncate">CONDITION</label>
+                                                                        <select
+                                                                        value={sel.condition || int.condition}
+                                                                        onChange={(e) => onUpdateSelection(int.id, { ...sel, condition: e.target.value })}
+                                                                        className="w-full text-[10px] uppercase tracking-wider px-2 py-1 bg-slate-100 text-black rounded border border-slate-200 cursor-pointer hover:bg-slate-200 focus:ring-1 focus:ring-[#0099CC] focus:outline-none"
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                        >
+                                                                        {['Active', 'Passive', 'Inactive', 'N/A'].map(o => <option key={o} value={o}>{o}</option>)}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            {/* Action Buttons */}
+                                                            <div className="flex gap-2 mt-auto pt-3 border-t border-slate-100">
+                                                                <button 
+                                                                    onClick={() => onUpdateSelection(int.id, { ...sel, status: sel.status === 'eligible' ? undefined : 'eligible' })}
+                                                                    className={`flex-1 text-xs py-1.5 rounded border transition-colors ${sel.status === 'eligible' ? 'bg-[#3AA047] text-white border-[#3AA047] font-bold' : 'border-slate-200 text-[#88888D] hover:bg-[#3AA047]/10 hover:text-[#3AA047] hover:border-[#3AA047]/30'}`}
+                                                                >
+                                                                    Eligible
+                                                                </button>
+                                                                <button 
+                                                                    onClick={() => onUpdateSelection(int.id, { ...sel, status: sel.status === 'not_eligible' ? undefined : 'not_eligible' })}
+                                                                    className={`flex-1 text-xs py-1.5 rounded border transition-colors ${sel.status === 'not_eligible' ? 'bg-[#A4343A] text-white border-[#A4343A] font-bold' : 'border-slate-200 text-[#88888D] hover:bg-[#A4343A]/10 hover:text-[#A4343A] hover:border-[#A4343A]/30'}`}
+                                                                >
+                                                                    No
+                                                                </button>
+                                                                <button 
+                                                                    onClick={() => onUpdateSelection(int.id, { ...sel, status: sel.status === 'conditional' ? undefined : 'conditional' })}
+                                                                    className={`flex-1 text-xs py-1.5 rounded border transition-colors ${sel.status === 'conditional' ? 'bg-[#FFD100] text-black border-[#FFD100] font-bold' : 'border-slate-200 text-[#88888D] hover:bg-[#FFD100]/20 hover:text-[#E55025] hover:border-[#FFD100]/50'}`}
+                                                                >
+                                                                    If/When
+                                                                </button>
+                                                                <button 
+                                                                    onClick={() => onUpdateSelection(int.id, { ...sel, status: sel.status === 'na' ? undefined : 'na' })}
+                                                                    className={`flex-1 text-xs py-1.5 rounded border transition-colors ${sel.status === 'na' ? 'bg-[#88888D] text-white border-[#88888D] font-bold' : 'border-slate-200 text-[#88888D] hover:bg-slate-100 hover:text-black'}`}
+                                                                >
+                                                                    N/A
+                                                                </button>
+                                                            </div>
+                                                            {sel.status && (
+                                                            <input 
+                                                                type="text"
+                                                                placeholder="Add notes..."
+                                                                className="w-full mt-2 text-xs border border-slate-200 rounded px-2 py-1 focus:ring-1 focus:ring-[#0099CC] focus:border-[#0099CC] transition-shadow"
+                                                                value={sel.notes || ''}
+                                                                onChange={(e) => onUpdateSelection(int.id, { ...sel, notes: e.target.value })}
+                                                            />
+                                                            )}
+                                                        </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                            );
+                        })}
                         </div>
-                    ))}
                     </div>
-                </div>
-                ))
+                    );
+                })
             )}
             </div>
         </div>
       </div>
-    </div>
-  );
-};
-
-interface ReportViewProps {
-  selections: SelectionsMap;
-  onHome: () => void;
-  view: ViewState;
-  setView: (v: ViewState) => void;
-}
-
-const ReportView: React.FC<ReportViewProps> = ({ selections, onHome, view, setView }) => {
-  const reportRef = useRef<HTMLDivElement>(null);
-
-  const getFilteredInterventions = (status: string) => {
-    return ALL_INTERVENTIONS.filter(i => (selections[i.id]?.status === status));
-  };
-
-  const getPriorityLabel = (urgency?: string, condition?: string) => {
-    if (!urgency || !condition || urgency === 'N/A' || condition === 'N/A') return null;
-    
-    const map: { [key: string]: string } = {
-      'Critical-Active': 'Priority 1: Immediate Action',
-      'Emergent-Active': 'Priority 2: High Urgency',
-      'Non-Critical-Active': 'Priority 4: Monitor',
-      'Critical-Passive': 'Priority 2: Address Soon',
-      'Emergent-Passive': 'Priority 3: Plan',
-      'Non-Critical-Passive': 'Priority 5: Defer',
-      'Critical-Inactive': 'Priority 3: Investigate',
-      'Emergent-Inactive': 'Priority 5: Defer',
-      'Non-Critical-Inactive': 'Priority 6: No Action',
-    };
-    return map[`${urgency}-${condition}`] || null;
-  };
-
-  const eligibleItems = getFilteredInterventions('eligible');
-  const conditionalItems = getFilteredInterventions('conditional');
-  const notEligibleItems = getFilteredInterventions('not_eligible');
-
-  const copyToClipboard = () => {
-    if (reportRef.current) {
-      const range = document.createRange();
-      range.selectNode(reportRef.current);
-      window.getSelection()?.removeAllRanges();
-      window.getSelection()?.addRange(range);
-      document.execCommand('copy');
-      window.getSelection()?.removeAllRanges();
-      // Using a simpler alert alternative or logging since strict mode might block alerts
-      // console.log('Report copied to clipboard!');
-    }
-  };
-
-  const downloadCSV = () => {
-    // CSV Headers
-    const headers = [
-      'Pillar', 
-      'Sub-Category', 
-      'Type', 
-      'Activity Name', 
-      'Selected Status', 
-      'Priority Label',
-      'Final Urgency', 
-      'Final Condition', 
-      'Notes'
-    ];
-
-    // Map all interventions to rows
-    const rows = ALL_INTERVENTIONS.map(item => {
-      const sel = selections[item.id] || {};
-      const finalUrgency = sel.urgency || item.urgency;
-      const finalCondition = sel.condition || item.condition;
-      const priority = getPriorityLabel(finalUrgency, finalCondition) || 'N/A';
-      
-      return [
-        item.pillarName,
-        item.subCatName,
-        item.typeName,
-        item.name,
-        sel.status ? sel.status.replace('_', ' ').toUpperCase() : 'UNSELECTED',
-        priority,
-        finalUrgency,
-        finalCondition,
-        sel.notes || ''
-      ].map(field => `"${String(field || '').replace(/"/g, '""')}"`).join(','); // Escape quotes and wrap in quotes
-    });
-
-    const csvContent = [headers.join(','), ...rows].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', `repairs_catalog_export_${new Date().toISOString().split('T')[0]}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  };
-
-  const GroupedList: React.FC<{ items: Intervention[] }> = ({ items }) => {
-    if (items.length === 0) return <p className="italic text-[#88888D]">None selected.</p>;
-    
-    // Group by Pillar -> SubCategory
-    const grouped = items.reduce((acc, item) => {
-      const key = `${item.pillarName}::${item.subCatName}`;
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(item);
-      return acc;
-    }, {} as { [key: string]: Intervention[] });
-
-    return (
-      <div className="space-y-6">
-        {Object.entries(grouped).map(([key, groupItems]) => {
-          const [pillar, subCat] = key.split('::');
-          return (
-            <div key={key} className="break-inside-avoid">
-              <h4 className="font-bold text-black border-b border-slate-200 pb-1 mb-3">{pillar} - {subCat}</h4>
-              <ul className="list-disc pl-5 space-y-4">
-                {groupItems.map(item => {
-                  const urgency = selections[item.id]?.urgency || item.urgency;
-                  const condition = selections[item.id]?.condition || item.condition;
-                  const priority = getPriorityLabel(urgency, condition);
-
-                  return (
-                    <li key={item.id} className="text-sm text-black">
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1">
-                        <span className="font-medium text-base">{item.name}</span>
-                        {priority && (
-                          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border shrink-0 ${
-                            priority.includes('Priority 1') ? 'bg-[#A4343A]/10 text-[#A4343A] border-[#A4343A]/20' :
-                            priority.includes('Priority 2') ? 'bg-[#E55025]/10 text-[#E55025] border-[#E55025]/20' :
-                            'bg-slate-100 text-[#88888D] border-slate-200'
-                          }`}>
-                            {priority}
-                          </span>
-                        )}
-                      </div>
-                      
-                      {(urgency !== 'N/A' && condition !== 'N/A') && (
-                        <div className="text-xs text-[#88888D] mt-1 flex flex-wrap gap-x-4 gap-y-1">
-                          <span className="flex items-center gap-1 font-medium text-black">
-                            Urgency: <span className="font-normal text-[#88888D]">{urgency}</span>
-                          </span>
-                          <span className="flex items-center gap-1 font-medium text-black">
-                            Condition: <span className="font-normal text-[#88888D]">{condition}</span>
-                          </span>
-                        </div>
-                      )}
-
-                      {selections[item.id].notes && (
-                        <div className="mt-1.5 bg-[#FFD100]/20 p-2 rounded border border-[#FFD100]/40 text-xs italic text-black">
-                          <strong>Note:</strong> {selections[item.id].notes}
-                        </div>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
-
-  return (
-    <div className="flex h-screen bg-slate-50">
-        <ExportSidebar onHome={onHome} />
-        
-        <div className="flex-1 flex flex-col overflow-hidden">
-            <TopNav view={view} setView={setView} />
-            <div className="flex-1 overflow-y-auto bg-white p-8">
-                <div className="max-w-4xl mx-auto">
-                    <div className="flex justify-between items-center mb-8 print:hidden">
-                        <div>
-                        <h2 className="text-3xl font-bold text-black">Export Activities</h2>
-                        <p className="text-[#88888D]">Review your selections and export your policy manual.</p>
-                        </div>
-                        <div className="flex gap-3">
-                        <button onClick={downloadCSV} className="flex items-center gap-2 px-4 py-2 bg-[#3AA047] text-white rounded hover:bg-[#3AA047]/80 shadow-sm transition-colors">
-                            <FileSpreadsheet size={18} /> Export CSV
-                        </button>
-                        <button onClick={copyToClipboard} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded hover:bg-slate-50 shadow-sm text-black">
-                            <Copy size={18} /> Copy Text
-                        </button>
-                        <button onClick={() => window.print()} className="flex items-center gap-2 px-4 py-2 bg-[#0099CC] text-white rounded hover:bg-[#0099CC]/80 shadow-sm">
-                            <Printer size={18} /> Print / Save PDF
-                        </button>
-                        </div>
-                    </div>
-
-                    <div ref={reportRef} className="bg-white p-12 shadow-lg border border-slate-200 min-h-[1000px] print:shadow-none print:border-none print:p-0">
-                        <div className="text-center border-b-2 border-black pb-6 mb-8">
-                        <h1 className="text-3xl font-bold uppercase tracking-wide text-black">Appendix A: Construction Activities</h1>
-                        <p className="text-[#88888D] mt-2">Generated via Repairs Catalog Builder</p>
-                        <p className="text-sm text-[#88888D] mt-1">{new Date().toLocaleDateString()}</p>
-                        </div>
-
-                        <div className="mb-8">
-                        <h3 className="text-xl font-bold text-black bg-slate-100 p-2 mb-4 border-l-4 border-[#3AA047]">1. Eligible Repairs</h3>
-                        <p className="mb-4 text-sm text-[#88888D]">The following activities have been approved for program funding and execution, subject to standard feasibility assessments.</p>
-                        <GroupedList items={eligibleItems} />
-                        </div>
-
-                        <div className="mb-8">
-                        <h3 className="text-xl font-bold text-black bg-slate-100 p-2 mb-4 border-l-4 border-[#FFD100]">2. Conditional Repairs</h3>
-                        <p className="mb-4 text-sm text-[#88888D]">The following activities are eligible only when specific conditions are met (see notes).</p>
-                        <GroupedList items={conditionalItems} />
-                        </div>
-
-                        <div className="mb-8">
-                        <h3 className="text-xl font-bold text-black bg-slate-100 p-2 mb-4 border-l-4 border-[#A4343A]">3. Non-Eligible Activities</h3>
-                        <p className="mb-4 text-sm text-[#88888D]">The following activities are strictly outside the current program scope.</p>
-                        <GroupedList items={notEligibleItems} />
-                        </div>
-
-                        <div className="mt-12 pt-8 border-t border-slate-200 text-center text-xs text-[#88888D]">
-                        <p>End of Policy Section</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
   );
 };
