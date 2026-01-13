@@ -13,7 +13,6 @@ import {
   ChevronDown,
   Info,
   Download,
-  Copy,
   Printer,
   Shield,
   Heart,
@@ -100,6 +99,13 @@ interface ExportConfig {
     criticality: boolean;
     notes: boolean;
   };
+}
+
+interface ReportViewProps {
+  selections: SelectionsMap;
+  onHome: () => void;
+  view: ViewState;
+  setView: (v: ViewState) => void;
 }
 
 // --- Brand Colors ---
@@ -798,10 +804,6 @@ const Branding = () => (
     </div>
   </div>
 );
-
-interface StatusBadgeProps {
-  status?: string;
-}
 
 const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   switch (status) {
@@ -1689,7 +1691,7 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome, view, setView
                         urgencyTag = "Non-Critical";
                         borderColor = "border-[#FFD100]";
                         urgencyColor = "bg-[#FFD100]/20 text-[#E55025]";
-                    } else if (pillar.name === 'Dwelling Safety' && sc.name.includes('Deferred')) {
+                    } else if (pillar.name === 'Dwelling Safety' && sc.name.includes('HSM')) {
                         urgencyTag = "Emergent";
                         borderColor = "border-[#E55025]";
                         urgencyColor = "bg-[#E55025]/10 text-[#E55025]";
