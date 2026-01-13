@@ -27,7 +27,9 @@ import {
   Ban,
   Hammer,
   Circle,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Settings,
+  Image as ImageIcon
 } from 'lucide-react';
 
 // --- Types & Interfaces ---
@@ -45,6 +47,9 @@ interface Intervention {
   subCatName?: string;
   typeId?: string;
   typeName?: string;
+  pillarDescription?: string;
+  subCatDescription?: string;
+  typeDescription?: string;
 }
 
 interface Type {
@@ -80,6 +85,21 @@ interface Selection {
 
 interface SelectionsMap {
   [key: string]: Selection;
+}
+
+interface ExportConfig {
+  format: 'csv' | 'pdf' | 'image';
+  levels: {
+    pillar: boolean;
+    subCategory: boolean;
+    type: boolean;
+    activity: boolean;
+  };
+  elements: {
+    definitions: boolean;
+    criticality: boolean;
+    notes: boolean;
+  };
 }
 
 // --- Brand Colors ---
@@ -739,7 +759,18 @@ const flattenInterventions = (): Intervention[] => {
     p.subCategories.forEach(sc => {
       sc.types.forEach(t => {
         t.interventions.forEach(i => {
-          all.push({ ...i, pillarId: p.id, pillarName: p.name, subCatId: sc.id, subCatName: sc.name, typeId: t.id, typeName: t.name });
+          all.push({ 
+            ...i, 
+            pillarId: p.id, 
+            pillarName: p.name, 
+            subCatId: sc.id, 
+            subCatName: sc.name, 
+            typeId: t.id, 
+            typeName: t.name,
+            pillarDescription: p.description,
+            subCatDescription: sc.description,
+            typeDescription: t.description 
+          });
         });
       });
     });
@@ -782,6 +813,167 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   }
 };
 
+interface ExportModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  config: ExportConfig;
+  onConfigChange: (newConfig: ExportConfig) => void;
+  onExport: () => void;
+}
+
+const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, config, onConfigChange, onExport }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+          <div>
+            <h2 className="text-xl font-bold text-slate-900">Export Options</h2>
+            <p className="text-sm text-slate-500 mt-1">Customize how your policy manual is generated.</p>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+            <XCircle size={20} className="text-slate-400" />
+          </button>
+        </div>
+        
+        <div className="p-8 space-y-8">
+          {/* Section 1: Format */}
+          <div>
+             <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide mb-4 flex items-center gap-2">
+               <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs border border-slate-200">1</span>
+               Select Format
+             </h3>
+             <div className="grid grid-cols-3 gap-4">
+                <button 
+                  onClick={() => onConfigChange({ ...config, format: 'csv' })}
+                  className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all ${config.format === 'csv' ? 'border-[#0099CC] bg-[#0099CC]/5 text-[#0099CC]' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-600'}`}
+                >
+                  <FileSpreadsheet size={32} className="mb-2" />
+                  <span className="font-bold text-sm">CSV Spreadsheet</span>
+                </button>
+                <button 
+                  onClick={() => onConfigChange({ ...config, format: 'pdf' })}
+                  className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all ${config.format === 'pdf' ? 'border-[#E55025] bg-[#E55025]/5 text-[#E55025]' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-600'}`}
+                >
+                  <Printer size={32} className="mb-2" />
+                  <span className="font-bold text-sm">Print / PDF</span>
+                </button>
+                <button 
+                   onClick={() => onConfigChange({ ...config, format: 'image' })}
+                   className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all ${config.format === 'image' ? 'border-[#3AA047] bg-[#3AA047]/5 text-[#3AA047]' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-600'}`}
+                >
+                  <ImageIcon size={32} className="mb-2" />
+                  <span className="font-bold text-sm">Image</span>
+                </button>
+             </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Section 2: Levels */}
+            <div>
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide mb-4 flex items-center gap-2">
+                <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs border border-slate-200">2</span>
+                Include Levels
+              </h3>
+              <div className="space-y-3">
+                <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={config.levels.pillar}
+                    onChange={(e) => onConfigChange({ ...config, levels: { ...config.levels, pillar: e.target.checked } })}
+                    className="w-5 h-5 text-[#0099CC] rounded focus:ring-[#0099CC]"
+                  />
+                  <span className="font-medium text-slate-700">Pillars</span>
+                </label>
+                <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={config.levels.subCategory}
+                    onChange={(e) => onConfigChange({ ...config, levels: { ...config.levels, subCategory: e.target.checked } })}
+                    className="w-5 h-5 text-[#0099CC] rounded focus:ring-[#0099CC]"
+                  />
+                  <span className="font-medium text-slate-700">Sub-Categories</span>
+                </label>
+                <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={config.levels.type}
+                    onChange={(e) => onConfigChange({ ...config, levels: { ...config.levels, type: e.target.checked } })}
+                    className="w-5 h-5 text-[#0099CC] rounded focus:ring-[#0099CC]"
+                  />
+                  <span className="font-medium text-slate-700">Types</span>
+                </label>
+                <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={config.levels.activity}
+                    disabled
+                    className="w-5 h-5 text-slate-400 rounded bg-slate-100 cursor-not-allowed"
+                  />
+                  <span className="font-medium text-slate-400">Activities (Always On)</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Section 3: Elements */}
+            <div>
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide mb-4 flex items-center gap-2">
+                <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs border border-slate-200">3</span>
+                Data Elements
+              </h3>
+              <div className="space-y-3">
+                <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={config.elements.definitions}
+                    onChange={(e) => onConfigChange({ ...config, elements: { ...config.elements, definitions: e.target.checked } })}
+                    className="w-5 h-5 text-[#0099CC] rounded focus:ring-[#0099CC]"
+                  />
+                  <span className="font-medium text-slate-700">Definitions</span>
+                </label>
+                <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={config.elements.criticality}
+                    onChange={(e) => onConfigChange({ ...config, elements: { ...config.elements, criticality: e.target.checked } })}
+                    className="w-5 h-5 text-[#0099CC] rounded focus:ring-[#0099CC]"
+                  />
+                  <span className="font-medium text-slate-700">Criticality (Urgency/Condition)</span>
+                </label>
+                <label className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={config.elements.notes}
+                    onChange={(e) => onConfigChange({ ...config, elements: { ...config.elements, notes: e.target.checked } })}
+                    className="w-5 h-5 text-[#0099CC] rounded focus:ring-[#0099CC]"
+                  />
+                  <span className="font-medium text-slate-700">User Notes</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3">
+          <button 
+            onClick={onClose}
+            className="px-6 py-2.5 rounded-lg font-bold text-slate-600 hover:bg-slate-200 transition-colors"
+          >
+            Cancel
+          </button>
+          <button 
+            onClick={onExport}
+            className="px-8 py-2.5 rounded-lg font-bold text-white bg-[#0099CC] hover:bg-[#0099CC]/90 shadow-lg shadow-[#0099CC]/20 transition-all flex items-center gap-2"
+          >
+            <Download size={18} /> Export Data
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const TopNav = ({ view, setView }: { view: ViewState, setView: (v: ViewState) => void }) => {
   const getButtonClass = (isActive: boolean) => 
     `px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 border ${
@@ -812,7 +1004,7 @@ const TopNav = ({ view, setView }: { view: ViewState, setView: (v: ViewState) =>
           onClick={() => setView('report')}
           className={getButtonClass(view === 'report')}
         >
-          <Download size={18} /> Export Activities
+          <Download size={18} /> Export
         </button>
     </div>
   );
@@ -895,7 +1087,7 @@ const LearnSidebar: React.FC<LearnSidebarProps> = ({ currentStep, steps, onStepC
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.2.5
+          Version 1.2.5.1
         </div>
       </div>
     </div>
@@ -938,7 +1130,7 @@ const ExportSidebar: React.FC<ExportSidebarProps> = ({ onHome }) => {
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.2.5
+          Version 1.2.5.1
         </div>
       </div>
     </div>
@@ -1154,7 +1346,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.2.5
+          Version 1.2.5.1
         </div>
       </div>
     </div>
@@ -1279,7 +1471,7 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
           
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-sm font-medium mb-6">
             <span className="flex h-2 w-2 rounded-full bg-white"></span>
-            Version 1.2.5 Available
+            Version 1.2.5.1 Available
           </div>
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 leading-tight">
             Standardize Your <span className="text-white">Home Repair</span> Program Offerings
@@ -1375,15 +1567,15 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
     {/* Call to Action Footer */}
     <div className="bg-slate-900 text-white py-20">
       <div className="max-w-4xl mx-auto px-6 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to define your program?</h2>
+        <h2 className="text-3xl md:text-4xl font-bold mb-6">Before you begin...</h2>
         <p className="text-[#88888D] text-lg mb-8">
-          Join other affiliates in standardizing the way we talk about and perform home repairs.
+          Review the guided learning modules to familiarize yourself with the Catalog Builder.
         </p>
         <button
-          onClick={onStart}
+          onClick={onLearn}
           className="px-8 py-4 bg-[#3AA047] text-white rounded-lg font-bold text-lg hover:bg-[#3AA047]/90 transition-all shadow-lg shadow-[#3AA047]/20"
         >
-          Open Activity Builder
+          Open Learning Guide
         </button>
       </div>
     </div>
@@ -1633,7 +1825,7 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome, view, setView
       )
     },
     {
-      title: "How to Use the Catalog Builder",
+      title: "Activity-level Policy",
       content: (
         <div className="space-y-6">
           <div className="bg-[#0099CC]/5 p-4 rounded-lg border border-[#0099CC]/20 flex items-start gap-3">
@@ -2103,84 +2295,84 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
   );
 };
 
-interface ReportViewProps {
-  selections: SelectionsMap;
-  onHome: () => void;
-  view: ViewState;
-  setView: (v: ViewState) => void;
-}
+// --- Report View with Export Logic ---
 
 const ReportView: React.FC<ReportViewProps> = ({ selections, onHome, view, setView }) => {
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [exportConfig, setExportConfig] = useState<ExportConfig>({
+    format: 'csv',
+    levels: { pillar: true, subCategory: true, type: true, activity: true },
+    elements: { definitions: true, criticality: true, notes: true }
+  });
+
   const reportRef = useRef<HTMLDivElement>(null);
 
   const getFilteredInterventions = (status: string) => {
     return ALL_INTERVENTIONS.filter(i => (selections[i.id]?.status === status));
   };
 
-  const getPriorityLabel = (urgency?: string, condition?: string) => {
-    if (!urgency || !condition || urgency === 'N/A' || condition === 'N/A') return null;
-    
-    const map: { [key: string]: string } = {
-      'Critical-Active': 'Priority 1: Immediate Action',
-      'Emergent-Active': 'Priority 2: High Urgency',
-      'Non-Critical-Active': 'Priority 4: Monitor',
-      'Critical-Passive': 'Priority 2: Address Soon',
-      'Emergent-Passive': 'Priority 3: Plan',
-      'Non-Critical-Passive': 'Priority 5: Defer',
-      'Critical-Inactive': 'Priority 3: Investigate',
-      'Emergent-Inactive': 'Priority 5: Defer',
-      'Non-Critical-Inactive': 'Priority 6: No Action',
-    };
-    return map[`${urgency}-${condition}`] || null;
-  };
-
   const eligibleItems = getFilteredInterventions('eligible');
   const conditionalItems = getFilteredInterventions('conditional');
   const notEligibleItems = getFilteredInterventions('not_eligible');
 
-  const copyToClipboard = () => {
-    if (reportRef.current) {
-      const range = document.createRange();
-      range.selectNode(reportRef.current);
-      window.getSelection()?.removeAllRanges();
-      window.getSelection()?.addRange(range);
-      document.execCommand('copy');
-      window.getSelection()?.removeAllRanges();
+  const handleExport = () => {
+    if (exportConfig.format === 'csv') {
+      downloadCSV();
+    } else if (exportConfig.format === 'pdf') {
+      setTimeout(() => window.print(), 100);
+    } else if (exportConfig.format === 'image') {
+      alert("Image export is not supported in this environment. Please use 'Print / PDF' and select 'Save as Image' in your system dialog if available.");
     }
+    setIsExportModalOpen(false);
   };
 
   const downloadCSV = () => {
-    // CSV Headers
-    const headers = [
-      'Pillar', 
-      'Sub-Category', 
-      'Type', 
-      'Activity Name', 
-      'Selected Status', 
-      'Priority Label',
-      'Final Urgency', 
-      'Final Condition', 
-      'Notes'
-    ];
+    const headers = [];
+    if (exportConfig.levels.pillar) headers.push('Pillar');
+    if (exportConfig.levels.subCategory) headers.push('Sub-Category');
+    if (exportConfig.levels.type) headers.push('Type');
+    headers.push('Activity Name');
+    headers.push('Selected Status');
+    
+    if (exportConfig.elements.criticality) {
+       headers.push('Priority Label', 'Final Urgency', 'Final Condition');
+    }
+    if (exportConfig.elements.definitions) {
+        if (exportConfig.levels.pillar) headers.push('Pillar Definition');
+        if (exportConfig.levels.subCategory) headers.push('Sub-Category Definition');
+        if (exportConfig.levels.type) headers.push('Type Definition');
+    }
+    if (exportConfig.elements.notes) headers.push('Notes');
 
-    // Map all interventions to rows
     const rows = ALL_INTERVENTIONS.map(item => {
       const sel = selections[item.id] || {};
       const finalUrgency = sel.urgency || item.urgency;
       const finalCondition = sel.condition || item.condition;
-      const priority = getPriorityLabel(finalUrgency, finalCondition) || 'N/A';
       
-      return [
-        item.pillarName,
-        item.subCatName,
-        item.typeName,
-        item.name,
-        sel.status ? sel.status.replace('_', ' ').toUpperCase() : 'UNSELECTED',
-        priority,
-        finalUrgency,
-        finalCondition,
-        sel.notes || ''
-      ].map(field => `"${String(field || '').replace(/"/g, '""')}"`).join(','); // Escape quotes and wrap in quotes
+      const getPriorityLabel = (u:string, c:string) => {
+         if (!u || !c || u === 'N/A' || c === 'N/A') return 'N/A';
+         const map:any = { 'Critical-Active': 'Priority 1', 'Emergent-Active': 'Priority 2', 'Non-Critical-Active': 'Priority 4', 'Critical-Passive': 'Priority 2', 'Emergent-Passive': 'Priority 3', 'Non-Critical-Passive': 'Priority 5', 'Critical-Inactive': 'Priority 3', 'Emergent-Inactive': 'Priority 5', 'Non-Critical-Inactive': 'Priority 6' };
+         return map[`${u}-${c}`] || 'N/A';
+      };
+
+      const row = [];
+      if (exportConfig.levels.pillar) row.push(item.pillarName);
+      if (exportConfig.levels.subCategory) row.push(item.subCatName);
+      if (exportConfig.levels.type) row.push(item.typeName);
+      row.push(item.name);
+      row.push(sel.status ? sel.status.replace('_', ' ').toUpperCase() : 'UNSELECTED');
+
+      if (exportConfig.elements.criticality) {
+          row.push(getPriorityLabel(finalUrgency, finalCondition), finalUrgency, finalCondition);
+      }
+      if (exportConfig.elements.definitions) {
+          if (exportConfig.levels.pillar) row.push(item.pillarDescription || '');
+          if (exportConfig.levels.subCategory) row.push(item.subCatDescription || '');
+          if (exportConfig.levels.type) row.push(item.typeDescription || '');
+      }
+      if (exportConfig.elements.notes) row.push(sel.notes || '');
+
+      return row.map(field => `"${String(field || '').replace(/"/g, '""')}"`).join(',');
     });
 
     const csvContent = [headers.join(','), ...rows].join('\n');
@@ -2200,7 +2392,6 @@ const ReportView: React.FC<ReportViewProps> = ({ selections, onHome, view, setVi
   const GroupedList: React.FC<{ items: Intervention[] }> = ({ items }) => {
     if (items.length === 0) return <p className="italic text-[#88888D]">None selected.</p>;
     
-    // Group by Pillar -> SubCategory
     const grouped = items.reduce((acc, item) => {
       const key = `${item.pillarName}::${item.subCatName}`;
       if (!acc[key]) acc[key] = [];
@@ -2214,18 +2405,40 @@ const ReportView: React.FC<ReportViewProps> = ({ selections, onHome, view, setVi
           const [pillar, subCat] = key.split('::');
           return (
             <div key={key} className="break-inside-avoid">
-              <h4 className="font-bold text-black border-b border-slate-200 pb-1 mb-3">{pillar} - {subCat}</h4>
+              <h4 className="font-bold text-black border-b border-slate-200 pb-1 mb-3">
+                  {exportConfig.levels.pillar && <span className="mr-2">{pillar}</span>} 
+                  {exportConfig.levels.pillar && exportConfig.levels.subCategory && <span className="text-slate-400 mr-2">/</span>}
+                  {exportConfig.levels.subCategory && <span>{subCat}</span>}
+              </h4>
+              
+              {exportConfig.elements.definitions && (
+                  <div className="mb-3 text-xs text-slate-500 italic">
+                      {exportConfig.levels.pillar && <div><strong>Pillar:</strong> {groupItems[0].pillarDescription}</div>}
+                      {exportConfig.levels.subCategory && <div><strong>Sub-Category:</strong> {groupItems[0].subCatDescription}</div>}
+                  </div>
+              )}
+
               <ul className="list-disc pl-5 space-y-4">
                 {groupItems.map(item => {
-                  const urgency = selections[item.id]?.urgency || item.urgency;
-                  const condition = selections[item.id]?.condition || item.condition;
+                  const sel = selections[item.id] || {};
+                  const urgency = sel.urgency || item.urgency;
+                  const condition = sel.condition || item.condition;
+                  
+                   const getPriorityLabel = (u:string, c:string) => {
+                        if (!u || !c || u === 'N/A' || c === 'N/A') return null;
+                        const map:any = { 'Critical-Active': 'Priority 1', 'Emergent-Active': 'Priority 2', 'Non-Critical-Active': 'Priority 4', 'Critical-Passive': 'Priority 2', 'Emergent-Passive': 'Priority 3', 'Non-Critical-Passive': 'Priority 5', 'Critical-Inactive': 'Priority 3', 'Emergent-Inactive': 'Priority 5', 'Non-Critical-Inactive': 'Priority 6' };
+                        return map[`${u}-${c}`];
+                   };
                   const priority = getPriorityLabel(urgency, condition);
 
                   return (
                     <li key={item.id} className="text-sm text-black">
                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1">
-                        <span className="font-medium text-base">{item.name}</span>
-                        {priority && (
+                        <span className="font-medium text-base">
+                            {exportConfig.levels.type && <span className="text-slate-500 font-normal mr-2">[{item.typeName}]</span>}
+                            {item.name}
+                        </span>
+                        {exportConfig.elements.criticality && priority && (
                           <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border shrink-0 ${
                             priority.includes('Priority 1') ? 'bg-[#A4343A]/10 text-[#A4343A] border-[#A4343A]/20' :
                             priority.includes('Priority 2') ? 'bg-[#E55025]/10 text-[#E55025] border-[#E55025]/20' :
@@ -2236,7 +2449,7 @@ const ReportView: React.FC<ReportViewProps> = ({ selections, onHome, view, setVi
                         )}
                       </div>
                       
-                      {(urgency !== 'N/A' && condition !== 'N/A') && (
+                      {exportConfig.elements.criticality && (urgency !== 'N/A' && condition !== 'N/A') && (
                         <div className="text-xs text-[#88888D] mt-1 flex flex-wrap gap-x-4 gap-y-1">
                           <span className="flex items-center gap-1 font-medium text-black">
                             Urgency: <span className="font-normal text-[#88888D]">{urgency}</span>
@@ -2247,7 +2460,7 @@ const ReportView: React.FC<ReportViewProps> = ({ selections, onHome, view, setVi
                         </div>
                       )}
 
-                      {selections[item.id].notes && (
+                      {exportConfig.elements.notes && selections[item.id]?.notes && (
                         <div className="mt-1.5 bg-[#FFD100]/20 p-2 rounded border border-[#FFD100]/40 text-xs italic text-black">
                           <strong>Note:</strong> {selections[item.id].notes}
                         </div>
@@ -2266,6 +2479,13 @@ const ReportView: React.FC<ReportViewProps> = ({ selections, onHome, view, setVi
   return (
     <div className="flex h-screen bg-slate-50">
         <ExportSidebar onHome={onHome} />
+        <ExportModal 
+            isOpen={isExportModalOpen} 
+            onClose={() => setIsExportModalOpen(false)} 
+            config={exportConfig}
+            onConfigChange={setExportConfig}
+            onExport={handleExport}
+        />
         
         <div className="flex-1 flex flex-col overflow-hidden">
             <TopNav view={view} setView={setView} />
@@ -2276,15 +2496,12 @@ const ReportView: React.FC<ReportViewProps> = ({ selections, onHome, view, setVi
                         <h2 className="text-3xl font-bold text-black">Export Activities</h2>
                         <p className="text-[#88888D]">Review your selections and export your policy manual.</p>
                         </div>
-                        <div className="flex gap-3">
-                        <button onClick={downloadCSV} className="flex items-center gap-2 px-4 py-2 bg-[#3AA047] text-white rounded hover:bg-[#3AA047]/80 shadow-sm transition-colors">
-                            <FileSpreadsheet size={18} /> Export CSV
-                        </button>
-                        <button onClick={copyToClipboard} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded hover:bg-slate-50 shadow-sm text-black">
-                            <Copy size={18} /> Copy Text
-                        </button>
-                        <button onClick={() => window.print()} className="flex items-center gap-2 px-4 py-2 bg-[#0099CC] text-white rounded hover:bg-[#0099CC]/80 shadow-sm">
-                            <Printer size={18} /> Print / Save PDF
+                        <div>
+                        <button 
+                            onClick={() => setIsExportModalOpen(true)} 
+                            className="flex items-center gap-2 px-6 py-3 bg-[#0099CC] text-white rounded-lg hover:bg-[#0099CC]/80 shadow-md transition-all font-bold"
+                        >
+                            <Settings size={20} /> Export Options
                         </button>
                         </div>
                     </div>
