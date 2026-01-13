@@ -1401,6 +1401,10 @@ interface LearnViewProps {
 const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome, view, setView }) => {
   const [step, setStep] = useState(0);
   
+  // Separate residential and community pillars for display
+  const residentialPillars = TAXONOMY_DATA.filter(p => p.id !== 'p4');
+  const communityPillars = TAXONOMY_DATA.filter(p => p.id === 'p4');
+
   const steps = [
     {
       title: "The Four Pillars",
@@ -1470,111 +1474,63 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome, view, setView
             <h3 className="text-xl font-bold text-black mb-4 border-b border-slate-200 pb-2">A. Residential Unit Sub-Categories</h3>
             <p className="text-sm text-[#88888D] mb-6">Each sub-category is assigned a default Urgency and Condition State to help prioritization.</p>
             
-            {/* Dwelling Safety */}
-            <div className="mb-8">
-              <h4 className="font-bold text-[#A4343A] mb-3 flex items-center gap-2"><Shield size={20}/> Dwelling Safety</h4>
-              <div className="grid gap-4">
-                <div className="bg-white p-5 rounded-lg border-l-4 border-[#A4343A] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Structural Components</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                        <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
-                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Restores the home's essential structural integrity to meet minimum building safety standards by addressing active, critical issues that could lead to immediate failure or unsafe living conditions.</p>
-                </div>
+            {residentialPillars.map(pillar => (
+              <div key={pillar.id} className="mb-8">
+                <h4 className={`font-bold ${pillar.color} mb-3 flex items-center gap-2`}>
+                  <pillar.icon size={20}/> {pillar.name}
+                </h4>
+                <div className="grid gap-4">
+                  {pillar.subCategories.map(sc => {
+                    // Determine default tags based on pillar or subcategory name/content if needed, 
+                    // or hardcode specific logic for display if it varies significantly from data.
+                    // For now, we will infer a representative tag from the first item if available, or static values.
+                    // In a real app, these 'default' properties might be on the SC object itself.
+                    // Here we maintain the visual style requested.
+                    
+                    let urgencyTag = "Critical";
+                    let conditionTag = "Active";
+                    let borderColor = "border-[#A4343A]";
+                    let urgencyColor = "bg-[#A4343A]/10 text-[#A4343A]";
 
-                <div className="bg-white p-5 rounded-lg border-l-4 border-[#A4343A] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Essential Home Systems (EHS)</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                        <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
-                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Addresses urgent, active failures in essential operational systems (e.g., HVAC, electrical, plumbing) necessary for maintaining safety, habitability, and basic home functionality.</p>
-                </div>
+                    // Simple logic to match the requested visual style based on Pillar/SC
+                    if (pillar.name === 'Occupant Health' && sc.name.includes('Non-Critical')) {
+                        urgencyTag = "Non-Critical";
+                        borderColor = "border-[#FFD100]";
+                        urgencyColor = "bg-[#FFD100]/20 text-[#E55025]";
+                    } else if (pillar.name === 'Dwelling Safety' && sc.name.includes('Deferred')) {
+                        urgencyTag = "Emergent";
+                        borderColor = "border-[#E55025]";
+                        urgencyColor = "bg-[#E55025]/10 text-[#E55025]";
+                    } else if (pillar.name === 'Home Performance') {
+                        if (sc.name.includes('Utilities')) {
+                             urgencyTag = "Non-Critical";
+                             conditionTag = "Passive";
+                             borderColor = "border-[#FFD100]";
+                             urgencyColor = "bg-[#FFD100]/20 text-[#E55025]";
+                        } else {
+                             urgencyTag = "Emergent";
+                             conditionTag = "Passive";
+                             borderColor = "border-[#E55025]";
+                             urgencyColor = "bg-[#E55025]/10 text-[#E55025]";
+                        }
+                    }
 
-                <div className="bg-white p-5 rounded-lg border-l-4 border-[#E55025] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Home Systems Maintenance (HSM)</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                        <span className="px-2 py-0.5 bg-[#E55025]/10 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Emergent</span>
-                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Focuses on visible, active issues that are non-critical but need addressing to prevent deterioration into critical problems, maintaining long-term home stability.</p>
+                    return (
+                      <div key={sc.id} className={`bg-white p-5 rounded-lg border-l-4 ${borderColor} shadow-sm`}>
+                        <div className="flex justify-between items-start mb-2">
+                          <span className="font-bold text-black text-lg">{sc.name}</span>
+                          <div className="flex gap-2 shrink-0 ml-2">
+                              <span className={`px-2 py-0.5 ${urgencyColor} text-xs rounded font-bold uppercase tracking-wide`}>{urgencyTag}</span>
+                              <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">{conditionTag}</span>
+                          </div>
+                        </div>
+                        <p className="text-sm text-[#88888D] leading-relaxed">{sc.description}</p>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-            </div>
-
-            {/* Occupant Health */}
-            <div className="mb-8">
-              <h4 className="font-bold text-[#E55025] mb-3 flex items-center gap-2"><Heart size={20}/> Occupant Health</h4>
-              <div className="grid gap-4">
-                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#A4343A] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Environmental Hazards Controls</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                        <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
-                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Targets active environmental and architectural hazards directly impacting health and safety, requiring immediate attention to ensure healthy living conditions.</p>
-                </div>
-
-                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#A4343A] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Critical Accessibility / Fall Prevention</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                        <span className="px-2 py-0.5 bg-[#A4343A]/10 text-[#A4343A] text-xs rounded font-bold uppercase tracking-wide">Critical</span>
-                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Provides essential modifications for individuals with mobility challenges, addressing active, emergent needs in key areas like ingress/egress, bathing, and movement to ensure safety and independence.</p>
-                </div>
-
-                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#FFD100] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Non-Critical Accessibility / Aging in Place</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                        <span className="px-2 py-0.5 bg-[#FFD100]/20 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Non-Critical</span>
-                        <span className="px-2 py-0.5 bg-slate-200 text-black text-xs rounded font-bold uppercase tracking-wide">Active</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Includes active, non-critical interventions that support daily living and independence for aging residents, ensuring accessibility and convenience while addressing non-urgent needs.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Home Performance */}
-             <div className="mb-8">
-              <h4 className="font-bold text-[#0099CC] mb-3 flex items-center gap-2"><Zap size={20}/> Home Performance</h4>
-              <div className="grid gap-4">
-                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#E55025] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Disaster / Security Readiness</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                        <span className="px-2 py-0.5 bg-[#E55025]/10 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Emergent</span>
-                        <span className="px-2 py-0.5 bg-slate-200 text-[#88888D] text-xs rounded font-bold uppercase tracking-wide">Passive</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Focuses on active, emergent interventions that prepare homes for disasters or enhance security, ensuring residents safety and resilience during emergencies.</p>
-                </div>
-
-                 <div className="bg-white p-5 rounded-lg border-l-4 border-[#FFD100] shadow-sm">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-bold text-black text-lg">Home Utilities Performance</span>
-                    <div className="flex gap-2 shrink-0 ml-2">
-                        <span className="px-2 py-0.5 bg-[#FFD100]/20 text-[#E55025] text-xs rounded font-bold uppercase tracking-wide">Non-Critical</span>
-                        <span className="px-2 py-0.5 bg-slate-200 text-[#88888D] text-xs rounded font-bold uppercase tracking-wide">Passive</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Addresses passive, non-critical upgrades and maintenance aimed at improving energy efficiency, water conservation, and overall utility management, optimizing home performance without urgent risks.</p>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
 
           <div>
@@ -1584,23 +1540,21 @@ const LearnView: React.FC<LearnViewProps> = ({ onComplete, onHome, view, setView
               <span><strong>Note:</strong> Criticality currently does not apply for Community Repair sub-categories.</span>
             </p>
             
-            <div className="mb-6">
-               <h4 className="font-bold text-[#3AA047] mb-3 flex items-center gap-2"><Users size={20}/> Community Repair</h4>
-               <div className="grid gap-4">
-                <div className="bg-white p-5 rounded-lg border-l-4 border-[#3AA047] shadow-sm">
-                  <span className="font-bold text-black block mb-2 text-lg">Community / Nonprofit Building Repair</span>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Repairs and improvements to all community and nonprofit buildings that stabilize these buildings so that they may continue to serve the community.</p>
-                </div>
-                <div className="bg-white p-5 rounded-lg border-l-4 border-[#3AA047] shadow-sm">
-                  <span className="font-bold text-black block mb-2 text-lg">Community Energy & Performance</span>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Repairs and improvements to all community and nonprofit buildings that decrease utility consumption and/or increase climate resilience.</p>
-                </div>
-                <div className="bg-white p-5 rounded-lg border-l-4 border-[#3AA047] shadow-sm">
-                  <span className="font-bold text-black block mb-2 text-lg">Public Space Improvements</span>
-                  <p className="text-sm text-[#88888D] leading-relaxed">Non-building repairs and improvements that improve community space conditions.</p>
-                </div>
-               </div>
-            </div>
+            {communityPillars.map(pillar => (
+              <div key={pillar.id} className="mb-6">
+                 <h4 className={`font-bold ${pillar.color} mb-3 flex items-center gap-2`}>
+                   <pillar.icon size={20}/> {pillar.name}
+                 </h4>
+                 <div className="grid gap-4">
+                   {pillar.subCategories.map(sc => (
+                     <div key={sc.id} className={`bg-white p-5 rounded-lg border-l-4 ${pillar.color.replace('text', 'border')} shadow-sm`}>
+                       <span className="font-bold text-black block mb-2 text-lg">{sc.name}</span>
+                       <p className="text-sm text-[#88888D] leading-relaxed">{sc.description}</p>
+                     </div>
+                   ))}
+                 </div>
+              </div>
+            ))}
           </div>
         </div>
       )
