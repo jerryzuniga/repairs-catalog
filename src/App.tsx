@@ -26,9 +26,8 @@ import {
   Ban,
   Hammer,
   Circle,
-  FileSpreadsheet,
   Settings,
-  FileImage
+  Image as ImageIcon
 } from 'lucide-react';
 
 // --- Types & Interfaces ---
@@ -1082,7 +1081,7 @@ const LearnSidebar: React.FC<LearnSidebarProps> = ({ currentStep, steps, onStepC
 
       <div className="p-4 bg-slate-50 border-t border-slate-200">
         <button 
-          onClick={() => window.open('https://github.com/jerryzuniga/repairs-catalog/blob/63618948d9784c8b8a88b30769ecb55d4ed99ca5/public/CatalogBuilder-UserGuide.pdf', '_blank')}
+          onClick={() => window.open('https://github.com/jerryzuniga/repairs-catalog/blob/63618948d9784c8b8a88b30769ecb55d4ed99ca5/public/CatalogBuilder-UserGuide.pdf?raw=true', '_blank')}
           className="w-full flex items-center justify-center gap-2 px-4 py-2 mb-2 bg-white border border-slate-300 rounded-lg text-black hover:bg-slate-100 transition-colors shadow-sm text-sm"
         >
           <BookOpen size={16} /> Download Guide
@@ -1094,7 +1093,7 @@ const LearnSidebar: React.FC<LearnSidebarProps> = ({ currentStep, steps, onStepC
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.2.5.1
+          Version 1.2.5.2
         </div>
       </div>
     </div>
@@ -1125,7 +1124,7 @@ const ExportSidebar: React.FC<ExportSidebarProps> = ({ onHome }) => {
 
       <div className="p-4 bg-slate-50 border-t border-slate-200">
         <button 
-          onClick={() => window.open('https://github.com/jerryzuniga/repairs-catalog/blob/63618948d9784c8b8a88b30769ecb55d4ed99ca5/public/CatalogBuilder-UserGuide.pdf', '_blank')}
+          onClick={() => window.open('https://github.com/jerryzuniga/repairs-catalog/blob/63618948d9784c8b8a88b30769ecb55d4ed99ca5/public/CatalogBuilder-UserGuide.pdf?raw=true', '_blank')}
           className="w-full flex items-center justify-center gap-2 px-4 py-2 mb-2 bg-white border border-slate-300 rounded-lg text-black hover:bg-slate-100 transition-colors shadow-sm text-sm"
         >
           <BookOpen size={16} /> Download Guide
@@ -1137,7 +1136,7 @@ const ExportSidebar: React.FC<ExportSidebarProps> = ({ onHome }) => {
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.2.5.1
+          Version 1.2.5.2
         </div>
       </div>
     </div>
@@ -1341,7 +1340,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           })}
         </div>
         <button 
-          onClick={() => window.open('https://github.com/jerryzuniga/repairs-catalog/blob/63618948d9784c8b8a88b30769ecb55d4ed99ca5/public/CatalogBuilder-UserGuide.pdf', '_blank')}
+          onClick={() => window.open('https://github.com/jerryzuniga/repairs-catalog/blob/63618948d9784c8b8a88b30769ecb55d4ed99ca5/public/CatalogBuilder-UserGuide.pdf?raw=true', '_blank')}
           className="w-full flex items-center justify-center gap-2 px-4 py-2 mt-4 mb-2 bg-white border border-slate-300 rounded-lg text-black hover:bg-slate-100 transition-colors shadow-sm text-sm"
         >
           <BookOpen size={16} /> Download Guide
@@ -1353,7 +1352,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.2.5.1
+          Version 1.2.5.2
         </div>
       </div>
     </div>
@@ -1478,7 +1477,7 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
           
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-sm font-medium mb-6">
             <span className="flex h-2 w-2 rounded-full bg-white"></span>
-            Version 1.2.5.1 Available
+            Version 1.2.5.2 Available
           </div>
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 leading-tight">
             Standardize Your <span className="text-white">Home Repair</span> Program Offerings
@@ -2298,253 +2297,6 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
             </div>
         </div>
       </div>
-    </div>
-  );
-};
-
-// --- Report View with Export Logic ---
-
-const ReportView: React.FC<ReportViewProps> = ({ selections, onHome, view, setView }) => {
-  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [exportConfig, setExportConfig] = useState<ExportConfig>({
-    format: 'csv',
-    levels: { pillar: true, subCategory: true, type: true, activity: true },
-    elements: { definitions: true, criticality: true, notes: true }
-  });
-
-  const reportRef = useRef<HTMLDivElement>(null);
-
-  const getFilteredInterventions = (status: string) => {
-    return ALL_INTERVENTIONS.filter(i => (selections[i.id]?.status === status));
-  };
-
-  const eligibleItems = getFilteredInterventions('eligible');
-  const conditionalItems = getFilteredInterventions('conditional');
-  const notEligibleItems = getFilteredInterventions('not_eligible');
-
-  const handleExport = () => {
-    if (exportConfig.format === 'csv') {
-      downloadCSV();
-    } else if (exportConfig.format === 'pdf') {
-      setTimeout(() => window.print(), 100);
-    } else if (exportConfig.format === 'image') {
-      alert("Image export is not supported in this environment. Please use 'Print / PDF' and select 'Save as Image' in your system dialog if available.");
-    }
-    setIsExportModalOpen(false);
-  };
-
-  const downloadCSV = () => {
-    const headers = [];
-    if (exportConfig.levels.pillar) headers.push('Pillar');
-    if (exportConfig.levels.subCategory) headers.push('Sub-Category');
-    if (exportConfig.levels.type) headers.push('Type');
-    headers.push('Activity Name');
-    headers.push('Selected Status');
-    
-    if (exportConfig.elements.criticality) {
-       headers.push('Priority Label', 'Final Urgency', 'Final Condition');
-    }
-    if (exportConfig.elements.definitions) {
-        if (exportConfig.levels.pillar) headers.push('Pillar Definition');
-        if (exportConfig.levels.subCategory) headers.push('Sub-Category Definition');
-        if (exportConfig.levels.type) headers.push('Type Definition');
-    }
-    if (exportConfig.elements.notes) headers.push('Notes');
-
-    const rows = ALL_INTERVENTIONS.map(item => {
-      const sel = selections[item.id] || {};
-      const finalUrgency = sel.urgency || item.urgency;
-      const finalCondition = sel.condition || item.condition;
-      
-      const getPriorityLabel = (u:string, c:string) => {
-         if (!u || !c || u === 'N/A' || c === 'N/A') return 'N/A';
-         const map:any = { 'Critical-Active': 'Priority 1', 'Emergent-Active': 'Priority 2', 'Non-Critical-Active': 'Priority 4', 'Critical-Passive': 'Priority 2', 'Emergent-Passive': 'Priority 3', 'Non-Critical-Passive': 'Priority 5', 'Critical-Inactive': 'Priority 3', 'Emergent-Inactive': 'Priority 5', 'Non-Critical-Inactive': 'Priority 6' };
-         return map[`${u}-${c}`] || 'N/A';
-      };
-
-      const row = [];
-      if (exportConfig.levels.pillar) row.push(item.pillarName);
-      if (exportConfig.levels.subCategory) row.push(item.subCatName);
-      if (exportConfig.levels.type) row.push(item.typeName);
-      row.push(item.name);
-      row.push(sel.status ? sel.status.replace('_', ' ').toUpperCase() : 'UNSELECTED');
-
-      if (exportConfig.elements.criticality) {
-          row.push(getPriorityLabel(finalUrgency, finalCondition), finalUrgency, finalCondition);
-      }
-      if (exportConfig.elements.definitions) {
-          if (exportConfig.levels.pillar) row.push(item.pillarDescription || '');
-          if (exportConfig.levels.subCategory) row.push(item.subCatDescription || '');
-          if (exportConfig.levels.type) row.push(item.typeDescription || '');
-      }
-      if (exportConfig.elements.notes) row.push(sel.notes || '');
-
-      return row.map(field => `"${String(field || '').replace(/"/g, '""')}"`).join(',');
-    });
-
-    const csvContent = [headers.join(','), ...rows].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', `repairs_catalog_export_${new Date().toISOString().split('T')[0]}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  };
-
-  const GroupedList: React.FC<{ items: Intervention[] }> = ({ items }) => {
-    if (items.length === 0) return <p className="italic text-[#88888D]">None selected.</p>;
-    
-    const grouped = items.reduce((acc, item) => {
-      const key = `${item.pillarName}::${item.subCatName}`;
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(item);
-      return acc;
-    }, {} as { [key: string]: Intervention[] });
-
-    return (
-      <div className="space-y-6">
-        {Object.entries(grouped).map(([key, groupItems]) => {
-          const [pillar, subCat] = key.split('::');
-          return (
-            <div key={key} className="break-inside-avoid">
-              <h4 className="font-bold text-black border-b border-slate-200 pb-1 mb-3">
-                  {exportConfig.levels.pillar && <span className="mr-2">{pillar}</span>} 
-                  {exportConfig.levels.pillar && exportConfig.levels.subCategory && <span className="text-slate-400 mr-2">/</span>}
-                  {exportConfig.levels.subCategory && <span>{subCat}</span>}
-              </h4>
-              
-              {exportConfig.elements.definitions && (
-                  <div className="mb-3 text-xs text-slate-500 italic">
-                      {exportConfig.levels.pillar && <div><strong>Pillar:</strong> {groupItems[0].pillarDescription}</div>}
-                      {exportConfig.levels.subCategory && <div><strong>Sub-Category:</strong> {groupItems[0].subCatDescription}</div>}
-                  </div>
-              )}
-
-              <ul className="list-disc pl-5 space-y-4">
-                {groupItems.map(item => {
-                  const sel = selections[item.id] || {};
-                  const urgency = sel.urgency || item.urgency;
-                  const condition = sel.condition || item.condition;
-                  
-                   const getPriorityLabel = (u:string, c:string) => {
-                        if (!u || !c || u === 'N/A' || c === 'N/A') return null;
-                        const map:any = { 'Critical-Active': 'Priority 1', 'Emergent-Active': 'Priority 2', 'Non-Critical-Active': 'Priority 4', 'Critical-Passive': 'Priority 2', 'Emergent-Passive': 'Priority 3', 'Non-Critical-Passive': 'Priority 5', 'Critical-Inactive': 'Priority 3', 'Emergent-Inactive': 'Priority 5', 'Non-Critical-Inactive': 'Priority 6' };
-                        return map[`${u}-${c}`];
-                   };
-                  const priority = getPriorityLabel(urgency, condition);
-
-                  return (
-                    <li key={item.id} className="text-sm text-black">
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1">
-                        <span className="font-medium text-base">
-                            {exportConfig.levels.type && <span className="text-slate-500 font-normal mr-2">[{item.typeName}]</span>}
-                            {item.name}
-                        </span>
-                        {exportConfig.elements.criticality && priority && (
-                          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border shrink-0 ${
-                            priority.includes('Priority 1') ? 'bg-[#A4343A]/10 text-[#A4343A] border-[#A4343A]/20' :
-                            priority.includes('Priority 2') ? 'bg-[#E55025]/10 text-[#E55025] border-[#E55025]/20' :
-                            'bg-slate-100 text-[#88888D] border-slate-200'
-                          }`}>
-                            {priority}
-                          </span>
-                        )}
-                      </div>
-                      
-                      {exportConfig.elements.criticality && (urgency !== 'N/A' && condition !== 'N/A') && (
-                        <div className="text-xs text-[#88888D] mt-1 flex flex-wrap gap-x-4 gap-y-1">
-                          <span className="flex items-center gap-1 font-medium text-black">
-                            Urgency: <span className="font-normal text-[#88888D]">{urgency}</span>
-                          </span>
-                          <span className="flex items-center gap-1 font-medium text-black">
-                            Condition: <span className="font-normal text-[#88888D]">{condition}</span>
-                          </span>
-                        </div>
-                      )}
-
-                      {exportConfig.elements.notes && selections[item.id]?.notes && (
-                        <div className="mt-1.5 bg-[#FFD100]/20 p-2 rounded border border-[#FFD100]/40 text-xs italic text-black">
-                          <strong>Note:</strong> {selections[item.id].notes}
-                        </div>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
-
-  return (
-    <div className="flex h-screen bg-slate-50">
-        <ExportSidebar onHome={onHome} />
-        <ExportModal 
-            isOpen={isExportModalOpen} 
-            onClose={() => setIsExportModalOpen(false)} 
-            config={exportConfig}
-            onConfigChange={setExportConfig}
-            onExport={handleExport}
-        />
-        
-        <div className="flex-1 flex flex-col overflow-hidden">
-            <TopNav view={view} setView={setView} />
-            <div className="flex-1 overflow-y-auto bg-white p-8">
-                <div className="max-w-4xl mx-auto">
-                    <div className="flex justify-between items-center mb-8 print:hidden">
-                        <div>
-                        <h2 className="text-3xl font-bold text-black">Export Activities</h2>
-                        <p className="text-[#88888D]">Review your selections and export your policy manual.</p>
-                        </div>
-                        <div>
-                        <button 
-                            onClick={() => setIsExportModalOpen(true)} 
-                            className="flex items-center gap-2 px-6 py-3 bg-[#0099CC] text-white rounded-lg hover:bg-[#0099CC]/80 shadow-md transition-all font-bold"
-                        >
-                            <Settings size={20} /> Export Options
-                        </button>
-                        </div>
-                    </div>
-
-                    <div ref={reportRef} className="bg-white p-12 shadow-lg border border-slate-200 min-h-[1000px] print:shadow-none print:border-none print:p-0">
-                        <div className="text-center border-b-2 border-black pb-6 mb-8">
-                        <h1 className="text-3xl font-bold uppercase tracking-wide text-black">Appendix A: Construction Activities</h1>
-                        <p className="text-[#88888D] mt-2">Generated via Repairs Catalog Builder</p>
-                        <p className="text-sm text-[#88888D] mt-1">{new Date().toLocaleDateString()}</p>
-                        </div>
-
-                        <div className="mb-8">
-                        <h3 className="text-xl font-bold text-black bg-slate-100 p-2 mb-4 border-l-4 border-[#3AA047]">1. Eligible Repairs</h3>
-                        <p className="mb-4 text-sm text-[#88888D]">The following activities have been approved for program funding and execution, subject to standard feasibility assessments.</p>
-                        <GroupedList items={eligibleItems} />
-                        </div>
-
-                        <div className="mb-8">
-                        <h3 className="text-xl font-bold text-black bg-slate-100 p-2 mb-4 border-l-4 border-[#FFD100]">2. Conditional Repairs</h3>
-                        <p className="mb-4 text-sm text-[#88888D]">The following activities are eligible only when specific conditions are met (see notes).</p>
-                        <GroupedList items={conditionalItems} />
-                        </div>
-
-                        <div className="mb-8">
-                        <h3 className="text-xl font-bold text-black bg-slate-100 p-2 mb-4 border-l-4 border-[#A4343A]">3. Non-Eligible Activities</h3>
-                        <p className="mb-4 text-sm text-[#88888D]">The following activities are strictly outside the current program scope.</p>
-                        <GroupedList items={notEligibleItems} />
-                        </div>
-
-                        <div className="mt-12 pt-8 border-t border-slate-200 text-center text-xs text-[#88888D]">
-                        <p>End of Policy Section</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
   );
 };
