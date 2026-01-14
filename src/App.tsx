@@ -805,6 +805,7 @@ const Branding = () => (
   </div>
 );
 
+// Define Interface before usage
 interface StatusBadgeProps {
   status?: string;
 }
@@ -1081,7 +1082,7 @@ const LearnSidebar: React.FC<LearnSidebarProps> = ({ currentStep, steps, onStepC
 
       <div className="p-4 bg-slate-50 border-t border-slate-200">
         <button 
-          onClick={() => window.open('#', '_blank')}
+          onClick={() => window.open('https://github.com/jerryzuniga/repairs-catalog/blob/63618948d9784c8b8a88b30769ecb55d4ed99ca5/public/CatalogBuilder-UserGuide.pdf', '_blank')}
           className="w-full flex items-center justify-center gap-2 px-4 py-2 mb-2 bg-white border border-slate-300 rounded-lg text-black hover:bg-slate-100 transition-colors shadow-sm text-sm"
         >
           <BookOpen size={16} /> Download Guide
@@ -1124,7 +1125,7 @@ const ExportSidebar: React.FC<ExportSidebarProps> = ({ onHome }) => {
 
       <div className="p-4 bg-slate-50 border-t border-slate-200">
         <button 
-          onClick={() => window.open('#', '_blank')}
+          onClick={() => window.open('https://github.com/jerryzuniga/repairs-catalog/blob/63618948d9784c8b8a88b30769ecb55d4ed99ca5/public/CatalogBuilder-UserGuide.pdf', '_blank')}
           className="w-full flex items-center justify-center gap-2 px-4 py-2 mb-2 bg-white border border-slate-300 rounded-lg text-black hover:bg-slate-100 transition-colors shadow-sm text-sm"
         >
           <BookOpen size={16} /> Download Guide
@@ -1340,7 +1341,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           })}
         </div>
         <button 
-          onClick={() => window.open('#', '_blank')}
+          onClick={() => window.open('https://github.com/jerryzuniga/repairs-catalog/blob/63618948d9784c8b8a88b30769ecb55d4ed99ca5/public/CatalogBuilder-UserGuide.pdf', '_blank')}
           className="w-full flex items-center justify-center gap-2 px-4 py-2 mt-4 mb-2 bg-white border border-slate-300 rounded-lg text-black hover:bg-slate-100 transition-colors shadow-sm text-sm"
         >
           <BookOpen size={16} /> Download Guide
