@@ -27,7 +27,9 @@ import {
   Hammer,
   Circle,
   Settings,
-  Image as ImageIcon
+  Image as ImageIcon,
+  FileSpreadsheet,
+  FileImage
 } from 'lucide-react';
 
 // --- Types & Interfaces ---
