@@ -1093,7 +1093,7 @@ const LearnSidebar: React.FC<LearnSidebarProps> = ({ currentStep, steps, onStepC
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.2.5.2
+          Version 1.2.5.3
         </div>
       </div>
     </div>
@@ -1136,7 +1136,7 @@ const ExportSidebar: React.FC<ExportSidebarProps> = ({ onHome }) => {
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.2.5.2
+          Version 1.2.5.3
         </div>
       </div>
     </div>
@@ -1156,6 +1156,8 @@ interface SidebarProps {
   onHome: () => void;
   showDefinitions: boolean;
   onToggleDefinitions: () => void;
+  showCriticalOnly: boolean;
+  onToggleCriticalOnly: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ 
@@ -1170,7 +1172,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   onStatusFilterChange, 
   onHome, 
   showDefinitions, 
-  onToggleDefinitions 
+  onToggleDefinitions,
+  showCriticalOnly,
+  onToggleCriticalOnly
 }) => {
   const stats = useMemo(() => {
     let eligible = 0, notEligible = 0, conditional = 0, na = 0;
@@ -1232,7 +1236,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Definitions Toggle */}
-        <div className="px-3 mb-4">
+        <div className="px-3 mb-2">
              <div className="flex items-center justify-between bg-slate-100 p-2 rounded-lg border border-slate-200">
                 <span className="text-xs font-medium text-slate-700">Show Definitions</span>
                 <button
@@ -1241,6 +1245,21 @@ const Sidebar: React.FC<SidebarProps> = ({
                 >
                     <span
                         className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${showDefinitions ? 'translate-x-4' : 'translate-x-1'}`}
+                    />
+                </button>
+            </div>
+        </div>
+
+        {/* Critical Only Toggle */}
+        <div className="px-3 mb-4">
+             <div className="flex items-center justify-between bg-slate-100 p-2 rounded-lg border border-slate-200">
+                <span className="text-xs font-medium text-slate-700">Critical Only</span>
+                <button
+                    onClick={onToggleCriticalOnly}
+                    className={`relative inline-flex h-4 w-8 items-center rounded-full transition-colors focus:outline-none ${showCriticalOnly ? 'bg-[#A4343A]' : 'bg-slate-300'}`}
+                >
+                    <span
+                        className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${showCriticalOnly ? 'translate-x-4' : 'translate-x-1'}`}
                     />
                 </button>
             </div>
@@ -1352,7 +1371,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <Home size={16} /> Back to Home
         </button>
         <div className="mt-4 text-center text-xs text-[#88888D]">
-          Version 1.2.5.2
+          Version 1.2.5.3
         </div>
       </div>
     </div>
@@ -1477,7 +1496,7 @@ const LandingView: React.FC<LandingViewProps> = ({ onStart, onLearn }) => (
           
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-sm font-medium mb-6">
             <span className="flex h-2 w-2 rounded-full bg-white"></span>
-            Version 1.2.5.2 Available
+            Version 1.2.5.3 Available
           </div>
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 leading-tight">
             Standardize Your <span className="text-white">Home Repair</span> Program Offerings
@@ -2007,6 +2026,7 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
   const [activeType, setActiveType] = useState("all");
   const [activeStatusFilter, setActiveStatusFilter] = useState<string | null>(null);
   const [showDefinitions, setShowDefinitions] = useState(true);
+  const [showCriticalOnly, setShowCriticalOnly] = useState(false);
 
   const filteredData = useMemo(() => {
     let data = TAXONOMY_DATA;
@@ -2037,8 +2057,15 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
                 statusMatch = status === activeStatusFilter;
               }
             }
+
+            // Critical Only filter
+            let criticalMatch = true;
+            if (showCriticalOnly) {
+              const currentUrgency = selections[i.id]?.urgency || i.urgency;
+              criticalMatch = currentUrgency === 'Critical';
+            }
             
-            return textMatch && statusMatch;
+            return textMatch && statusMatch && criticalMatch;
           })
         })).filter(t => {
            // Type filter logic
@@ -2053,7 +2080,7 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
           return subCatMatch && hasTypes;
       })
     })).filter(p => p.subCategories.length > 0);
-  }, [searchTerm, activePillar, activeSubCat, activeType, activeStatusFilter, selections]);
+  }, [searchTerm, activePillar, activeSubCat, activeType, activeStatusFilter, selections, showCriticalOnly]);
 
   return (
     <div className="flex h-screen bg-slate-50">
@@ -2070,6 +2097,8 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
         onHome={onHome}
         showDefinitions={showDefinitions}
         onToggleDefinitions={() => setShowDefinitions(!showDefinitions)}
+        showCriticalOnly={showCriticalOnly}
+        onToggleCriticalOnly={() => setShowCriticalOnly(!showCriticalOnly)}
       />
 
       {/* Main Content */}
