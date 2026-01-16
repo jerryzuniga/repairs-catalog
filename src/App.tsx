@@ -27,7 +27,8 @@ import {
   Hammer,
   Circle,
   Settings,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Copy
 } from 'lucide-react';
 
 // --- Types & Interfaces ---
@@ -86,7 +87,7 @@ interface SelectionsMap {
 }
 
 interface ExportConfig {
-  format: 'csv' | 'pdf' | 'image';
+  format: 'csv' | 'pdf' | 'text';
   levels: {
     pillar: boolean;
     subCategory: boolean;
@@ -866,11 +867,11 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, config, onCo
                   <span className="font-bold text-sm">Print / PDF</span>
                 </button>
                 <button 
-                   onClick={() => onConfigChange({ ...config, format: 'image' })}
-                   className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all ${config.format === 'image' ? 'border-[#3AA047] bg-[#3AA047]/5 text-[#3AA047]' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-600'}`}
+                   onClick={() => onConfigChange({ ...config, format: 'text' })}
+                   className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all ${config.format === 'text' ? 'border-slate-600 bg-slate-100 text-slate-800' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-600'}`}
                 >
-                  <ImageIcon size={32} className="mb-2" />
-                  <span className="font-bold text-sm">Image</span>
+                  <Copy size={32} className="mb-2" />
+                  <span className="font-bold text-sm">Copy Text</span>
                 </button>
              </div>
           </div>
@@ -914,10 +915,10 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, config, onCo
                   <input 
                     type="checkbox" 
                     checked={config.levels.activity}
-                    disabled
-                    className="w-5 h-5 text-slate-400 rounded bg-slate-100 cursor-not-allowed"
+                    onChange={(e) => onConfigChange({ ...config, levels: { ...config.levels, activity: e.target.checked } })}
+                    className="w-5 h-5 text-[#0099CC] rounded focus:ring-[#0099CC]"
                   />
-                  <span className="font-medium text-slate-400">Activities (Always On)</span>
+                  <span className="font-medium text-slate-700">Activities</span>
                 </label>
               </div>
             </div>
@@ -972,7 +973,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, config, onCo
             onClick={onExport}
             className="px-8 py-2.5 rounded-lg font-bold text-white bg-[#0099CC] hover:bg-[#0099CC]/90 shadow-lg shadow-[#0099CC]/20 transition-all flex items-center gap-2"
           >
-            <Download size={18} /> Export Data
+            {config.format === 'text' ? <Copy size={18} /> : <Download size={18} />} 
+            {config.format === 'text' ? 'Copy Text' : 'Export Data'}
           </button>
         </div>
       </div>
@@ -2350,13 +2352,78 @@ const ReportView: React.FC<ReportViewProps> = ({ selections, onHome, view, setVi
   const conditionalItems = getFilteredInterventions('conditional');
   const notEligibleItems = getFilteredInterventions('not_eligible');
 
+  const copyToClipboard = () => {
+    let text = `APPENDIX A: CONSTRUCTION ACTIVITIES\nGenerated via Repairs Catalog Builder\n${new Date().toLocaleDateString()}\n\n`;
+
+    const processList = (title: string, items: Intervention[]) => {
+      if (items.length === 0) return;
+      text += `${title}\n${'-'.repeat(title.length)}\n`;
+
+      const grouped = items.reduce((acc, item) => {
+        const key = `${item.pillarName}::${item.subCatName}`;
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(item);
+        return acc;
+      }, {} as { [key: string]: Intervention[] });
+
+      Object.entries(grouped).forEach(([key, groupItems]) => {
+        const [pillar, subCat] = key.split('::');
+        
+        let header = "";
+        if (exportConfig.levels.pillar) header += pillar;
+        if (exportConfig.levels.pillar && exportConfig.levels.subCategory) header += " / ";
+        if (exportConfig.levels.subCategory) header += subCat;
+        
+        if (header) text += `\n${header}\n`;
+
+        if (exportConfig.elements.definitions) {
+           if (exportConfig.levels.pillar) text += `(Pillar: ${groupItems[0].pillarDescription})\n`;
+           if (exportConfig.levels.subCategory) text += `(SubCat: ${groupItems[0].subCatDescription})\n`;
+        }
+
+        if (exportConfig.levels.activity) {
+            groupItems.forEach(item => {
+                const sel = selections[item.id] || {};
+                const urgency = sel.urgency || item.urgency;
+                const condition = sel.condition || item.condition;
+                
+                let line = "";
+                if (exportConfig.levels.type) line += `[${item.typeName}] `;
+                line += `- ${item.name}`;
+                text += `${line}\n`;
+
+                if (exportConfig.elements.criticality && urgency !== 'N/A' && condition !== 'N/A') {
+                    text += `  Urgency: ${urgency}, Condition: ${condition}\n`;
+                }
+                if (exportConfig.elements.notes && sel.notes) {
+                    text += `  Note: ${sel.notes}\n`;
+                }
+            });
+        }
+      });
+      text += "\n\n";
+    };
+
+    processList("1. ELIGIBLE REPAIRS", eligibleItems);
+    processList("2. CONDITIONAL REPAIRS", conditionalItems);
+    processList("3. NON-ELIGIBLE ACTIVITIES", notEligibleItems);
+
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    alert("Policy manual copied to clipboard!");
+  };
+
   const handleExport = () => {
     if (exportConfig.format === 'csv') {
       downloadCSV();
     } else if (exportConfig.format === 'pdf') {
       setTimeout(() => window.print(), 100);
-    } else if (exportConfig.format === 'image') {
-      alert("Image export is not supported in this environment. Please use 'Print / PDF' and select 'Save as Image' in your system dialog if available.");
+    } else if (exportConfig.format === 'text') {
+      copyToClipboard();
     }
     setIsExportModalOpen(false);
   };
@@ -2454,7 +2521,7 @@ const ReportView: React.FC<ReportViewProps> = ({ selections, onHome, view, setVi
               )}
 
               <ul className="list-disc pl-5 space-y-4">
-                {groupItems.map(item => {
+                {exportConfig.levels.activity && groupItems.map(item => {
                   const sel = selections[item.id] || {};
                   const urgency = sel.urgency || item.urgency;
                   const condition = sel.condition || item.condition;
