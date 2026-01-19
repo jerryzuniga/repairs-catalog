@@ -27,7 +27,10 @@ import {
   Hammer,
   Circle,
   Settings,
-  Copy
+  Copy,
+  Tag,
+  Star,
+  Wrench
 } from 'lucide-react';
 
 // --- Types & Interfaces ---
@@ -48,6 +51,7 @@ interface Intervention {
   pillarDescription?: string;
   subCatDescription?: string;
   typeDescription?: string;
+  features?: string[]; // Added to support feature tags
 }
 
 interface Type {
@@ -118,6 +122,12 @@ const C_RED = 'text-[#A4343A]';
 // --- Assets ---
 const LOGO_URL = 'https://github.com/jerryzuniga/repairs-catalog/blob/fd2b835413161d9a35a156dbe830f8ecc911531f/public/catalog.png?raw=true';
 
+// --- Feature Categories Configuration ---
+const FEATURE_CATEGORIES = [
+  { id: 'top50_overall', label: 'Top 50 Overall', color: 'bg-purple-600', textColor: 'text-purple-600', short: '50' },
+  { id: 'hud_maint', label: 'HUD Maintenance', color: 'bg-slate-500', textColor: 'text-slate-500', short: 'HM' },
+];
+
 // --- Mock Data: Taxonomy Framework ---
 const TAXONOMY_DATA: Pillar[] = [
   {
@@ -136,7 +146,7 @@ const TAXONOMY_DATA: Pillar[] = [
           {
             id: 'sct1',
             name: 'Structural Flooring / Foundation',
-            description: 'Repairs that maintain the structural stability and integrity of the home’s foundation and flooring systems.',
+            description: '',
             interventions: [
               { id: 'i101', name: 'Repair/replace deteriorated floor joists', urgency: 'Critical', condition: 'Active' },
               { id: 'i102', name: 'Stabilize piers and footings', urgency: 'Critical', condition: 'Active' },
@@ -148,7 +158,7 @@ const TAXONOMY_DATA: Pillar[] = [
           {
             id: 'sct2',
             name: 'Structural Roofing',
-            description: 'Repairs or replacements necessary to maintain the basic structural integrity of the roof and prevent collapse or accelerate deterioration.',
+            description: '',
             interventions: [
               { id: 'i106', name: 'Reinforce/replace compromised trusses', urgency: 'Critical', condition: 'Active' },
               { id: 'i107', name: 'Fix sagging roof supports', urgency: 'Critical', condition: 'Active' },
@@ -160,7 +170,7 @@ const TAXONOMY_DATA: Pillar[] = [
           {
             id: 'sct3',
             name: 'Structural Walls',
-            description: 'Repairs to load-bearing and external walls required to restore basic structural integrity and prevent collapse or accelerate deterioration.',
+            description: '',
             interventions: [
               { id: 'i111', name: 'Reinforce bowing load-bearing walls', urgency: 'Critical', condition: 'Active' },
               { id: 'i112', name: 'Repair failing wall studs', urgency: 'Critical', condition: 'Active' },
@@ -171,7 +181,7 @@ const TAXONOMY_DATA: Pillar[] = [
           {
             id: 'sct4',
             name: 'Non-unit Structural Repairs',
-            description: 'Structural interventions necessary for outbuildings, retaining walls, or other non-living unit structures that are essential for the stability and safety of the property as a whole.',
+            description: '',
             interventions: [
               { id: 'i115', name: 'Stabilize retaining walls', urgency: 'Critical', condition: 'Active' },
               { id: 'i116', name: 'Repair compromised garages/sheds', urgency: 'Critical', condition: 'Active' },
@@ -188,20 +198,13 @@ const TAXONOMY_DATA: Pillar[] = [
         types: [
           {
             id: 'sct5',
-            name: 'EHS Roofing - Replacement',
-            description: 'Full replacement of roofing systems that are in critical condition, posing immediate risks such as leaks, structural damage, or compromised safety.',
+            name: 'EHS Roofing',
+            description: '',
             interventions: [
               { id: 'i119', name: 'Complete shingle replacement', urgency: 'Critical', condition: 'Active' },
               { id: 'i120', name: 'Reinstall underlayment', urgency: 'Critical', condition: 'Active' },
               { id: 'i121', name: 'Full tear-off and reroof', urgency: 'Critical', condition: 'Active' },
-              { id: 'i122', name: 'Upgrade to impact-resistant shingles', urgency: 'Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct6',
-            name: 'EHS Roofing - Repair',
-            description: 'Repairs to damaged roofing components that are essential to prevent water intrusion, structural failure, or other significant risks to the home.',
-            interventions: [
+              { id: 'i122', name: 'Upgrade to impact-resistant shingles', urgency: 'Critical', condition: 'Active' },
               { id: 'i123', name: 'Repair damaged flashing', urgency: 'Critical', condition: 'Active' },
               { id: 'i124', name: 'Fix roof valleys', urgency: 'Critical', condition: 'Active' },
               { id: 'i125', name: 'Patch missing shingles', urgency: 'Critical', condition: 'Active' },
@@ -209,18 +212,18 @@ const TAXONOMY_DATA: Pillar[] = [
             ]
           },
           {
-            id: 'sct7',
+            id: 'sct6',
             name: 'EHS Wall Systems',
-            description: 'Repair or replacement of wall components, both interior and exterior, that are critical to maintaining structural integrity, safety, and habitability.',
+            description: '',
             interventions: [
-              { id: 'i127', name: 'Replace compromised siding', urgency: 'Critical', condition: 'Active' },
+              { id: 'i127', name: 'Repair Siding / Cladding', urgency: 'Critical', condition: 'Active' },
               { id: 'i128', name: 'Minimum siding repair standards', urgency: 'Critical', condition: 'Active' }
             ]
           },
           {
-            id: 'sct8',
+            id: 'sct7',
             name: 'EHS HVAC',
-            description: 'Repairs or replacements necessary for heating, ventilation, and air conditioning systems that ensure safe indoor temperatures, proper ventilation, and air quality.',
+            description: '',
             interventions: [
               { id: 'i129', name: 'Replace inoperable furnace/AC', urgency: 'Critical', condition: 'Active' },
               { id: 'i130', name: 'Repair damaged ductwork', urgency: 'Critical', condition: 'Active' },
@@ -229,9 +232,9 @@ const TAXONOMY_DATA: Pillar[] = [
             ]
           },
           {
-            id: 'sct9',
+            id: 'sct8',
             name: 'EHS Electrical',
-            description: 'Electrical system repairs or upgrades addressing immediate safety concerns or severe deficiencies that pose risks of fire, electrocution, or system failures.',
+            description: '',
             interventions: [
               { id: 'i133', name: 'Upgrade sub-standard panels', urgency: 'Critical', condition: 'Active' },
               { id: 'i134', name: 'Rewire unsafe circuits', urgency: 'Critical', condition: 'Active' },
@@ -240,54 +243,55 @@ const TAXONOMY_DATA: Pillar[] = [
             ]
           },
           {
-            id: 'sct10',
+            id: 'sct9',
             name: 'EHS Plumbing',
-            description: 'Essential repairs to water, sewage, and gas supply systems that address active failures or risks that directly impact health and safety.',
+            description: '',
             interventions: [
-              { id: 'i137', name: 'Fix burst water pipes', urgency: 'Critical', condition: 'Active' },
-              { id: 'i138', name: 'Repair severe sewer backups', urgency: 'Critical', condition: 'Active' },
-              { id: 'i139', name: 'Address gas leaks', urgency: 'Critical', condition: 'Active' },
-              { id: 'i140', name: 'Replace corroded pipes', urgency: 'Critical', condition: 'Active' }
+              { id: 'i137', name: 'Supply Pipe Repair', urgency: 'Critical', condition: 'Active' },
+              { id: 'i138', name: 'Drain Repair', urgency: 'Critical', condition: 'Active' },
+              { id: 'i139', name: 'Sewer (Main) Repair', urgency: 'Critical', condition: 'Active' },
+              { id: 'i140', name: 'Address gas leaks', urgency: 'Critical', condition: 'Active' },
+              { id: 'i141', name: 'Replace corroded pipes', urgency: 'Critical', condition: 'Active' }
+            ]
+          },
+          {
+            id: 'sct10',
+            name: 'EHS Flooring',
+            description: '',
+            interventions: [
+              { id: 'i142', name: 'Replace rotted subfloors', urgency: 'Critical', condition: 'Active' },
+              { id: 'i143', name: 'Fix buckling floors', urgency: 'Critical', condition: 'Active' },
+              { id: 'i144', name: 'Install moisture barriers', urgency: 'Critical', condition: 'Active' }
             ]
           },
           {
             id: 'sct11',
-            name: 'EHS Flooring',
-            description: 'Repairs to floors that have become unstable, unsafe, or compromised due to issues like rot, water damage, or subfloor failure.',
+            name: 'EHS Walkways / Decks / Steps',
+            description: '',
             interventions: [
-              { id: 'i141', name: 'Replace rotted subfloors', urgency: 'Critical', condition: 'Active' },
-              { id: 'i142', name: 'Fix buckling floors', urgency: 'Critical', condition: 'Active' },
-              { id: 'i143', name: 'Install moisture barriers', urgency: 'Critical', condition: 'Active' }
+              { id: 'i145', name: 'Rebuild deteriorated steps', urgency: 'Critical', condition: 'Active' },
+              { id: 'i146', name: 'Reinforce weak deck structures', urgency: 'Critical', condition: 'Active' },
+              { id: 'i147', name: 'Replace crumbling walkways', urgency: 'Critical', condition: 'Active' }
             ]
           },
           {
             id: 'sct12',
-            name: 'EHS Walkways / Decks / Steps',
-            description: 'Repairs to exterior pathways that address safety hazards, such as instability, collapse risks, or severe trip hazards, ensuring safe movement across the property.',
+            name: 'EHS Water Heater',
+            description: '',
             interventions: [
-              { id: 'i144', name: 'Rebuild deteriorated steps', urgency: 'Critical', condition: 'Active' },
-              { id: 'i145', name: 'Reinforce weak deck structures', urgency: 'Critical', condition: 'Active' },
-              { id: 'i146', name: 'Replace crumbling walkways', urgency: 'Critical', condition: 'Active' }
+              { id: 'i148', name: 'Install new water heater', urgency: 'Critical', condition: 'Active' },
+              { id: 'i149', name: 'Replace leaking unit', urgency: 'Critical', condition: 'Active' },
+              { id: 'i150', name: 'Fix heating element', urgency: 'Critical', condition: 'Active' }
             ]
           },
           {
             id: 'sct13',
-            name: 'EHS Water Heater',
-            description: 'Replacement or repair of water heaters that are non-functional or failing, resulting in unreliable hot water supply critical for daily living.',
-            interventions: [
-              { id: 'i147', name: 'Install new water heater', urgency: 'Critical', condition: 'Active' },
-              { id: 'i148', name: 'Replace leaking unit', urgency: 'Critical', condition: 'Active' },
-              { id: 'i149', name: 'Fix heating element', urgency: 'Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct14',
             name: 'EHS Doors & Windows',
-            description: 'Repairs or replacements that address immediate safety, security, or severe weatherproofing issues, ensuring proper insulation, entry, and exit functionality.',
+            description: '',
             interventions: [
-              { id: 'i150', name: 'Replace shattered windows', urgency: 'Critical', condition: 'Active' },
-              { id: 'i151', name: 'Repair broken locks', urgency: 'Critical', condition: 'Active' },
-              { id: 'i152', name: 'Fix inoperable doors', urgency: 'Critical', condition: 'Active' }
+              { id: 'i151', name: 'Window Replacement', urgency: 'Critical', condition: 'Active' },
+              { id: 'i152', name: 'Exterior Door Replacement', urgency: 'Critical', condition: 'Active' },
+              { id: 'i153', name: 'Fix inoperable doors', urgency: 'Critical', condition: 'Active' }
             ]
           }
         ]
@@ -298,41 +302,40 @@ const TAXONOMY_DATA: Pillar[] = [
         description: 'Focuses on visible, active issues that are non-critical but need addressing to prevent deterioration into critical problems, maintaining long-term home stability.',
         types: [
           {
-            id: 'sct15',
+            id: 'sct14',
             name: 'HSM Plumbing & Water Heater',
-            description: 'Repairs addressing active, non-critical plumbing and water heater issues that display visible symptoms of disrepair and, if left unattended, could escalate into critical problems.',
+            description: '',
             interventions: [
-              { id: 'i153', name: 'Fix dripping faucets', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i154', name: 'Replace corroded anode rod', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i155', name: 'Address clogged drains', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i156', name: 'Regulate water pressure', urgency: 'Emergent', condition: 'Active' }
+              { id: 'i154', name: 'Fix dripping faucets', urgency: 'Emergent', condition: 'Active' },
+              { id: 'i155', name: 'Replace corroded anode rod', urgency: 'Emergent', condition: 'Active' },
+              { id: 'i156', name: 'Address clogged drains', urgency: 'Emergent', condition: 'Active' },
+              { id: 'i157', name: 'Regulate water pressure', urgency: 'Emergent', condition: 'Active' }
+            ]
+          },
+          {
+            id: 'sct15',
+            name: 'HSM Electrical',
+            description: '',
+            interventions: [
+              { id: 'i158', name: 'Replace worn switches/outlets', urgency: 'Emergent', condition: 'Active' },
+              { id: 'i159', name: 'Fix flickering lights', urgency: 'Emergent', condition: 'Active' },
+              { id: 'i160', name: 'Replace outdated fixtures', urgency: 'Emergent', condition: 'Active' }
             ]
           },
           {
             id: 'sct16',
-            name: 'HSM Electrical',
-            description: 'Addressing active electrical issues that present visible signs of disrepair but do not immediately threaten safety or function; these repairs prevent future critical failures.',
+            name: 'HSM Door and Window',
+            description: '',
             interventions: [
-              { id: 'i157', name: 'Replace worn switches/outlets', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i158', name: 'Fix flickering lights', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i159', name: 'Replace outdated fixtures', urgency: 'Emergent', condition: 'Active' }
+              { id: 'i161', name: 'Interior Door Replacement', urgency: 'Emergent', condition: 'Active' },
+              { id: 'i162', name: 'Re-align sagging doors', urgency: 'Emergent', condition: 'Active' },
+              { id: 'i163', name: 'Window Repair (cracks / caulking)', urgency: 'Emergent', condition: 'Active' }
             ]
           },
           {
             id: 'sct17',
-            name: 'HSM Door and Window',
-            description: 'Repairs to doors and windows showing visible signs of deterioration, such as drafts, alignment issues, or minor damage, that need attention before escalating into more serious problems.',
-            interventions: [
-              { id: 'i160', name: 'Re-align sagging doors', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i161', name: 'Seal drafty windows', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i162', name: 'Replace cracked panes', urgency: 'Emergent', condition: 'Active' },
-              { id: 'i163', name: 'Re-caulk windows', urgency: 'Emergent', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct18',
             name: 'HSM Exterior Paint',
-            description: 'Addressing visible exterior paint damage that, while not immediately threatening the home’s integrity, can lead to more significant wear if neglected.',
+            description: '',
             interventions: [
               { id: 'i164', name: 'Repaint peeling areas', urgency: 'Emergent', condition: 'Active' },
               { id: 'i165', name: 'Touch-up exposed wood', urgency: 'Emergent', condition: 'Active' },
@@ -340,18 +343,18 @@ const TAXONOMY_DATA: Pillar[] = [
             ]
           },
           {
-            id: 'sct19',
+            id: 'sct18',
             name: 'HSM Interior Paint',
-            description: 'Repairs focusing on visible interior paint damage that could worsen over time if unaddressed, such as peeling, chipping, or staining.',
+            description: '',
             interventions: [
               { id: 'i167', name: 'Repaint chipped/peeling walls', urgency: 'Emergent', condition: 'Active' },
               { id: 'i168', name: 'Cover visible stains', urgency: 'Emergent', condition: 'Active' }
             ]
           },
           {
-            id: 'sct20',
+            id: 'sct19',
             name: 'HSM Appliance',
-            description: 'Repairing or replacing appliances with visible, active issues such as diminished efficiency, malfunctioning parts, or minor damage that can lead to complete breakdowns if left unattended.',
+            description: '',
             interventions: [
               { id: 'i169', name: 'Repair refrigerator compressor', urgency: 'Emergent', condition: 'Active' },
               { id: 'i170', name: 'Replace cracked stove elements', urgency: 'Emergent', condition: 'Active' },
@@ -359,9 +362,9 @@ const TAXONOMY_DATA: Pillar[] = [
             ]
           },
           {
-            id: 'sct21',
+            id: 'sct20',
             name: 'HSM Cabinetry',
-            description: 'Repairs to cabinetry that shows signs of active deterioration, such as misalignment, wear, or minor damage that, if left unaddressed, can impact functionality or lead to more significant repair needs.',
+            description: '',
             interventions: [
               { id: 'i172', name: 'Re-align cabinet doors', urgency: 'Emergent', condition: 'Active' },
               { id: 'i173', name: 'Fix sticking drawers', urgency: 'Emergent', condition: 'Active' },
@@ -369,9 +372,9 @@ const TAXONOMY_DATA: Pillar[] = [
             ]
           },
           {
-            id: 'sct22',
+            id: 'sct21',
             name: 'HSM Flooring',
-            description: 'Addressing active flooring issues such as looseness, visible damage, or wear that, while not yet critical, can lead to safety hazards or more severe deterioration if not repaired.',
+            description: '',
             interventions: [
               { id: 'i175', name: 'Secure loose tiles/boards', urgency: 'Emergent', condition: 'Active' },
               { id: 'i176', name: 'Repair cracked grout', urgency: 'Emergent', condition: 'Active' },
@@ -379,9 +382,9 @@ const TAXONOMY_DATA: Pillar[] = [
             ]
           },
           {
-            id: 'sct23',
+            id: 'sct22',
             name: 'HSM Exterior Decks/Walkways',
-            description: 'Repairs focused on visible signs of wear or damage to exterior surfaces that, while not immediately hazardous, can worsen and create safety risks or structural issues if left untreated.',
+            description: '',
             interventions: [
               { id: 'i178', name: 'Replace rotting deck boards', urgency: 'Emergent', condition: 'Active' },
               { id: 'i179', name: 'Fix loose railings', urgency: 'Emergent', condition: 'Active' },
@@ -406,9 +409,9 @@ const TAXONOMY_DATA: Pillar[] = [
         description: 'Targets active environmental and architectural hazards directly impacting health and safety, requiring immediate attention to ensure healthy living conditions.',
         types: [
           {
-            id: 'sct24',
+            id: 'sct23',
             name: 'Respiratory Hazards',
-            description: 'Controls and interventions targeting indoor air pollutants that can harm respiratory health, ensuring safe air quality for occupants.',
+            description: '',
             interventions: [
               { id: 'i181', name: 'Ventilation controls', urgency: 'Critical', condition: 'Active' },
               { id: 'i182', name: 'Radon testing and remediation', urgency: 'Critical', condition: 'Active' },
@@ -416,9 +419,9 @@ const TAXONOMY_DATA: Pillar[] = [
             ]
           },
           {
-            id: 'sct25',
+            id: 'sct24',
             name: 'Chemical Hazards',
-            description: 'Measures that address harmful chemicals present in the home, such as lead, asbestos, and other toxic substances, ensuring safe living conditions.',
+            description: '',
             interventions: [
               { id: 'i184', name: 'Lead paint encapsulation', urgency: 'Critical', condition: 'Active' },
               { id: 'i185', name: 'Lead paint abatement (removal)', urgency: 'Critical', condition: 'Active' },
@@ -427,9 +430,9 @@ const TAXONOMY_DATA: Pillar[] = [
             ]
           },
           {
-            id: 'sct26',
+            id: 'sct25',
             name: 'Biological Hazards',
-            description: 'Controls and remediation of biological contaminants that threaten health, such as mold, pests, and bio-waste, ensuring a sanitary living environment.',
+            description: '',
             interventions: [
               { id: 'i188', name: 'Mold remediation', urgency: 'Critical', condition: 'Active' },
               { id: 'i189', name: 'Pest control', urgency: 'Critical', condition: 'Active' },
@@ -437,9 +440,9 @@ const TAXONOMY_DATA: Pillar[] = [
             ]
           },
           {
-            id: 'sct27',
+            id: 'sct26',
             name: 'Environmental Hazards - Other',
-            description: 'Controls addressing various structural or disasters not covered under more specific categories, including interventions that reduce risks from environmental conditions or structural dangers.',
+            description: '',
             interventions: [
               { id: 'i191', name: 'Hazardous tree removal', urgency: 'Critical', condition: 'Active' },
               { id: 'i192', name: 'Structural hazard removal', urgency: 'Critical', condition: 'Active' }
@@ -453,19 +456,19 @@ const TAXONOMY_DATA: Pillar[] = [
         description: 'Provides essential modifications for individuals with mobility challenges, addressing active, emergent needs in key areas like ingress/egress, bathing, and movement to ensure safety and independence.',
         types: [
           {
-            id: 'sct28',
+            id: 'sct27',
             name: 'Critical Accessibility - Ingress/Egress',
-            description: 'Systems and modifications that provide accessible entry and exit for individuals with mobility challenges, enabling easier movement across different levels of the home.',
+            description: '',
             interventions: [
-              { id: 'i193', name: 'Modular/temporary ramp system', urgency: 'Critical', condition: 'Active' },
+              { id: 'i193', name: 'Modular/temporary ramp system', urgency: 'Critical', condition: 'Active', features: ['hud_maint'] },
               { id: 'i194', name: 'Permanent integrated ramp', urgency: 'Critical', condition: 'Active' },
               { id: 'i195', name: 'Stair lifts / Platform lifts', urgency: 'Critical', condition: 'Active' }
             ]
           },
           {
-            id: 'sct29',
+            id: 'sct28',
             name: 'Critical Accessibility - Showering',
-            description: 'Modifications and equipment that improve the safety and accessibility of bathing and showering areas, especially for those with limited mobility.',
+            description: '',
             interventions: [
               { id: 'i196', name: 'Roll-in/Zero-barrier shower', urgency: 'Critical', condition: 'Active' },
               { id: 'i197', name: 'Tub cutout', urgency: 'Critical', condition: 'Active' },
@@ -473,9 +476,9 @@ const TAXONOMY_DATA: Pillar[] = [
             ]
           },
           {
-            id: 'sct30',
+            id: 'sct29',
             name: 'Critical Accessibility - Bathroom',
-            description: 'Bathroom-specific interventions that improve accessibility, focusing on fixtures, controls, and layouts that cater to individuals with physical limitations.',
+            description: '',
             interventions: [
               { id: 'i199', name: 'Pedestal/wall-mount sink', urgency: 'Critical', condition: 'Active' },
               { id: 'i200', name: 'Raised toilet/frames', urgency: 'Critical', condition: 'Active' },
@@ -483,80 +486,72 @@ const TAXONOMY_DATA: Pillar[] = [
             ]
           },
           {
-            id: 'sct31',
+            id: 'sct30',
             name: 'Fall Prevention - Grab Bars / Railings',
-            description: 'Installation of support bars and railings in critical areas to reduce fall risks and provide additional stability for those with balance or mobility challenges.',
+            description: '',
             interventions: [
-              { id: 'i202', name: 'Grab bars (all locations)', urgency: 'Critical', condition: 'Active' },
+              { id: 'i202', name: 'Grab bars (all locations / types)', urgency: 'Critical', condition: 'Active' },
               { id: 'i203', name: 'Interior stair railings', urgency: 'Critical', condition: 'Active' },
               { id: 'i204', name: 'Transfer poles', urgency: 'Critical', condition: 'Active' }
             ]
           },
           {
-            id: 'sct32',
+            id: 'sct31',
             name: 'Fall Prevention - Decks, Steps & Walkways',
-            description: 'Interventions designed to minimize fall hazards in outdoor and transitional spaces by providing safe, stable, and accessible surfaces.',
+            description: '',
             interventions: [
               { id: 'i205', name: 'Half-step systems', urgency: 'Critical', condition: 'Active' },
               { id: 'i206', name: 'Contrast step systems', urgency: 'Critical', condition: 'Active' },
-              { id: 'i207', name: 'Exterior anti-slip treatment', urgency: 'Critical', condition: 'Active' }
+              { id: 'i207', name: 'Exterior anti-slip', urgency: 'Critical', condition: 'Active' }
             ]
           }
         ]
       },
       {
         id: 'sc6',
-        name: 'Non-Critical Accessibility / Aging in Place',
+        name: 'Non-Critical Accessibility',
         description: 'Includes active, non-critical interventions that support daily living and independence for aging residents, ensuring accessibility and convenience while addressing non-urgent needs.',
         types: [
           {
-            id: 'sct33',
-            name: 'Assistive Aids',
-            description: 'Tools and devices designed to assist individuals with mobility, reaching, or daily activities that can be challenging due to aging or physical limitations.',
+            id: 'sct32',
+            name: 'Assistive Kitchen & Bath',
+            description: '',
             interventions: [
-              { id: 'i208', name: 'Reacher/grabber tools', urgency: 'Non-Critical', condition: 'Active' },
-              { id: 'i209', name: 'Walking canes', urgency: 'Non-Critical', condition: 'Active' }
+              { id: 'i208', name: 'Accessibility shelving', urgency: 'Non-Critical', condition: 'Active' },
+              { id: 'i209', name: 'Cabinet adjustments (lower/raise)', urgency: 'Non-Critical', condition: 'Active' },
+              { id: 'i210', name: 'Anti-scald protection', urgency: 'Non-Critical', condition: 'Active' },
+              { id: 'i211', name: 'Bidet (Complete / Bidet Seats)', urgency: 'Non-Critical', condition: 'Active' },
+              { id: 'i212', name: 'Shower chair / transfer bench', urgency: 'Non-Critical', condition: 'Active' }
+            ]
+          },
+          {
+            id: 'sct33',
+            name: 'Assistive Technology',
+            description: '',
+            interventions: [
+              { id: 'i213', name: 'Smart door locks', urgency: 'Non-Critical', condition: 'Active' },
+              { id: 'i214', name: 'Fall detection devices', urgency: 'Non-Critical', condition: 'Active' }
             ]
           },
           {
             id: 'sct34',
-            name: 'Assistive Kitchen & Bath',
-            description: 'Modifications or devices in kitchens and bathrooms that improve accessibility and ease of use for older adults and individuals with limited mobility.',
+            name: 'Comfort Enhancements',
+            description: '',
             interventions: [
-              { id: 'i210', name: 'Accessibility shelving', urgency: 'Non-Critical', condition: 'Active' },
-              { id: 'i211', name: 'Cabinet adjustments (lower/raise)', urgency: 'Non-Critical', condition: 'Active' },
-              { id: 'i212', name: 'Anti-scald devices', urgency: 'Non-Critical', condition: 'Active' },
-              { id: 'i213', name: 'Shower chair/transfer bench', urgency: 'Non-Critical', condition: 'Active' }
+              { id: 'i215', name: 'Ceiling fans', urgency: 'Non-Critical', condition: 'Active' },
+              { id: 'i216', name: 'Large print thermostats', urgency: 'Non-Critical', condition: 'Active' },
+              { id: 'i217', name: 'Bed risers', urgency: 'Non-Critical', condition: 'Active' },
+              { id: 'i218', name: 'Lever door knobs / grippers', urgency: 'Non-Critical', condition: 'Active' }
             ]
           },
           {
             id: 'sct35',
-            name: 'Assistive Technology',
-            description: 'Technology solutions that enhance safety, independence, and convenience for older adults and individuals aging in place.',
-            interventions: [
-              { id: 'i214', name: 'Smart door locks', urgency: 'Non-Critical', condition: 'Active' },
-              { id: 'i215', name: 'Automatic pill dispensers', urgency: 'Non-Critical', condition: 'Active' },
-              { id: 'i216', name: 'Fall detection devices', urgency: 'Non-Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct36',
-            name: 'Comfort Enhancements',
-            description: 'Adjustments and tools that improve comfort and simplify daily living tasks, allowing for easier and more enjoyable aging in place.',
-            interventions: [
-              { id: 'i217', name: 'Ceiling fans', urgency: 'Non-Critical', condition: 'Active' },
-              { id: 'i218', name: 'Ergonomic furniture', urgency: 'Non-Critical', condition: 'Active' },
-              { id: 'i219', name: 'Automatic bed risers', urgency: 'Non-Critical', condition: 'Active' }
-            ]
-          },
-          {
-            id: 'sct37',
             name: 'Lighting Improvements',
-            description: 'Lighting enhancements designed to improve visibility and safety in non-critical situations, particularly for aging individuals.',
+            description: '',
             interventions: [
-              { id: 'i220', name: 'Motion-activated lights', urgency: 'Non-Critical', condition: 'Active' },
-              { id: 'i221', name: 'Task lighting', urgency: 'Non-Critical', condition: 'Active' },
-              { id: 'i222', name: 'Exterior walkway lighting', urgency: 'Non-Critical', condition: 'Active' }
+              { id: 'i219', name: 'Motion-activated lights', urgency: 'Non-Critical', condition: 'Active' },
+              { id: 'i220', name: 'Task lighting', urgency: 'Non-Critical', condition: 'Active' },
+              { id: 'i221', name: 'Exterior walkway lighting', urgency: 'Non-Critical', condition: 'Active' }
             ]
           }
         ]
@@ -577,44 +572,44 @@ const TAXONOMY_DATA: Pillar[] = [
         description: 'Focuses on active, emergent interventions that prepare homes for disasters or enhance security, ensuring residents safety and resilience during emergencies.',
         types: [
           {
-            id: 'sct38',
+            id: 'sct36',
             name: 'Utility Management',
-            description: 'Systems and interventions aimed at ensuring critical utilities remain operational during emergencies or failures. This includes the ability to control, isolate, and protect utility systems from damage or disruption.',
+            description: '',
             interventions: [
-              { id: 'i223', name: 'Automated shutoff systems', urgency: 'Emergent', condition: 'Passive' },
-              { id: 'i224', name: 'Backup generator/power', urgency: 'Emergent', condition: 'Passive' },
-              { id: 'i225', name: 'Surge protection', urgency: 'Emergent', condition: 'Passive' }
+              { id: 'i222', name: 'Automated shutoff systems', urgency: 'Emergent', condition: 'Passive' },
+              { id: 'i223', name: 'Backup generator / power', urgency: 'Emergent', condition: 'Passive' },
+              { id: 'i224', name: 'Surge protection', urgency: 'Emergent', condition: 'Passive' }
+            ]
+          },
+          {
+            id: 'sct37',
+            name: 'Structural Safeguarding',
+            description: '',
+            interventions: [
+              { id: 'i225', name: 'Hurricane straps / clips', urgency: 'Emergent', condition: 'Passive' },
+              { id: 'i226', name: 'Seismic retrofitting', urgency: 'Emergent', condition: 'Passive' },
+              { id: 'i227', name: 'Storm shutters', urgency: 'Emergent', condition: 'Passive' },
+              { id: 'i228', name: 'Floodproofing / barriers', urgency: 'Emergent', condition: 'Passive' }
+            ]
+          },
+          {
+            id: 'sct38',
+            name: 'Fire Safety',
+            description: '',
+            interventions: [
+              { id: 'i229', name: 'Smoke/CO2 alarms', urgency: 'Critical', condition: 'Passive' },
+              { id: 'i230', name: 'Fire extinguishers', urgency: 'Emergent', condition: 'Passive' },
+              { id: 'i231', name: 'Residential sprinkler system', urgency: 'Emergent', condition: 'Passive' }
             ]
           },
           {
             id: 'sct39',
-            name: 'Structural Safeguarding',
-            description: 'Measures to enhance the physical resilience of a structure against natural or human-induced hazards. These interventions include reinforcement and protection strategies designed to mitigate the effects of forces like earthquakes, floods, and storms.',
-            interventions: [
-              { id: 'i226', name: 'Hurricane straps/clips', urgency: 'Emergent', condition: 'Passive' },
-              { id: 'i227', name: 'Seismic retrofitting', urgency: 'Emergent', condition: 'Passive' },
-              { id: 'i228', name: 'Storm shutters', urgency: 'Emergent', condition: 'Passive' },
-              { id: 'i229', name: 'Floodproofing/barriers', urgency: 'Emergent', condition: 'Passive' }
-            ]
-          },
-          {
-            id: 'sct40',
-            name: 'Fire Safety',
-            description: 'Systems and devices implemented to detect, control, and prevent the outbreak or spread of fires. These include both preventive measures and active fire suppression systems designed to protect occupants and property.',
-            interventions: [
-              { id: 'i230', name: 'Smoke/CO2 alarms', urgency: 'Emergent', condition: 'Passive' },
-              { id: 'i231', name: 'Fire extinguishers', urgency: 'Emergent', condition: 'Passive' },
-              { id: 'i232', name: 'Residential sprinkler system', urgency: 'Emergent', condition: 'Passive' }
-            ]
-          },
-          {
-            id: 'sct41',
             name: 'Emergency Preparedness',
-            description: 'Precautionary measures and installations designed to prepare a home and its occupants for emergencies. These can include safe rooms, emergency communication systems, and other readiness strategies to protect lives during a crisis.',
+            description: '',
             interventions: [
-              { id: 'i233', name: 'Safe room construction', urgency: 'Emergent', condition: 'Passive' },
-              { id: 'i234', name: 'Home medical alert system', urgency: 'Emergent', condition: 'Passive' },
-              { id: 'i235', name: 'Emergency water storage', urgency: 'Emergent', condition: 'Passive' }
+              { id: 'i232', name: 'Safe room construction', urgency: 'Emergent', condition: 'Passive' },
+              { id: 'i233', name: 'Home medical alert system', urgency: 'Emergent', condition: 'Passive' },
+              { id: 'i234', name: 'Emergency water storage', urgency: 'Emergent', condition: 'Passive' }
             ]
           }
         ]
@@ -625,50 +620,50 @@ const TAXONOMY_DATA: Pillar[] = [
         description: 'Addresses passive, non-critical upgrades and maintenance aimed at improving energy efficiency, water conservation, and overall utility management, optimizing home performance without urgent risks.',
         types: [
           {
-            id: 'sct42',
+            id: 'sct40',
             name: 'Energy - Solar Energy Systems',
-            description: 'Installation and maintenance of systems that capture solar energy for home use, helping to reduce reliance on traditional energy sources and lower utility costs.',
+            description: '',
             interventions: [
-              { id: 'i236', name: 'Solar panel installation', urgency: 'Non-Critical', condition: 'Passive' },
-              { id: 'i237', name: 'Solar battery storage', urgency: 'Non-Critical', condition: 'Passive' }
+              { id: 'i235', name: 'Solar panels', urgency: 'Non-Critical', condition: 'Passive' },
+              { id: 'i236', name: 'Solar battery storage', urgency: 'Non-Critical', condition: 'Passive' }
+            ]
+          },
+          {
+            id: 'sct41',
+            name: 'Energy - Efficient Lighting',
+            description: '',
+            interventions: [
+              { id: 'i237', name: 'LED lighting', urgency: 'Non-Critical', condition: 'Passive' },
+              { id: 'i238', name: 'Smart lighting systems', urgency: 'Non-Critical', condition: 'Passive' }
+            ]
+          },
+          {
+            id: 'sct42',
+            name: 'Energy - Efficient HVAC/Water Heater',
+            description: '',
+            interventions: [
+              { id: 'i239', name: 'High-efficiency furnace', urgency: 'Non-Critical', condition: 'Passive' },
+              { id: 'i240', name: 'Geothermal heat pumps', urgency: 'Non-Critical', condition: 'Passive' },
+              { id: 'i241', name: 'Ductless mini-split systems', urgency: 'Non-Critical', condition: 'Passive' }
             ]
           },
           {
             id: 'sct43',
-            name: 'Energy - Efficient Lighting',
-            description: 'Upgrades and modifications to lighting systems that reduce energy consumption while maintaining or improving lighting quality.',
+            name: 'Water - Low-flow Fixtures',
+            description: '',
             interventions: [
-              { id: 'i238', name: 'LED lighting upgrades', urgency: 'Non-Critical', condition: 'Passive' },
-              { id: 'i239', name: 'Smart lighting systems', urgency: 'Non-Critical', condition: 'Passive' }
+              { id: 'i242', name: 'Low-flow showerheads', urgency: 'Non-Critical', condition: 'Passive' },
+              { id: 'i243', name: 'Dual-flush toilets', urgency: 'Non-Critical', condition: 'Passive' }
             ]
           },
           {
             id: 'sct44',
-            name: 'Energy - Efficient HVAC/Water Heater',
-            description: 'Upgrades or replacements to heating, ventilation, air conditioning, and water heating systems that enhance energy efficiency and optimize performance.',
-            interventions: [
-              { id: 'i240', name: 'High-efficiency furnace', urgency: 'Non-Critical', condition: 'Passive' },
-              { id: 'i241', name: 'Geothermal heat pumps', urgency: 'Non-Critical', condition: 'Passive' },
-              { id: 'i242', name: 'Ductless mini-split systems', urgency: 'Non-Critical', condition: 'Passive' }
-            ]
-          },
-          {
-            id: 'sct45',
-            name: 'Water - Low-flow Fixtures',
-            description: 'Installation of water-saving fixtures that reduce water usage while maintaining performance and comfort.',
-            interventions: [
-              { id: 'i243', name: 'Low-flow showerheads', urgency: 'Non-Critical', condition: 'Passive' },
-              { id: 'i244', name: 'Dual-flush toilets', urgency: 'Non-Critical', condition: 'Passive' }
-            ]
-          },
-          {
-            id: 'sct46',
             name: 'Weatherization - Insulation',
-            description: 'Adding or upgrading insulation in key areas of the home to improve energy efficiency and comfort by reducing heat loss or gain.',
+            description: '',
             interventions: [
-              { id: 'i245', name: 'Attic insulation', urgency: 'Non-Critical', condition: 'Passive' },
-              { id: 'i246', name: 'Spray foam insulation', urgency: 'Non-Critical', condition: 'Passive' },
-              { id: 'i247', name: 'Radiant barriers', urgency: 'Non-Critical', condition: 'Passive' }
+              { id: 'i244', name: 'Attic insulation', urgency: 'Non-Critical', condition: 'Passive' },
+              { id: 'i245', name: 'Spray foam insulation', urgency: 'Non-Critical', condition: 'Passive' },
+              { id: 'i246', name: 'Radiant barriers', urgency: 'Non-Critical', condition: 'Passive' }
             ]
           }
         ]
@@ -689,22 +684,22 @@ const TAXONOMY_DATA: Pillar[] = [
         description: 'Repairs and improvements to all community and nonprofit buildings that stabilize these buildings so that they may continue to serve the community.',
         types: [
           {
-            id: 'sct47',
+            id: 'sct45',
             name: 'Critical Building Systems Repairs',
-            description: 'Repairs focused on essential systems within community and nonprofit buildings that are vital for safe and functional operations. These include interventions that address urgent issues impacting habitability, safety, and compliance with minimum operational standards.',
+            description: '',
             interventions: [
-              { id: 'i248', name: 'Repair faulty community HVAC', urgency: 'N/A', condition: 'N/A' },
-              { id: 'i249', name: 'Fix leaking plumbing systems', urgency: 'N/A', condition: 'N/A' },
-              { id: 'i250', name: 'Address critical roof leaks', urgency: 'N/A', condition: 'N/A' }
+              { id: 'i247', name: 'HVAC - Community', urgency: 'N/A', condition: 'N/A' },
+              { id: 'i248', name: 'Plumbing - Community', urgency: 'N/A', condition: 'N/A' },
+              { id: 'i249', name: 'Roofing - Community', urgency: 'N/A', condition: 'N/A' }
             ]
           },
           {
-            id: 'sct48',
+            id: 'sct46',
             name: 'Non-Critical Building Improvements',
-            description: 'Non-essential improvements that enhance the usability, comfort, or aesthetics of community and nonprofit spaces but are not essential for safety or functionality.',
+            description: '',
             interventions: [
-              { id: 'i251', name: 'Repaint community rooms', urgency: 'N/A', condition: 'N/A' },
-              { id: 'i252', name: 'Replace worn flooring', urgency: 'N/A', condition: 'N/A' }
+              { id: 'i250', name: 'Painting - Community', urgency: 'N/A', condition: 'N/A' },
+              { id: 'i251', name: 'Flooring - Community', urgency: 'N/A', condition: 'N/A' }
             ]
           }
         ]
@@ -715,13 +710,13 @@ const TAXONOMY_DATA: Pillar[] = [
         description: 'Repairs and improvements to all community and nonprofit buildings that decrease utility consumption and/or increase climate resilience.',
         types: [
           {
-            id: 'sct49',
+            id: 'sct47',
             name: 'Community Energy Projects',
-            description: 'Initiatives focused on improving energy efficiency, reducing energy consumption, and enhancing sustainability within community and nonprofit buildings. These projects aim to lower operational costs and contribute to environmental stewardship.',
+            description: '',
             interventions: [
-              { id: 'i253', name: 'Install LED lighting upgrades', urgency: 'N/A', condition: 'N/A' },
-              { id: 'i254', name: 'Add community solar panels', urgency: 'N/A', condition: 'N/A' },
-              { id: 'i255', name: 'Programmable thermostats', urgency: 'N/A', condition: 'N/A' }
+              { id: 'i252', name: 'Install LED lighting upgrades', urgency: 'N/A', condition: 'N/A' },
+              { id: 'i253', name: 'Community solar panels', urgency: 'N/A', condition: 'N/A' },
+              { id: 'i254', name: 'Programmable thermostats', urgency: 'N/A', condition: 'N/A' }
             ]
           }
         ]
@@ -732,23 +727,23 @@ const TAXONOMY_DATA: Pillar[] = [
         description: 'Non-building repairs and improvements that improve community space conditions.',
         types: [
           {
-            id: 'sct50',
+            id: 'sct48',
             name: 'Community Accessibility Improvements',
-            description: 'Modifications and upgrades that improve the accessibility of public spaces and community buildings, ensuring inclusivity for individuals with disabilities and mobility challenges.',
+            description: '',
             interventions: [
-              { id: 'i256', name: 'Install wheelchair ramps', urgency: 'N/A', condition: 'N/A' },
-              { id: 'i257', name: 'Add accessible restrooms', urgency: 'N/A', condition: 'N/A' },
-              { id: 'i258', name: 'Improve curb cuts', urgency: 'N/A', condition: 'N/A' }
+              { id: 'i255', name: 'Wheelchair ramps - Community', urgency: 'N/A', condition: 'N/A' },
+              { id: 'i256', name: 'Accessible restrooms - Community', urgency: 'N/A', condition: 'N/A' },
+              { id: 'i257', name: 'Curb cuts - Community', urgency: 'N/A', condition: 'N/A' }
             ]
           },
           {
-            id: 'sct51',
+            id: 'sct49',
             name: 'Non-critical Community Space Improvements',
-            description: 'Enhancements to public and community spaces that improve aesthetics, usability, and overall community well-being but are not essential for safety or accessibility.',
+            description: '',
             interventions: [
-              { id: 'i259', name: 'Add decorative landscaping', urgency: 'N/A', condition: 'N/A' },
-              { id: 'i260', name: 'Install public art/murals', urgency: 'N/A', condition: 'N/A' },
-              { id: 'i261', name: 'Upgrade community gardens', urgency: 'N/A', condition: 'N/A' }
+              { id: 'i258', name: 'Landscaping - Community', urgency: 'N/A', condition: 'N/A' },
+              { id: 'i259', name: 'Public art/murals', urgency: 'N/A', condition: 'N/A' },
+              { id: 'i260', name: 'Community gardens', urgency: 'N/A', condition: 'N/A' }
             ]
           }
         ]
@@ -1159,6 +1154,8 @@ interface SidebarProps {
   onToggleDefinitions: () => void;
   showCriticalOnly: boolean;
   onToggleCriticalOnly: () => void;
+  activeFeature: string | null;
+  onFeatureChange: (feature: string | null) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ 
@@ -1175,7 +1172,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   showDefinitions, 
   onToggleDefinitions,
   showCriticalOnly,
-  onToggleCriticalOnly
+  onToggleCriticalOnly,
+  activeFeature,
+  onFeatureChange
 }) => {
   const stats = useMemo(() => {
     let eligible = 0, notEligible = 0, conditional = 0, na = 0;
@@ -1266,7 +1265,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             </div>
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-1 mb-6">
           <button 
             onClick={() => {
               onPillarChange('all');
@@ -1330,6 +1329,38 @@ const Sidebar: React.FC<SidebarProps> = ({
              );
           })}
         </div>
+
+        {/* Feature Sets Panel */}
+        <div className="px-3 mb-4">
+          <h4 className="text-xs font-semibold text-[#88888D] uppercase mb-2 flex items-center gap-2">
+            <Tag size={12} /> Feature Sets
+          </h4>
+          <div className="space-y-1">
+            {FEATURE_CATEGORIES.map(feature => {
+              const isActive = activeFeature === feature.id;
+              return (
+                <button
+                  key={feature.id}
+                  onClick={() => onFeatureChange(isActive ? null : feature.id)}
+                  className={`w-full text-left px-3 py-2 rounded text-xs flex items-center justify-between group transition-all ${
+                    isActive 
+                      ? 'bg-slate-100 font-bold text-black ring-1 ring-slate-200' 
+                      : 'text-[#88888D] hover:bg-slate-50 hover:text-black'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className={`flex items-center justify-center w-5 h-5 rounded-full ${feature.color} text-[9px] font-bold text-white shadow-sm`}>
+                      {feature.short}
+                    </div>
+                    <span>{feature.label}</span>
+                  </div>
+                  {isActive && <CheckCircle size={12} className="text-black" />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
       </div>
 
       <div className="p-4 bg-slate-50 border-t border-slate-200">
@@ -2026,6 +2057,7 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
   const [activeSubCat, setActiveSubCat] = useState("all");
   const [activeType, setActiveType] = useState("all");
   const [activeStatusFilter, setActiveStatusFilter] = useState<string | null>(null);
+  const [activeFeature, setActiveFeature] = useState<string | null>(null);
   const [showDefinitions, setShowDefinitions] = useState(true);
   const [showCriticalOnly, setShowCriticalOnly] = useState(false);
 
@@ -2065,8 +2097,14 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
               const currentUrgency = selections[i.id]?.urgency || i.urgency;
               criticalMatch = currentUrgency === 'Critical';
             }
+
+            // Feature filter (Placeholder logic for now as data isn't tagged yet)
+            let featureMatch = true;
+            if (activeFeature) {
+               featureMatch = i.features?.includes(activeFeature) || false;
+            }
             
-            return textMatch && statusMatch && criticalMatch;
+            return textMatch && statusMatch && criticalMatch && featureMatch;
           })
         })).filter(t => {
            // Type filter logic
@@ -2081,7 +2119,7 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
           return subCatMatch && hasTypes;
       })
     })).filter(p => p.subCategories.length > 0);
-  }, [searchTerm, activePillar, activeSubCat, activeType, activeStatusFilter, selections, showCriticalOnly]);
+  }, [searchTerm, activePillar, activeSubCat, activeType, activeStatusFilter, selections, showCriticalOnly, activeFeature]);
 
   return (
     <div className="flex h-screen bg-slate-50">
@@ -2100,6 +2138,8 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
         onToggleDefinitions={() => setShowDefinitions(!showDefinitions)}
         showCriticalOnly={showCriticalOnly}
         onToggleCriticalOnly={() => setShowCriticalOnly(!showCriticalOnly)}
+        activeFeature={activeFeature}
+        onFeatureChange={setActiveFeature}
       />
 
       {/* Main Content */}
@@ -2119,14 +2159,24 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
             </div>
             <div className="flex items-center justify-between mt-2">
               <Breadcrumbs activePillar={activePillar} activeSubCat={activeSubCat} activeType={activeType} />
-              {activeStatusFilter && (
-                <button 
-                  onClick={() => setActiveStatusFilter(null)}
-                  className="text-xs font-medium text-[#E55025] hover:text-[#A4343A] flex items-center gap-1"
-                >
-                  <XCircle size={12} /> Clear "{activeStatusFilter === 'unselected' ? 'Unselected' : activeStatusFilter}" filter
-                </button>
-              )}
+              <div className="flex gap-2">
+                {activeFeature && (
+                    <button 
+                    onClick={() => setActiveFeature(null)}
+                    className="text-xs font-medium text-purple-600 hover:text-purple-800 flex items-center gap-1"
+                    >
+                    <XCircle size={12} /> Clear "{FEATURE_CATEGORIES.find(f => f.id === activeFeature)?.label}"
+                    </button>
+                )}
+                {activeStatusFilter && (
+                    <button 
+                    onClick={() => setActiveStatusFilter(null)}
+                    className="text-xs font-medium text-[#E55025] hover:text-[#A4343A] flex items-center gap-1"
+                    >
+                    <XCircle size={12} /> Clear "{activeStatusFilter === 'unselected' ? 'Unselected' : activeStatusFilter}"
+                    </button>
+                )}
+              </div>
             </div>
             </div>
 
@@ -2238,7 +2288,7 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
                                                     {type.interventions.map(int => {
                                                         const sel = selections[int.id] || {};
                                                         return (
-                                                        <div key={int.id} className={`border-l-4 ${pillar.color.replace('text', 'border')} border-y border-r rounded-r-lg p-4 transition-all flex flex-col justify-between h-full group/card ${sel.status ? 'border-slate-300 bg-white shadow-sm' : 'border-slate-200 bg-slate-50/30 hover:bg-white hover:shadow-md'}`}>
+                                                        <div key={int.id} className={`border-l-4 ${pillar.color.replace('text', 'border')} border-y border-r rounded-r-lg p-4 transition-all flex flex-col justify-between min-h-[1.5rem] h-full group/card ${sel.status ? 'border-slate-300 bg-white shadow-sm' : 'border-slate-200 bg-slate-50/30 hover:bg-white hover:shadow-md'}`}>
                                                             <div className="flex flex-col gap-2 mb-3">
                                                                 <div className="flex justify-between items-start">
                                                                     <h5 className={`font-medium ${pillar.color} text-sm leading-tight pr-2`}>{int.name}</h5>
@@ -2270,43 +2320,58 @@ const CatalogView: React.FC<CatalogViewProps> = ({ selections, onUpdateSelection
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            
-                                                            {/* Action Buttons */}
-                                                            <div className="flex gap-2 mt-auto pt-3 border-t border-slate-100">
-                                                                <button 
-                                                                    onClick={() => onUpdateSelection(int.id, { ...sel, status: sel.status === 'eligible' ? undefined : 'eligible' })}
-                                                                    className={`flex-1 text-xs py-1.5 rounded border transition-colors ${sel.status === 'eligible' ? 'bg-[#3AA047] text-white border-[#3AA047] font-bold' : 'border-slate-200 text-[#88888D] hover:bg-[#3AA047]/10 hover:text-[#3AA047] hover:border-[#3AA047]/30'}`}
-                                                                >
-                                                                    Eligible
-                                                                </button>
-                                                                <button 
-                                                                    onClick={() => onUpdateSelection(int.id, { ...sel, status: sel.status === 'not_eligible' ? undefined : 'not_eligible' })}
-                                                                    className={`flex-1 text-xs py-1.5 rounded border transition-colors ${sel.status === 'not_eligible' ? 'bg-[#A4343A] text-white border-[#A4343A] font-bold' : 'border-slate-200 text-[#88888D] hover:bg-[#A4343A]/10 hover:text-[#A4343A] hover:border-[#A4343A]/30'}`}
-                                                                >
-                                                                    No
-                                                                </button>
-                                                                <button 
-                                                                    onClick={() => onUpdateSelection(int.id, { ...sel, status: sel.status === 'conditional' ? undefined : 'conditional' })}
-                                                                    className={`flex-1 text-xs py-1.5 rounded border transition-colors ${sel.status === 'conditional' ? 'bg-[#FFD100] text-black border-[#FFD100] font-bold' : 'border-slate-200 text-[#88888D] hover:bg-[#FFD100]/20 hover:text-[#E55025] hover:border-[#FFD100]/50'}`}
-                                                                >
-                                                                    If/When
-                                                                </button>
-                                                                <button 
-                                                                    onClick={() => onUpdateSelection(int.id, { ...sel, status: sel.status === 'na' ? undefined : 'na' })}
-                                                                    className={`flex-1 text-xs py-1.5 rounded border transition-colors ${sel.status === 'na' ? 'bg-[#88888D] text-white border-[#88888D] font-bold' : 'border-slate-200 text-[#88888D] hover:bg-slate-100 hover:text-black'}`}
-                                                                >
-                                                                    N/A
-                                                                </button>
+
+                                                            <div className="mt-auto">
+                                                                {/* Action Buttons */}
+                                                                <div className="flex gap-2 pt-3 border-t border-slate-100">
+                                                                    <button 
+                                                                        onClick={() => onUpdateSelection(int.id, { ...sel, status: sel.status === 'eligible' ? undefined : 'eligible' })}
+                                                                        className={`flex-1 text-xs py-1.5 rounded border transition-colors ${sel.status === 'eligible' ? 'bg-[#3AA047] text-white border-[#3AA047] font-bold' : 'border-slate-200 text-[#88888D] hover:bg-[#3AA047]/10 hover:text-[#3AA047] hover:border-[#3AA047]/30'}`}
+                                                                    >
+                                                                        Eligible
+                                                                    </button>
+                                                                    <button 
+                                                                        onClick={() => onUpdateSelection(int.id, { ...sel, status: sel.status === 'not_eligible' ? undefined : 'not_eligible' })}
+                                                                        className={`flex-1 text-xs py-1.5 rounded border transition-colors ${sel.status === 'not_eligible' ? 'bg-[#A4343A] text-white border-[#A4343A] font-bold' : 'border-slate-200 text-[#88888D] hover:bg-[#A4343A]/10 hover:text-[#A4343A] hover:border-[#A4343A]/30'}`}
+                                                                    >
+                                                                        No
+                                                                    </button>
+                                                                    <button 
+                                                                        onClick={() => onUpdateSelection(int.id, { ...sel, status: sel.status === 'conditional' ? undefined : 'conditional' })}
+                                                                        className={`flex-1 text-xs py-1.5 rounded border transition-colors ${sel.status === 'conditional' ? 'bg-[#FFD100] text-black border-[#FFD100] font-bold' : 'border-slate-200 text-[#88888D] hover:bg-[#FFD100]/20 hover:text-[#E55025] hover:border-[#FFD100]/50'}`}
+                                                                    >
+                                                                        If/When
+                                                                    </button>
+                                                                    <button 
+                                                                        onClick={() => onUpdateSelection(int.id, { ...sel, status: sel.status === 'na' ? undefined : 'na' })}
+                                                                        className={`flex-1 text-xs py-1.5 rounded border transition-colors ${sel.status === 'na' ? 'bg-[#88888D] text-white border-[#88888D] font-bold' : 'border-slate-200 text-[#88888D] hover:bg-slate-100 hover:text-black'}`}
+                                                                    >
+                                                                        N/A
+                                                                    </button>
+                                                                </div>
+                                                                {sel.status && (
+                                                                <input 
+                                                                    type="text"
+                                                                    placeholder="Add notes..."
+                                                                    className="w-full mt-2 text-xs border border-slate-200 rounded px-2 py-1 focus:ring-1 focus:ring-[#0099CC] focus:border-[#0099CC] transition-shadow"
+                                                                    value={sel.notes || ''}
+                                                                    onChange={(e) => onUpdateSelection(int.id, { ...sel, notes: e.target.value })}
+                                                                />
+                                                                )}
+
+                                                                {/* Feature Icons Row - Moved to Bottom */}
+                                                                <div className="flex gap-1 mt-2 items-center min-h-[1.5rem]">
+                                                                  {int.features?.map(fId => {
+                                                                     const cat = FEATURE_CATEGORIES.find(c => c.id === fId);
+                                                                     if (!cat) return null;
+                                                                     return (
+                                                                       <div key={fId} className={`flex items-center justify-center w-6 h-6 rounded-full ${cat.color} text-[10px] font-bold text-white shadow-sm`} title={cat.label}>
+                                                                         {cat.short}
+                                                                       </div>
+                                                                     );
+                                                                  })}
+                                                                </div>
                                                             </div>
-                                                            {sel.status && (
-                                                            <input 
-                                                                type="text"
-                                                                placeholder="Add notes..."
-                                                                className="w-full mt-2 text-xs border border-slate-200 rounded px-2 py-1 focus:ring-1 focus:ring-[#0099CC] focus:border-[#0099CC] transition-shadow"
-                                                                value={sel.notes || ''}
-                                                                onChange={(e) => onUpdateSelection(int.id, { ...sel, notes: e.target.value })}
-                                                            />
-                                                            )}
                                                         </div>
                                                         );
                                                     })}
