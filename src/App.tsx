@@ -28,9 +28,7 @@ import {
   Circle,
   Settings,
   Copy,
-  Tag,
-  Star,
-  Wrench
+  Tag
 } from 'lucide-react';
 
 // --- Types & Interfaces ---
